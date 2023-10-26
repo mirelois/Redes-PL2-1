@@ -36,6 +36,8 @@ Java
    * | ; | |; | |; | —
  * Nº *hops* lógicos
    * Última métrica, pouco relevante, desempate
+ * O que é que cada nó guarda?
+   * As métricas comulativas de todos os nós mais para cima (decidir o caminho é mais complicado mais em baixo)
 
 ### Funcionalidades
 
@@ -46,11 +48,13 @@ Java
    * pergunta-se ao *bootstrapper* quais é que são os vizinhos do novo nó
    * o *bootstrapper* sabe à partida quais são os vizinhos, hard-coded
  * RUNTIME: Vizinhos (folhas)
- * RUNTIME: ()
+   * Simples, apenas se pergunta o caminho da stream e esta folha entende quais estão ligados ao RP
+ * RUNTIME: ???? (nós intermédios)
+   * Complicado, pode ser um novo ponto de acesso ao RP que tem de propagar para as folhas da árvore
  
 #### Remoção de Nodos
  * O RP NUNCA morre, não se faz eleição de líder
-   * ...unless...
+   * ...unless... (última das últimas coisas)
  * Graciosa
    * Pedir saída (IGMPv2, Leave Group)
  * Não-Graciosa
@@ -62,5 +66,11 @@ Java
 #### Criação da Árvore de Distribuição
  * Para cada pedido de acesso à Stream, deve-se criar uma rapidamente
  * Ativamente, durante o processo de Stream 
+ * O que é que cada nó guarda?
+   * Um único caminho para os acessos ao RP
 
 #### Recuperação de Perda
+
+### Extras
+ * Vídeos visualmente distintos para facilitar a apresentação
+   * escrever a letra A, B, C no paint para o vídeo A, B, C...
