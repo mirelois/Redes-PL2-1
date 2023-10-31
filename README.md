@@ -30,7 +30,7 @@
 
 #### Linguagem
 
-Java
+~~Java~~ Python
 
 #### Métricas
  * Foco: como é uma *stream* de multimedia, throughput é a métrica rainha, seguida da latência
