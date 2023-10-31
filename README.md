@@ -5,6 +5,7 @@
 #### Protocolo
 
  * UDP?
+   * RTP?? já usa UDP, podemos inspirarmo-nos
  * Se virmos que faz sentido TUDO do TCP mais vale trocar de protocolo em certas alturas (reduz carga aplicacional)
  * OSPF para hellos?
 
