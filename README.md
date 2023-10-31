@@ -13,16 +13,18 @@
      * loss 
      * não vamos esperar pelos anteriores? podemos definir uma **margem de *display*** parte da latência total
        * *buffer* do packet 2 enquanto espera pelo 1 MAS até ao limite da latência
-   * Timestamp - instante de sample do primeiro byte
+   * **Timestamp** - instante de sample do primeiro byte
      * Útil para calcular diferença para a latência
      * Se der para deduzir do *Sequence #* kinda inútil
-   * SSRC - Identifica a fonte da RTP Stream
+       * Os packets podem ter tamanho diferente uns dos outros dependendo da bitrate (DASH*)
+   * **SSRC** - Identifica a fonte da RTP Stream
      * Lixo
  * RTCP, TCP para Real-Time
    * Enviado por todos os participantes de um RTP, ao invés de apenas o Servidor, para todos os outros participantes (*flood* para informar o estado da rede)
    * Normalmente usa multicast addressing
    * Para distinguir RTP e RTCP usa-se diferentes port numbers para cada um
    * Para limitar o tráfego, quantos mais utilizadores há menos mensagens RTCP se envia
+   * Limitar o tamanho dos envios de Controlo para 5% da largura de banda total para o RTP mesmo, 75% receivers e 25% senders
  * Se virmos que faz sentido TUDO do TCP mais vale trocar de protocolo em certas alturas (reduz carga aplicacional)
  * OSPF para hellos (manter os nós vivos na rede)
 
