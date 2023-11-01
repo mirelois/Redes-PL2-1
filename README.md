@@ -32,7 +32,7 @@
 
 #### Linguagem
 
-~~Java~~ Python
+~~Java~~ ~~Python~~ Java
 
 #### Métricas
  * Foco: como é uma *stream* de multimedia, throughput é a métrica rainha, seguida da latência
@@ -103,10 +103,17 @@
  * ARRANQUE: *Bootstrapper*
    * pergunta-se ao *bootstrapper* quais é que são os vizinhos do novo nó
    * o *bootstrapper* sabe à partida quais são os vizinhos, hard-coded
+ * RUNTIME: Protocolo **NAP** (Node Addition Protocol)
  * RUNTIME: Vizinhos (folhas)
    * Simples, apenas se pergunta o caminho da stream e esta folha entende quais estão ligados ao RP
- * RUNTIME: ???? (nós intermédios)
+ * RUNTIME: Vizinhos, downstream também (nós intermédios, >=2 ligações)
    * Complicado, pode ser um novo ponto de acesso ao RP que tem de propagar para as folhas da árvore
+   * Identificar o seu tipo (Middle ou End-Node)
+   * Propagar pelos vizinhos uma pergunta semelhante à inicial, mas com a capacidade de fazer para trás para os clientes
+     * Encontrar uma **árvore**, **cliente** e/ou **RP** indica que vai fazer parte da árvore de todos esses clientes 
+     * Tem de ser sempre propagado, tal como no iniciar
+     * Marcar cada um dos adjacentes como *downstream* ou *upstream*
+     * **Árvore** implica conexão com **RP** e com todos os **Clientes** nele ligados (qualquer outro também seria árvore de)
  
 #### Remoção de Nodos
  * O RP NUNCA morre, não se faz eleição de líder
