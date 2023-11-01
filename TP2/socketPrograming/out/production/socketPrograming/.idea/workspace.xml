@@ -47,7 +47,7 @@
     <configuration name="Server" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Server" />
       <module name="socketPrograming" />
-      <option name="PROGRAM_PARAMETERS" value="localhost localhost" />
+      <option name="PROGRAM_PARAMETERS" value="localhost" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

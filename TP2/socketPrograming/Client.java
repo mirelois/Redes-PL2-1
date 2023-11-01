@@ -11,7 +11,7 @@ public class Client {
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-        DatagramSocket socket = new DatagramSocket();
+        DatagramSocket socket = new DatagramSocket(6969);
 
         InetAddress ip = InetAddress.getByName(args[0]);
 
@@ -20,6 +20,6 @@ public class Client {
         socket.receive(datagramPacket);
 
         Packet packet = new Packet(datagramPacket.getData(), datagramPacket.getLength());
-        System.out.println(new String(packet.getHeader()));
+        packet.printheader();
     }
 }

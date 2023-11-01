@@ -18,7 +18,7 @@ public class Packet {
 
         this.payload_size = payload_size;
 
-        this.header = new byte[payload_size];
+        this.header = new byte[HEADER_SIZE];
 
         this.header[0] = (byte) (sequence_number >> 8 /* & 0xFF */);
         this.header[1] = (byte) (sequence_number /* & 0xFF */);
@@ -100,7 +100,7 @@ public class Packet {
 
     public byte[] getPacket() {
 
-        byte[] packet = new byte[HEADER_SIZE];
+        byte[] packet = new byte[HEADER_SIZE+payload_size];
 
         for (int i = 0; i < HEADER_SIZE; i++) {
             packet[i] = this.header[i];
