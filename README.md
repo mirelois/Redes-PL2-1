@@ -83,7 +83,7 @@
      * Pode desperdiçar muita rede por tomar caminhos menos úteis
      * Pode ser conjugado com conhecimento para baixo em cada um dos nodos, tornando-os responsáveis por conhecer os melhores caminhos
      * Poupa as mensagens a ser enviadas, para não serem inúteis ao longo do caminho e não sobrecarregarem o RP
-     * Cada *router* pode saber o seu **best throughput** ao longo do seu ramo e apenas informar isso com "RTCP"
+     * Cada *router* pode saber o seu **best throughput/latência/jitter/loss** ao longo do seu ramo e apenas informar isso com "RTCP"
 
 #### Decisão entre Servidores
  * Relevante quando mais que um Servidor têm o mesmo conteúdo
