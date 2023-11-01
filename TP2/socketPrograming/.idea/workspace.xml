@@ -44,6 +44,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="FullDuplex1" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="fullDuplex" />
+      <module name="socketPrograming" />
+      <option name="PROGRAM_PARAMETERS" value="3300" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FullDuplex2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="fullDuplex" />
+      <module name="socketPrograming" />
+      <option name="PROGRAM_PARAMETERS" value="6675" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Server" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Server" />
       <module name="socketPrograming" />
@@ -53,11 +69,13 @@
       </method>
     </configuration>
     <configuration name="Running Like Sonic" type="CompoundRunConfigurationType">
-      <toRun name="Client" type="Application" />
-      <toRun name="Server" type="Application" />
+      <toRun name="FullDuplex1" type="Application" />
+      <toRun name="FullDuplex2" type="Application" />
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Application.FullDuplex1" />
+      <item itemvalue="Application.FullDuplex2" />
       <item itemvalue="Application.Client" />
       <item itemvalue="Application.Server" />
       <item itemvalue="Compound.Running Like Sonic" />

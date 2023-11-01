@@ -6,8 +6,9 @@ import java.net.InetAddress;
 
 public class Client {
     public static void main(String[] args) throws Exception{
-        if(args.length != 1)
+        if(args.length != 1) {
             System.out.println("1 argumentos");
+        }
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
