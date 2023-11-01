@@ -15,8 +15,6 @@ public class fullDuplex {
 
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 
-        byte[] receiveBuffer = new byte[1024];
-
         Thread sender;
         try (DatagramSocket socket = new DatagramSocket(Integer.parseInt(args[0]))){
             sender = new Thread(() -> {
