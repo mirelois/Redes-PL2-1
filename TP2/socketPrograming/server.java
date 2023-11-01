@@ -1,6 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.util.Scanner;
 
 /**
@@ -10,7 +11,7 @@ public class Server {
 
     static DatagramPacket datagram;
     static DatagramSocket socket;
-    static int port = 3000;
+    static int port = 7000;
     static InetAddress address;
 
 
@@ -27,7 +28,8 @@ public class Server {
 
             Packet packet = new Packet(0, 0, msg.getBytes(), msg.length());
 
-            datagram = new DatagramPacket(packet.getPacket(), packet.getPacketLength());
+
+            datagram = new DatagramPacket(packet.getPacket(), packet.getPacketLength(), InetAddress.getByName(args[1]), 6969);
 
             socket.send(datagram);
 
