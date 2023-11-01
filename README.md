@@ -7,7 +7,7 @@
  * UDP?
  * RTP?? já usa UDP, podemos inspirarmo-nos
    * **Payload type** - tipo de ficheiro (inútil, vai ser sempre mpeg)
-     * Lixo
+     * Lixo, se apenas houver um tipo de *encoding*
    * **Sequence #** - detetar sequência/perda de packets 
      * necessário, não vamos dar display a frames anteriores do vídeo 
      * loss 
@@ -26,7 +26,9 @@
    * Para limitar o tráfego, quantos mais utilizadores há menos mensagens RTCP se envia
    * Limitar o tamanho dos envios de Controlo para 5% da largura de banda total para o RTP mesmo, 75% receivers e 25% senders
  * Se virmos que faz sentido TUDO do TCP mais vale trocar de protocolo em certas alturas (reduz carga aplicacional)
- * OSPF para hellos (manter os nós vivos na rede)
+  
+ * **INP**, Idle-Node Protocol
+   * OSPF-like para hellos (manter os nós vivos na rede)
 
 #### Linguagem
 
@@ -61,8 +63,38 @@
 
 ### Funcionalidades
 
+#### Nodo pede Stream
+ * Nodo sobe a árvore de transferência por algum nodo que já esteja fazer *stream* daquele ficheiro
+ * Se nenhum se encontrar a transferir o ficheiro, chega até ao RP
+ * Um Protocolo auxiliar para pedir ligação
+   * Este pedido pode ser por *flood* aos vizinhos ou pode ser especial pelos melhores caminhos
+   * Nunca se sabe como está o estado superior, um pior caminho próximo pode ser seguido pelo melhor de cima: *flood*
+
+#### RP pede ao Servidor o conteúdo
+ * Terá de ter um Protocolo específico, o mais leve possível
+ * Um Request content e um Stop content que o RP controla sempre para escolher entre Servidores
+
+#### RP envia stream para o Cliente
+ * O RP conhece a árvore inteira, mas não necessariamente o estado inteiro dos caminhos.
+   * *Full Centralized*: Se o RP conhecer a árvore inteira pode fazer Djikstra a cada intervalo de tempo
+     * Pode maximizar o uso das larguras de rede & trocar qual o Servidor que serve com esses dados
+     * Tem muito mais *overhead*: todos as informações sobre a rede têm de chegar ao RP
+   * *Step-by-Step*: cada nó toma a decisão por onde enviar os pacotes em cada passo, o RP não sabe de nada
+     * Pode desperdiçar muita rede por tomar caminhos menos úteis
+     * Pode ser conjugado com conhecimento para baixo em cada um dos nodos, tornando-os responsáveis por conhecer os melhores caminhos
+       * Muita troca de mensagens, tende para o Full Centralized
+
+#### Decisão entre Servidores
+ * Relevante quando mais que um Servidor têm o mesmo conteúdo
+ * O enunciado sugere marcar uma métrica para cada um dos Servidores
+   * Pode ser um valor de desempate, onde o RP guarda dinamicamente qual o melhor Servidor a usar para cada momento
+   * Pode ser uma métrica junto de cada ficheiro em vez do Servidor, onde um Servidor pode ter um ficheiro maior e não outro
+
 #### Adição de Servidores
- * waaaaaat?
+ * O RP precisa de conseguir receber informação sobre o novo servidor adicionado
+   * Quais os vídeos neles guardados
+   * Quais as métricas? definidas
+ * O RP precisa de saber o caminho até ao servidor
 
 #### Adição de Nodos
  * Árvore hard-coded
@@ -93,7 +125,8 @@
    * Um único caminho para os acessos ao RP
 
 #### Recuperação de Perda
-
+ * Baseado na diferença entre as frames, fazer uma interpolação?
+  
 ### Extras
  * Vídeos visualmente distintos para facilitar a apresentação
    * escrever a letra A, B, C no paint para o vídeo A, B, C...
