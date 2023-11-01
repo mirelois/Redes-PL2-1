@@ -26,7 +26,7 @@ public class Server {
             Scanner scanner = new Scanner(System.in);
             String msg = scanner.nextLine();
 
-            Packet packet = new Packet(0, 0, msg.getBytes(), msg.length());
+            Packet packet = new Packet(1, 1, msg.getBytes(), msg.length());
 
 
             datagram = new DatagramPacket(packet.getPacket(), packet.getPacketLength(), InetAddress.getByName(args[1]), 6969);
