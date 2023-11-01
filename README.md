@@ -6,7 +6,29 @@
 
 #### Existentes
 
- * UDP?
+ * UDP
+   * Simplesmente usado na camada de transporte, faz o que tem de fazer
+ * TCP
+   * **Sequence #**
+     * Depende se o pacote é um *SYN* ou se é o resto da sequência
+     * Se o *SYN* estiver a 1, então é o número inicial da sessão
+     * Se o *SYN* estiver a 0, então é o número acumulado desde o primeiro byte
+   * **Ack #**
+     * *ACK* a 1 -> valor que a *source* está à espera de receber de seguida
+     * Seguido de um *SYN* Será o Sequence # do *SYN* anterior mais 1
+   * **Data Offset**
+     * Tamanho do TCP Packet em 32-bit words, que também o offset até ao packet
+   * **Flags**
+     * **CWR** - Congestion Window Reduced, respondeu com Congestion Control Mechanism em resposta a um **ECE** a 1
+     * **ECE** - ECN-Echo (dá Echo do IP), dual role
+       * *SYN* 1 -> TCP peer is **ECN** capable
+       * *SYN* 0 -> Recebeu-se **ECN** no *IP*, o que indica network congestion
+     * **URG** - Urgent Pointer Field é significativo
+     * **ACK** - O campo Ack # é significante
+     * **PSH** - Pede para fazer push à data no buffer para a aplicação
+     * **RST** - Reset Connection
+     * **SYN** - Apenas o primeiro packet de cada lado da conexão deve ter esta flag
+     * **FIN** - Último packet do sender
  * RTP?? já usa UDP, podemos inspirarmo-nos
    * **Payload type** - tipo de ficheiro (inútil, vai ser sempre mpeg)
      * Lixo, se apenas houver um tipo de *encoding*
