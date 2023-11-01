@@ -82,7 +82,8 @@
    * *Step-by-Step*: cada nó toma a decisão por onde enviar os pacotes em cada passo, o RP não sabe de nada
      * Pode desperdiçar muita rede por tomar caminhos menos úteis
      * Pode ser conjugado com conhecimento para baixo em cada um dos nodos, tornando-os responsáveis por conhecer os melhores caminhos
-       * Muita troca de mensagens, tende para o Full Centralized
+     * Poupa as mensagens a ser enviadas, para não serem inúteis ao longo do caminho e não sobrecarregarem o RP
+     * Cada *router* pode saber o seu **best throughput** ao longo do seu ramo e apenas informar isso com "RTCP"
 
 #### Decisão entre Servidores
  * Relevante quando mais que um Servidor têm o mesmo conteúdo
