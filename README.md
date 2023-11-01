@@ -15,7 +15,12 @@
      * Se o *SYN* estiver a 0, então é o número acumulado desde o primeiro byte
      * Serve para conseguir *Reliable transmission* - Retransmission
        * Retransmission Ambiguity quando um *ACK* é recebido depois de uma retransmissão (qual??)
-       * **Dupack-based retransmission**
+       * **Dupack-based retransmission** - Os *ACK* dos pacotes guardam até ao pacote mais recente recebido
+         * Quando um pacote for falhado 3x (não está presente em 3 *ACKs*) ele é retransmitido
+         * Parece útil quando é necessária fidelidade completa (muito demorada)
+       * **Timeout-based retransmission** - Depois de certo tempo, um segmento é retransimitido
+         * Esse tempo repete, com *exponential backoff*, até ao *ACK* desse segmento
+         * O tempo baseia-se no **RTT** que tem de ser bem calculado (muitos problemas de estimativa)
    * **Ack #**
      * *ACK* a 1 -> valor que a *source* está à espera de receber de seguida
      * Seguido de um *SYN* Será o Sequence # do *SYN* anterior mais 1
@@ -117,6 +122,9 @@
    * Implicava **margem de *display*** maior que algumas vezes o **RTT**
  * Seria parecido com **TCP**, mas sem ter em conta Triple-*ACK* (ou os *RTT* seriam demasiados)
    * Enviar *ACK* dos pacotes até então recebidos
+   * Se um pacote não for *ACK-ed* então é retransmitido por *Timeout*
+     * Não faz sentido fazer *Dupack-based* porque dependeria de pelo menos 3 *ACKs*
+     * O *Timeout*, do lado do Servidor/RP pode ter em consideração os tempos de latência (parar de retransmitir)
 
 #### Nodo pede Stream
  * Nodo sobe a árvore de transferência por algum nodo que já esteja fazer *stream* daquele ficheiro
