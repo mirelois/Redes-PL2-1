@@ -2,7 +2,9 @@
 
 ## Base Decisions
 
-#### Protocolo
+### Protocolo
+
+#### Existentes
 
  * UDP?
  * RTP?? já usa UDP, podemos inspirarmo-nos
@@ -26,17 +28,28 @@
    * Para limitar o tráfego, quantos mais utilizadores há menos mensagens RTCP se envia
    * Limitar o tamanho dos envios de Controlo para 5% da largura de banda total para o RTP mesmo, 75% receivers e 25% senders
  * Se virmos que faz sentido TUDO do TCP mais vale trocar de protocolo em certas alturas (reduz carga aplicacional)
-  
- * **INP**, Idle-Node Protocol
+
+#### Protocolos a usar
+ * **RAP**, Real-Time Application-Level Protocol
+   * Protocolo para enviar os dados da *stream* propriamente dita
+   * **Sequence #**
+   * **Timestamp**
+   * ****
+ * **INTP**, Idle-Node Tick Protocol
    * OSPF-like para hellos (manter os nós vivos na rede)
+ * **NAP**, Node Addition Protocol
+   * Protocolo para adicionar nodos, antes e depois do arranque
 
 #### Linguagem
 
 ~~Java~~ ~~Python~~ Java
 
 #### Métricas
+ * De quanto em quanto tempo se devem atualizar as métricas (tempo de envio das RTCP)?
+   * 20s
  * Foco: como é uma *stream* de multimedia, throughput é a métrica rainha, seguida da latência
    * Seguir as *guidelines* das teóricas (jogos: latência, etc...)
+   * Avaliado por um Djikstra (se centralizado) ou ponto a ponto
  * Apenas são atualizadas pelo caminho da Árvore construída no arranque
  * *Jitter*
    * Variância da latência
