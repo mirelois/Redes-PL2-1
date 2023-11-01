@@ -13,11 +13,15 @@
      * Depende se o pacote é um *SYN* ou se é o resto da sequência
      * Se o *SYN* estiver a 1, então é o número inicial da sessão
      * Se o *SYN* estiver a 0, então é o número acumulado desde o primeiro byte
+     * Serve para conseguir *Reliable transmission* - Retransmission
+       * Retransmission Ambiguity quando um *ACK* é recebido depois de uma retransmissão (qual??)
+       * **Dupack-based retransmission**
    * **Ack #**
      * *ACK* a 1 -> valor que a *source* está à espera de receber de seguida
      * Seguido de um *SYN* Será o Sequence # do *SYN* anterior mais 1
    * **Data Offset**
-     * Tamanho do TCP Packet em 32-bit words, que também o offset até ao packet
+     * Tamanho do TCP Packet em 32-bit words, que também é o offset até ao packet
+     * Permite até 40 bytes de opções, com 20 bytes do header
    * **Flags**
      * **CWR** - Congestion Window Reduced, respondeu com Congestion Control Mechanism em resposta a um **ECE** a 1
      * **ECE** - ECN-Echo (dá Echo do IP), dual role
@@ -29,6 +33,15 @@
      * **RST** - Reset Connection
      * **SYN** - Apenas o primeiro packet de cada lado da conexão deve ter esta flag
      * **FIN** - Último packet do sender
+   * **Window size** - Tamanho da *receive window* (até ao espaço livre no buffer de quem envia, mas pode ser menos)
+     * Se o **Window Size** for 0, o sender não envia mais dados e começa um *persist timer* (que evita deadlock)
+     * Envia um pequeno depois para recomeçar o envio completo, recebendo um *ACK* para indicar o novo *window size*
+   * **Checksum**
+   * **Urgent Pointer** - Aponta para o último data byte urgente com offset do *sequence #*
+   * **Options** - tamanho das options depende do data offset
+     * **Window Scaling** - Dar scale ao window size, apenas durante o *SYN* da conexão
+     * **Maximum segment size** - Tamanho máximo da data que se pode transmitir
+       * Tenta-se que seja pequeno o suficiente para evitar *IP fragmentation*
  * RTP?? já usa UDP, podemos inspirarmo-nos
    * **Payload type** - tipo de ficheiro (inútil, vai ser sempre mpeg)
      * Lixo, se apenas houver um tipo de *encoding*
@@ -57,7 +70,7 @@
    * **Sequence #**
    * **Timestamp**
    * ****
- * **INTP**, Idle-Node Tick Protocol
+ * **INTP**, Idle Node Tick Protocol
    * OSPF-like para hellos (manter os nós vivos na rede)
  * **NAP**, Node Addition Protocol
    * Protocolo para adicionar nodos, antes e depois do arranque
@@ -98,12 +111,22 @@
 
 ### Funcionalidades
 
+#### Retransmissão
+ * Como o protocolo é *RTP*, a necessidade de novos *packets* é maior que a de todos
+ * Pode haver uma margem relativamente grande de *buffering* dos pacotes para depois apresentar
+   * Implicava **margem de *display*** maior que algumas vezes o **RTT**
+ * Seria parecido com **TCP**, mas sem ter em conta Triple-*ACK* (ou os *RTT* seriam demasiados)
+   * Enviar *ACK* dos pacotes até então recebidos
+
 #### Nodo pede Stream
  * Nodo sobe a árvore de transferência por algum nodo que já esteja fazer *stream* daquele ficheiro
  * Se nenhum se encontrar a transferir o ficheiro, chega até ao RP
  * Um Protocolo auxiliar para pedir ligação
    * Este pedido pode ser por *flood* aos vizinhos ou pode ser especial pelos melhores caminhos
    * Nunca se sabe como está o estado superior, um pior caminho próximo pode ser seguido pelo melhor de cima: *flood*
+ * O Nodo deve dar avisar que ainda está vivo e a ouvir a stream
+   * **RTCP**-like avisa que ainda está a ouvir
+   * Mensagem *Opt-in* para sair ativamente
 
 #### RP pede ao Servidor o conteúdo
  * Terá de ter um Protocolo específico, o mais leve possível
