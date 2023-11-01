@@ -159,7 +159,7 @@
    * Levou com um raio (IGMPv1, escolhas)
      * Ativa (continuamente perguntar se está vivo)
        * parece pior porque tem 2x o número de mensagens
-     * Passivo (broadcast da sua vivicitude)
+     * Passivo (broadcast da sua vivicitude, vivicidencia, vivicidade, viviciderencia)
 
 #### Criação da Árvore de Distribuição
  * Para cada pedido de acesso à Stream, deve-se criar uma rapidamente
