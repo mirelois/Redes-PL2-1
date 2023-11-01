@@ -2,7 +2,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Scanner;
-import Packet;
 
 /**
  * server
@@ -15,7 +14,7 @@ public class Server {
     static InetAddress address;
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         
         address = InetAddress.getByName(args[0]);
 

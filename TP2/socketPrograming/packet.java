@@ -77,7 +77,7 @@ public class Packet {
 
     public byte[] getHeader() {
 
-        byte[] header = new byte[header_size];
+        byte[] header = new byte[HEADER_SIZE];
 
         for (int i = 0; i < HEADER_SIZE; i++) {
             header[i] = this.header[i];
@@ -100,7 +100,7 @@ public class Packet {
 
     public byte[] getPacket() {
 
-        byte[] packet = new byte[header_size];
+        byte[] packet = new byte[HEADER_SIZE];
 
         for (int i = 0; i < HEADER_SIZE; i++) {
             packet[i] = this.header[i];
@@ -118,8 +118,8 @@ public class Packet {
 
     public void printheader() {
         System.out.print("[RTP-Header] ");
-        System.out.println("SequenceNumber: " + SequenceNumber
-                         + ", TimeStamp: " + TimeStamp);
+        System.out.println("SequenceNumber: " + sequence_number
+                         + ", TimeStamp: " + time_stamp);
     }
 
 }
