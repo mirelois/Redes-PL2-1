@@ -191,6 +191,7 @@
      * Ativa (continuamente perguntar se está vivo)
        * parece pior porque tem 2x o número de mensagens
      * Passivo (broadcast da sua vivicitude, vivicidencia, vivicidade, viviciderencia)
+   * Levou com um raio e era super 
 
 #### Criação da Árvore de Distribuição
  * Para cada pedido de acesso à Stream, deve-se criar uma rapidamente
@@ -204,3 +205,10 @@
 ### Extras
  * Vídeos visualmente distintos para facilitar a apresentação
    * escrever a letra A, B, C no paint para o vídeo A, B, C...
+
+## Implementation
+
+### Conexões *Overlay*
+
+ * Para cada um dos vizinhos, criar um ***Listener*** *Thread* que gere a conexão, com um *Socket* para cada
+ * O ***Listener*** deve comunicar ao vizinho designado qual a porta que foi aberta para a sua conversação
