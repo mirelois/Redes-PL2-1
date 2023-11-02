@@ -53,8 +53,8 @@ public class Packet {
             this.payload[i - HEADER_SIZE] = packet[i];
         }
 
-        this.sequence_number = packet[1] + (packet[0] << 8);
-        this.time_stamp = packet[5] + (packet[4] << 8) + (packet[3] << 16) + (packet[2] << 24);
+        this.sequence_number = packet[1] | (packet[0] << 8);
+        this.time_stamp = packet[5] | (packet[4] << 8) | (packet[3] << 16) | (packet[2] << 24);
     }
 
     public byte[] getPayload() {
