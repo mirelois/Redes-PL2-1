@@ -33,7 +33,7 @@ public class BootStraper {
 
             HashMap<String, InetAddress> map = new HashMap<String, InetAddress>();
 
-            Pattern pattern = Pattern.compile("([^,]+?):(\\d+\\.\\d+\\.\\d+\\.\\d+)"); // matches stuff like n1:1.1.1.1;
+            Pattern pattern = Pattern.compile("([^ ,]+?):((?:\\d+\\.\\d+\\.\\d+\\.\\d+)|localhost)"); // matches stuff like n1:1.1.1.1 and n2:localhost
             
             Matcher matcher = pattern.matcher(reader.readLine());
 
