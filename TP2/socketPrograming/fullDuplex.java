@@ -21,7 +21,7 @@ public class fullDuplex {
             
             t1.join();
             t2.join();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
