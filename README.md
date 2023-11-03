@@ -191,7 +191,18 @@
      * Ativa (continuamente perguntar se está vivo)
        * parece pior porque tem 2x o número de mensagens
      * Passivo (broadcast da sua vivicitude, vivicidencia, vivicidade, viviciderencia)
-   * Levou com um raio e era super 
+   * Levou com um raio e era super importante (alguém ficou com **0 vizinhos** na rede)
+     * Precisamos de refazer o *overlay*
+     * Pode ser enviado também nos momentos em que não é catastrófica
+       * Para evitar tráfego extra pode usar a técnica de *random wait time* para enviar para quem for decidido que é para se enviar
+     * **Vizinhos dos vizinhos** - Cada nodo sabe uma lista dos vizinhos dos seus vizinhos
+       * No caso de falha, tenta conectar-se a esses vizinhos para saber quais estão disponíveis na *Overlay*
+       * Gasta aproximadamente *N^2* espaço e não compensa contra duas falhas (adjacentes)
+     * **Traceroute** - *Flood* que é captado pela rede *Overlay* e define os novos vizinhos
+       * Este *flood* imita o *flood* na criação da árvore de distribuição mas para sempre inteligentemente
+       * Pode encher muito os *routers* que não são parte da rede *Overlay*
+     * **Perguntar ao Bootstraper** - sabe os vizinhos todos de quem morreu, basta perguntar
+       * Não é uma solução real porque não necessariamente existe alguém com conhecimento geral 
 
 #### Criação da Árvore de Distribuição
  * Para cada pedido de acesso à Stream, deve-se criar uma rapidamente
@@ -208,7 +219,13 @@
 
 ## Implementation
 
-### Conexões *Overlay*
+### Iniciar a Topologia
+ * Usar **ONode IP Bootstrapper** para indicar todos exceto os *Bootstrappers*
+ * O *Bootstrapper* recebe o ficheiro onde os vizinhos se encontram
 
+### Estado dos Nodos
+ * Vizinhos do *Overlay*
+
+### Conexões *Overlay*
  * Para cada um dos vizinhos, criar um ***Listener*** *Thread* que gere a conexão, com um *Socket* para cada
  * O ***Listener*** deve comunicar ao vizinho designado qual a porta que foi aberta para a sua conversação
