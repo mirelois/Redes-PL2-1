@@ -13,43 +13,19 @@ public class fullDuplex {
             return;
         }
 
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        Thread t1, t2;
 
-        Thread sender;
-        try (DatagramSocket socket = new DatagramSocket(Integer.parseInt(args[0]))){
-            sender = new Thread(() -> {
-                int i=0;
-                byte[] sendBuffer;
-                String[] message;
-                while(true) {
-
-                    try {
-                        message = input.readLine().split(",", 3); // Example: 192.168.56.101,3000,This is a random message
-                        sendBuffer = message[2].getBytes();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    Packet packet = new Packet(i, i, sendBuffer, sendBuffer.length);
-                    i++;
-                    try {
-                        socket.send(new DatagramPacket(packet.getPacket(), packet.getPacketLength(), InetAddress.getByName(message[0]), Integer.parseInt(message[1])));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-            sender.start();
-            DatagramPacket receivePacket;
-            byte[] receiveBytes = new byte[1024];
-            Packet packet;
-            while(true){
-                receivePacket = new DatagramPacket(receiveBytes, receiveBytes.length);
-                socket.receive(receivePacket);
-                packet = new Packet(receivePacket.getData(), receivePacket.getLength());
-                packet.printheader();
-                System.out.println(new String(packet.getPayload(), StandardCharsets.UTF_8));
-            }
+        try(DatagramSocket socket = new DatagramSocket(Integer.parseInt(args[0]))){
+            Sender sender = new Sender(socket);
+            t1 = new Thread(sender);
+            t1.start();
+            
+            Receiver receiver = new Receiver(socket);
+            t2 = new Thread(receiver);
+            t2.start();
+            
+            t1.join();
+            t2.join();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
