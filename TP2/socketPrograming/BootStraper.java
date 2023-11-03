@@ -33,8 +33,8 @@ public class BootStraper {
 
             HashMap<String, InetAddress> map = new HashMap<String, InetAddress>();
 
-            Pattern pattern = Pattern.compile("([^,]+?):(\\d+\\.\\d+\\.\\d+\\.\\d+)"); // matches stuff like n1:1.1.1.1
-
+            Pattern pattern = Pattern.compile("([^,]+?):(\\d+\\.\\d+\\.\\d+\\.\\d+)"); // matches stuff like n1:1.1.1.1;
+            
             Matcher matcher = pattern.matcher(reader.readLine());
 
             while(matcher.find()){
@@ -49,22 +49,35 @@ public class BootStraper {
 
                     matcher = pattern.matcher(strLine);
 
+
                     if(!matcher.find()){
                         // TODO error
                     }
-
-                    if (!map.containsKey(matcher.group(1))) {
+                    
+                    String node = matcher.group(1);
+                    String neighbours = matcher.group(2);
+                    
+                    if (!map.containsKey(node)) {
                         // TODO error
                     }
 
-                    tree.put(map.get(matcher.group(1)), new ArrayList<InetAddress>());
+                    tree.put(map.get(node), new ArrayList<InetAddress>());
+                    
+                    pattern = Pattern.compile("[^ ,]+");
 
-                    for (String string : matcher.group(2).split(",")) {
-                        if (!map.containsKey(string)) {
+                    matcher = pattern.matcher(neighbours);
+
+                    while (matcher.find()) {
+
+                        String neighbour = matcher.group();
+                        
+                        if (!map.containsKey(neighbour)) {
                             // TODO error
                         }
-                        tree.get(map.get(matcher.group(1))).add(map.get(string));
+                        tree.get(map.get(node)).add(map.get(neighbour));
+                        
                     }
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -77,41 +90,11 @@ public class BootStraper {
 
     public static void main(String[] args) {
         
-        // HashMap<InetAddress,ArrayList<InetAddress>> map = getTree("./tree.txt");
-        //
-        // String str = "n1:12.12.12.12,n2:13.13.13.13";
-        //
-        // Pattern pattern = Pattern.compile("([^,]+?):(\\d+\\.\\d+\\.\\d+\\.\\d+)");
-        //
-        // Matcher matcher = pattern.matcher(str);
-        //
-        // while(matcher.find()){
-        //     System.out.println(matcher.group(1));
-        //     System.out.println(matcher.group(2));
-        // }
+        HashMap<InetAddress, ArrayList<InetAddress>> map = getTree("./tree.txt");
+
+        System.out.println(map);;
         
-        HashMap<InetAddress,ArrayList<InetAddress>> map = getTree("./tree.txt");
-
-        HashMap<String,String> m = new HashMap<String,String>();
-
-        m.put("k1", "V1");
-
-        try{
-            System.out.println(map.get(InetAddress.getByName("127.0.0.1")));
-        }catch(UnknownHostException e){}
-        System.out.println(m);
 
     }
-
-
-
-
-
-
-
-
-
-
     
-
 }
