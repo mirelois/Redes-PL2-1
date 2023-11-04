@@ -19,13 +19,8 @@ public class fullDuplex {
             t2 = new Thread(receiver);
             t2.start();
 
-            BootStraper bootStraper = new BootStraper(1234);
-            t3 = new Thread(bootStraper);
-            t3.start();
-            
             t1.join();
             t2.join();
-            t3.join();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

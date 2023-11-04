@@ -5,9 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,38 +106,66 @@ public class BootStraper {
         
         // NOTE using regular TCP for now
 
-        try {
-            Socket socket;
+        // try {
+        //     Socket socket;
+        //
+        //     try (ServerSocket serverSocket = new ServerSocket(1234)) {
+        //         socket = serverSocket.accept();
+        //
+        //         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        //         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        //
+        //         while (true) {
+        //             String msg = bufferedReader.readLine();
+        //             System.out.println(msg);
+        //             if (msg.equals("Tree")) {
+        //                 bufferedWriter.write("ACK");
+        //                 bufferedWriter.newLine();
+        //                 bufferedWriter.flush();
+        //             }
+        //         }
+        //     }
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
 
-            try (ServerSocket serverSocket = new ServerSocket(1234)) {
-                socket = serverSocket.accept();
+        byte[] buff = new byte[1024];
 
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        try(DatagramSocket socket = new DatagramSocket(2000)){
+            
+            while(true){
 
-                while (true) {
-                    String msg = bufferedReader.readLine();
-                    System.out.println(msg);
-                    if (msg.equals("Tree")) {
-                        bufferedWriter.write("ACK");
-                        bufferedWriter.newLine();
-                        bufferedWriter.flush();
-                    }
+                DatagramPacket datagramPacket = new DatagramPacket(buff, buff.length);
+
+                try{
+                 socket.receive(datagramPacket);
+                }catch(IOException e){
+                    e.printStackTrace();
                 }
+
+
+                InetAddress address = datagramPacket.getAddress();
+                int port = datagramPacket.getPort();
+
+                byte[] msg = new byte[1024];
+
+                msg = "ACK".getBytes();
+
+                Packet packet = new Packet(0, 0, msg, msg.length);
+                    
+                DatagramPacket datagramPacketSend = new DatagramPacket(packet.getPacket(), packet.getPacketLength(), address, port);
+
+
+                try{
+                    socket.send(datagramPacketSend);
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+
             }
-        } catch (IOException e) {
+        }catch(SocketException e){
             e.printStackTrace();
         }
-
     }
-    //
-    // public static void main(String[] args) {
-    //
-    // HashMap<InetAddress, ArrayList<InetAddress>> map = getTree("./tree.txt");
-    //
-    // System.out.println(map);
-    // ;
-    //
-    // }
 
 }
