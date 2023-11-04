@@ -1,28 +1,17 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.*;
 
-public class BootStraper {
-
-    int port;
-
-    public BootStraper(int port) {
-        this.port = port;
-    }
+public class BootStrapper{
 
     public static HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
 
@@ -102,8 +91,8 @@ public class BootStraper {
         return tree;
     }
 
-    public static void main(String[] args) {
-        
+    public static void runBoot(int bootPort) {
+
         // NOTE using regular TCP for now
 
         // try {
@@ -131,7 +120,7 @@ public class BootStraper {
 
         byte[] buff = new byte[1024];
 
-        try(DatagramSocket socket = new DatagramSocket(2000)){
+        try(DatagramSocket socket = new DatagramSocket(bootPort)){
             
             while(true){
 
@@ -147,14 +136,11 @@ public class BootStraper {
                 InetAddress address = datagramPacket.getAddress();
                 int port = datagramPacket.getPort();
 
-                byte[] msg = new byte[1024];
-
-                msg = "ACK".getBytes();
+                byte[] msg = "ACK".getBytes();
 
                 Packet packet = new Packet(0, 0, msg, msg.length);
                     
                 DatagramPacket datagramPacketSend = new DatagramPacket(packet.getPacket(), packet.getPacketLength(), address, port);
-
 
                 try{
                     socket.send(datagramPacketSend);
