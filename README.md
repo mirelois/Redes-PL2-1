@@ -79,6 +79,10 @@
    * OSPF-like para hellos (manter os nós vivos na rede)
  * **NAP**, Node Addition Protocol
    * Protocolo para adicionar nodos, antes e depois do arranque
+ * **BOP**, Bootstrapper Operation Protocol
+   * TCP like, precisamos de nao ter perdas
+   * mantem timer de packets enviados e lista de ACK's retransmite se nao receber um
+     ACK dentro de uma determinada janela de tempo, podemos utilizar algumas das flags do TCP
 
 #### Linguagem
 

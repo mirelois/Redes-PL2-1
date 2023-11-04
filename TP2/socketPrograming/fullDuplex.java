@@ -8,7 +8,7 @@ public class fullDuplex {
             return;
         }
 
-        Thread t1, t2;
+        Thread t1, t2, t3;
 
         try(DatagramSocket socket = new DatagramSocket(Integer.parseInt(args[0]))){
             Sender sender = new Sender(socket);
@@ -18,9 +18,14 @@ public class fullDuplex {
             Receiver receiver = new Receiver(socket);
             t2 = new Thread(receiver);
             t2.start();
+
+            BootStraper bootStraper = new BootStraper(1234);
+            t3 = new Thread(bootStraper);
+            t3.start();
             
             t1.join();
             t2.join();
+            t3.join();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
