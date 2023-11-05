@@ -1,19 +1,28 @@
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.lang.instrument.Instrumentation;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.regex.*;
+import java.lang.instrument.Instrumentation;
 
-public class BootStrapper{
+public class BootStrapper {
 
-    public static HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
+    String filePath;
+
+    int port;
+
+    private static HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
 
         FileInputStream stream = null;
 
@@ -91,65 +100,54 @@ public class BootStrapper{
         return tree;
     }
 
-    public static void runBoot(int bootPort) {
-
-        // NOTE using regular TCP for now
-
-        // try {
-        //     Socket socket;
-        //
-        //     try (ServerSocket serverSocket = new ServerSocket(1234)) {
-        //         socket = serverSocket.accept();
-        //
-        //         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        //         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        //
-        //         while (true) {
-        //             String msg = bufferedReader.readLine();
-        //             System.out.println(msg);
-        //             if (msg.equals("Tree")) {
-        //                 bufferedWriter.write("ACK");
-        //                 bufferedWriter.newLine();
-        //                 bufferedWriter.flush();
-        //             }
-        //         }
-        //     }
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+    public HashMap<InetAddress, ArrayList<InetAddress>> runBoot(int bootPort) {
 
         byte[] buff = new byte[1024];
 
-        try(DatagramSocket socket = new DatagramSocket(bootPort)){
-            
-            while(true){
+        HashMap<InetAddress, ArrayList<InetAddress>> tree = getTree(this.filePath);
+
+        try (DatagramSocket socket = new DatagramSocket(bootPort)) {
+
+            while (true) {
 
                 DatagramPacket datagramPacket = new DatagramPacket(buff, buff.length);
 
-                try{
-                 socket.receive(datagramPacket);
-                }catch(IOException e){
+                try {
+                    socket.receive(datagramPacket);
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-
 
                 InetAddress address = datagramPacket.getAddress();
                 int port = datagramPacket.getPort();
 
-                byte[] msg = "ACK".getBytes();
+                Bop bop = new Bop(datagramPacket.getData(), datagramPacket.getLength());
 
-                Packet packet = new Packet(0, 0, msg, msg.length);
-                    
-                DatagramPacket datagramPacketSend = new DatagramPacket(packet.getPacket(), packet.getPacketLength(), address, port);
+                ArrayList<InetAddress> neighbours = tree.get(address);
 
-                try{
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                
+                oos.writeObject(neighbours);
+                
+                byte[] payload = baos.toByteArray();
+
+                Random rng = new Random(1234);
+
+                Bop send_bop = new Bop(false, payload, payload.length);
+
+                //TODO reber ack do cliente
+
+                DatagramPacket datagramPacketSend = new DatagramPacket(bop.getPacket(), bop.getPacketLength(), address, port);
+
+                try {
                     socket.send(datagramPacketSend);
-                }catch(IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
             }
-        }catch(SocketException e){
+        } catch (SocketException e) {
             e.printStackTrace();
         }
     }
