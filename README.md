@@ -79,11 +79,12 @@
    * OSPF-like para hellos (manter os nós vivos na rede)
  * **NAP**, Node Addition Protocol
    * Protocolo para adicionar nodos, antes e depois do arranque
- * **BOP**, Bootstrapper Operation Protocol
-   * TCP like, precisamos de nao ter perdas
-   * mantem timer de packets enviados e lista de ACK's retransmite se nao receber um
-     ACK dentro de uma determinada janela de tempo, podemos utilizar algumas das flags do TCP
-
+ * **BOP**, Bootstrapper Opening Protocol
+   * Protocolo para iniciar a rede *overlay*
+   * **ACK Flag** - *Flag* utilizada pelo *Bootstrapper Client* para distinguir os pedidos das receções
+     * Provavelmente inútil, máquina de estados resolveria isto
+   * Conjugado com retransmissão por *timeout*, na primeira e na segunda mensagem
+   
 #### Linguagem
 
 ~~Java~~ ~~Python~~ Java
@@ -226,6 +227,14 @@
 ### Iniciar a Topologia
  * Usar **ONode IP Bootstrapper** para indicar todos exceto os *Bootstrappers*
  * O *Bootstrapper* recebe o ficheiro onde os vizinhos se encontram
+ * O protocolo utilizado é o *BOP*:
+   * Os *Bootstrapper Clients* mandam um *BOP* packet recorrente, por *timeout*, a pedir os dados;
+     * Termina quando receberem os dados do *Bootstrapper*
+   * O *Bootstrapper* envia um *BOP* packet recorrente, por *timeout*, com os vizinhos do *Client*;
+     * Começa a enviar quando receber o Pedido dos Dados
+     * Termina quando receber a acusação de receção do *Client*
+   * O *Cliente* envia um *BOP* packet a acusar a receção.
+     * Envia **sempre** que receber os dados pelo *Bootstrapper* (o *Ack* foi perdido)
 
 ### Estado dos Nodos
  * Vizinhos do *Overlay*
