@@ -86,13 +86,17 @@ public class Bop {
         }
     }
 
-    public static int getheaderSize() {
+    public int getheaderSize() {
         return header_size;
     }
 
     // public int getSequence_number() {
     // return sequence_number;
     // }
+    
+    public boolean getAck() {
+        return this.Ack;
+    }
 
     public int getChecksum() {
         return checksum;

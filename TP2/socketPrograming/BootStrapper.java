@@ -22,6 +22,8 @@ public class BootStrapper {
 
     int port;
 
+    int timeout = 1000;
+
     private static HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
 
         FileInputStream stream = null;
@@ -138,6 +140,7 @@ public class BootStrapper {
 
                 if (bop.getAck()) {
                     wait_map.get(address).interrupt();
+                    wait_map.remove(address);
                 } else {
 
                     // get neighbours from tree
@@ -145,30 +148,43 @@ public class BootStrapper {
                     // ------
 
                     // write neighbours into byte array payload
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos);
+                    try {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ObjectOutputStream oos = new ObjectOutputStream(baos);
 
-                    oos.writeObject(neighbours);
+                        oos.writeObject(neighbours);
 
-                    byte[] payload = baos.toByteArray();
-                    // ------
+                        byte[] payload = baos.toByteArray();
 
-                    Bop send_bop = new Bop(false, payload, payload.length);
+                        // ------
 
-                    DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(),
-                            send_bop.getPacketLength(), address, port);
+                        Bop send_bop = new Bop(false, payload, payload.length);
 
-                    socket.send(send_datagram_packet);
+                        DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(),
+                                send_bop.getPacketLength(), address, port);
 
-                    Thread t = new Thread(() -> {
-                        while (true) {
-                            Thread.sleep(10);
-                            socket.send(send_datagram_packet);
-                        }
-                    });
+                        socket.send(send_datagram_packet);
 
-                    wait_map.put(address, t);
-                    t.start();
+                        Thread t = new Thread(() -> {
+                            while (true) {
+                                try {
+                                    try {
+                                        Thread.sleep(this.timeout);
+                                    } catch (InterruptedException e) {
+                                        return;
+                                    }
+                                    socket.send(send_datagram_packet);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        wait_map.put(address, t);
+                        t.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                 }
 
