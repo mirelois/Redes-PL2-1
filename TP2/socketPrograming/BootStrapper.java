@@ -160,9 +160,11 @@ public class BootStrapper {
 
                     socket.send(send_datagram_packet);
 
-                    Thread t = new Thread(()->{
+                    Thread t = new Thread(() -> {
+                        while (true) {
                             Thread.sleep(10);
                             socket.send(send_datagram_packet);
+                        }
                     });
 
                     wait_map.put(address, t);
