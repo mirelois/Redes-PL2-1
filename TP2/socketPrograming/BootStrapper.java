@@ -102,14 +102,22 @@ public class BootStrapper {
 
     public HashMap<InetAddress, ArrayList<InetAddress>> runBoot(int bootPort) {
 
+        // buffer to receive datagramPacket
         byte[] buff = new byte[1024];
 
+        // neighbour tree from file
         HashMap<InetAddress, ArrayList<InetAddress>> tree = getTree(this.filePath);
 
+        // initialize map to store clients for whom wainting for ack
+        HashMap<InetAddress, Thread> wait_map = new HashMap<InetAddress, Thread>();
+
+        // open socket
         try (DatagramSocket socket = new DatagramSocket(bootPort)) {
 
+            // start waiting for packets
             while (true) {
 
+                // ------ get DatagramPacket from socket -------
                 DatagramPacket datagramPacket = new DatagramPacket(buff, buff.length);
 
                 try {
@@ -117,33 +125,49 @@ public class BootStrapper {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                // -------------
 
+                // ------get sender address and port number ------
                 InetAddress address = datagramPacket.getAddress();
                 int port = datagramPacket.getPort();
+                // ------
 
+                // unpack BOP packet
                 Bop bop = new Bop(datagramPacket.getData(), datagramPacket.getLength());
+                // ------
 
-                ArrayList<InetAddress> neighbours = tree.get(address);
+                if (bop.getAck()) {
+                    wait_map.get(address).interrupt();
+                } else {
 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(baos);
-                
-                oos.writeObject(neighbours);
-                
-                byte[] payload = baos.toByteArray();
+                    // get neighbours from tree
+                    ArrayList<InetAddress> neighbours = tree.get(address);
+                    // ------
 
-                Random rng = new Random(1234);
+                    // write neighbours into byte array payload
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ObjectOutputStream oos = new ObjectOutputStream(baos);
 
-                Bop send_bop = new Bop(false, payload, payload.length);
+                    oos.writeObject(neighbours);
 
-                //TODO reber ack do cliente
+                    byte[] payload = baos.toByteArray();
+                    // ------
 
-                DatagramPacket datagramPacketSend = new DatagramPacket(bop.getPacket(), bop.getPacketLength(), address, port);
+                    Bop send_bop = new Bop(false, payload, payload.length);
 
-                try {
-                    socket.send(datagramPacketSend);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(),
+                            send_bop.getPacketLength(), address, port);
+
+                    socket.send(send_datagram_packet);
+
+                    Thread t = new Thread(()->{
+                            Thread.sleep(10);
+                            socket.send(send_datagram_packet);
+                    });
+
+                    wait_map.put(address, t);
+                    t.start();
+
                 }
 
             }
