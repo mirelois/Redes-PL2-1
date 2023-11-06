@@ -50,20 +50,24 @@ public class Bop {
             this.payload_size = payload_size;
 
             this.checksum = 0; // TODO checksum
-
+                               // 
             this.header_size = HEADER_SIZE;
-
             this.header = new byte[HEADER_SIZE];
-
+            
             this.header[0] = 0x00;
             this.header[1] = (byte) (checksum >> 8);
             this.header[2] = (byte) (checksum);
+            if (payload_size > 0){
 
-            this.payload = new byte[payload_size];
+                this.payload = new byte[payload_size];
 
-            for (int i = 0; i < payload.length; i++) {
-                this.payload[i] = payload[i];
+                for (int i = 0; i < payload.length; i++) {
+                    this.payload[i] = payload[i];
+                }
+            }else{
+                this.payload = null;
             }
+
             
         }
 
