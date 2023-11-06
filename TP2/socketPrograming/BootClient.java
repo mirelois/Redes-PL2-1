@@ -68,7 +68,7 @@ public class BootClient implements Runnable{
 
                     // entra aqui quando receber o pacote bem
                     t.interrupt();
-                    
+
                     this.neighbours.addAll((ArrayList<InetAddress>) deserialize(bopReceived.getPayload()));
                     System.out.println(neighbours);
                     synchronized (neighbours) {
