@@ -15,9 +15,18 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.*;
 
-public class BootStrapper {
-    
-    public static byte[] serialize(Object obj) throws IOException {
+public class BootStrapper implements Runnable{
+
+    private int bootPort, timeout;
+    private String filePath;
+
+    public BootStrapper(int bootPort, String filePath, int timeout){
+        this.bootPort = bootPort;
+        this.timeout = timeout;
+        this.filePath = filePath;
+    }
+
+    private byte[] serialize(Object obj) throws IOException{
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
@@ -25,7 +34,7 @@ public class BootStrapper {
         return out.toByteArray();
     }
 
-    private static HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
+    private HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
 
         FileInputStream stream = null;
 
@@ -103,7 +112,8 @@ public class BootStrapper {
         return tree;
     }
 
-    public static void runBoot(int bootPort, String filePath, int timeout) {
+    @Override
+    public void run() {
 
         // buffer to receive datagramPacket
         byte[] buff = new byte[1024];

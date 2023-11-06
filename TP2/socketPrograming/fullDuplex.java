@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,10 +14,15 @@ public class fullDuplex {
 
         // Setup Phase:
         if(args.length == 1) {
-            BootStrapper.runBoot(2000, "/usr/bin/passwd", 1000); // Falta mega ir removendo as entradas no dicionario quando receber ACKS do clientes de que têm os seus vizinhos
+            new Thread(new BootStrapper(2000, args[0], 1000)).start(); // no one will get this one #LMAO
         }
-        else
-            BootClient.askNeighbours(); // falta return e guardar o estado dos vizinhos
+        else {
+            try {
+                BootClient.askNeighbours(InetAddress.getByName(args[1]), 1000, 1000, 10);
+            } catch (UnknownHostException e){
+                e.printStackTrace();
+            }
+        }
 
         // Phase 2
         Thread t1, t2;
