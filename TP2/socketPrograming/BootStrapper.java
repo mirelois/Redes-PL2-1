@@ -148,7 +148,9 @@ public class BootStrapper {
 
                         Bop send_bop = new Bop(false, payload, payload.length, bop.getAddress(), bop.getPort());
 
-                        //DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(), send_bop.getPacketLength(), address, port);
+                        // DatagramPacket send_datagram_packet = new
+                        // DatagramPacket(send_bop.getPacket(), send_bop.getPacketLength(), address,
+                        // port);
 
                         socket.send(send_bop.toDatagramPacket());
 
@@ -161,24 +163,6 @@ public class BootStrapper {
                                         return;
                                     }
                                     socket.send(send_bop.toDatagramPacket());
-=======
-                        Bop send_bop = new Bop(false, payload, payload.length);
-
-                        DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(),
-                                send_bop.getPacketLength(), address, port);
-
-                        socket.send(send_datagram_packet);
-
-                        Thread t = new Thread(() -> {
-                            for (int i = 0; i < 5; i++) {
-                                try {
-                                    try {
-                                        Thread.sleep(this.timeout);
-                                    } catch (InterruptedException e) {
-                                        return;
-                                    }
-                                    socket.send(send_datagram_packet);
->>>>>>> ac28a14 (minor changes)
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }

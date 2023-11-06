@@ -15,9 +15,9 @@ public class BootClient {
                 Thread.sleep(timeOut);
 
                 // send neighbour request
-                Bop bop = new Bop(false, null, 0);
+                Bop bop = new Bop(false, null, 0, bootStraperIP, bootStraperPort);
 
-                socket.send(bop.getDatagramPacket());
+                socket.send(bop.toDatagramPacket());
                 // ---------
             }
         });
@@ -38,9 +38,9 @@ public class BootClient {
                 //entra aqui quando receber o pacote bem
                 t.interrupt();
 
-                Bop bop_ack = new Bop(true, null, 0);
+                Bop bop_ack = new Bop(true, null, 0, bootStraperIP, bootStraperPort);
 
-                socket.send(bop_ack.getDatagramPacket());
+                socket.send(bop_ack.toDatagramPacket());
             }
 
         }

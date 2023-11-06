@@ -3,6 +3,14 @@ import java.net.InetAddress;
 
 public class Bop {
 
+    public int checksum(byte[] data){
+        int sum = 0;
+        for (byte b : data) {
+            sum += b;
+        }
+        return ~sum;
+    }
+
     static int HEADER_SIZE = 3;
 
     int header_size;
