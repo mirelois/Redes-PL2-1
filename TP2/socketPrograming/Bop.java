@@ -69,23 +69,23 @@ public class Bop {
 
     }
 
-    public Bop(byte[] packet, int packet_size) {
+    public Bop(DatagramPacket udpPacket) {
 
         // TODO: check packet_size
 
+        byte[] packet = udpPacket.getData();
         this.ack = packet[0] != 0;
-
 
 
         if (ack) {
             this.header_size = 1;
             this.header = new byte[1];
-        } else {
+        } else { 
             
             this.header_size = HEADER_SIZE;
             this.header = new byte[HEADER_SIZE];
             
-            for (int i = 0; i < payload.length; i++) {
+            for (int i = 0; i < packet.length - this.header_size; i++) {
                 this.payload[i] = packet[header_size + i];
             }
             this.checksum = packet[2] | (packet[1] >> 8);

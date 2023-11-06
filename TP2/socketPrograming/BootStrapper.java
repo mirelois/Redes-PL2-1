@@ -129,7 +129,7 @@ public class BootStrapper {
                 // ------
 
                 // unpack BOP packet
-                Bop bop = new Bop(datagramPacket.getData(), datagramPacket.getLength());
+                Bop bop = new Bop(datagramPacket);
                 // ------
 
                 if (bop.getAck()) {
