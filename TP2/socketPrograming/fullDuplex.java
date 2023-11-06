@@ -18,7 +18,7 @@ public class fullDuplex {
         }
         else {
             try {
-                BootClient.askNeighbours(InetAddress.getByName(args[1]), 1000, 1000, 10);
+                new Thread(new BootClient(InetAddress.getByName(args[1]), 1000, 1000, 10)).start();
             } catch (UnknownHostException e){
                 e.printStackTrace();
             }

@@ -7,9 +7,18 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-public class BootClient {
+public class BootClient implements Runnable{
+    private int bootStrapperPort, port, timeOut;
 
-    public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
+    private InetAddress bootStrapperIP;
+
+    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut){
+        this.bootStrapperIP = bootStrapperIP;
+        this.bootStrapperPort = bootStrapperPort;
+        this.port = port;
+        this.timeOut = timeOut;
+    }
+    private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
         
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
@@ -17,7 +26,8 @@ public class BootClient {
         
     }
 
-    public static void askNeighbours(InetAddress bootStraperIP, int bootStraperPort, int port, int timeOut) {
+    @Override
+    public void run() {
         try(DatagramSocket socket = new DatagramSocket(port)) {
 
             Thread t = new Thread(() -> {
@@ -29,7 +39,7 @@ public class BootClient {
                     }
 
                     // send neighbour request
-                    Bop bop = new Bop(false, null, 0, bootStraperIP, bootStraperPort);
+                    Bop bop = new Bop(false, null, 0, bootStrapperIP, bootStrapperPort);
 
                     try {
                         socket.send(bop.toDatagramPacket());
@@ -61,7 +71,7 @@ public class BootClient {
 
                     System.out.println(neighbour);
 
-                    Bop bop_ack = new Bop(true, null, 0, bootStraperIP, bootStraperPort);
+                    Bop bop_ack = new Bop(true, null, 0, bootStrapperIP, bootStrapperPort);
 
                     socket.send(bop_ack.toDatagramPacket());
                 }

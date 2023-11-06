@@ -22,8 +22,8 @@ public class BootStrapper implements Runnable{
 
     public BootStrapper(int bootPort, String filePath, int timeout){
         this.bootPort = bootPort;
-        this.timeout = timeout;
         this.filePath = filePath;
+        this.timeout = timeout;
     }
 
     private byte[] serialize(Object obj) throws IOException{
