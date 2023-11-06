@@ -68,12 +68,12 @@ public class BootClient implements Runnable{
 
                     // entra aqui quando receber o pacote bem
                     t.interrupt();
-
-                    //System.out.println(neighbour);
-
+                    
                     this.neighbours.addAll((ArrayList<InetAddress>) deserialize(bopReceived.getPayload()));
-
-                    this.neighbours.notify();
+                    System.out.println(neighbours);
+                    synchronized (neighbours) {
+                        this.neighbours.notify();
+                    }
 
                     Bop bop_ack = new Bop(true, null, 0, bootStrapperIP, bootStrapperPort);
 

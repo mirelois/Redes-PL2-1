@@ -19,12 +19,14 @@ public class fullDuplex {
         }
         else {
             try {
-                new Thread(new BootClient(InetAddress.getByName(args[1]), 1000, 1000, 10, neighbours)).start();
+                new Thread(new BootClient(InetAddress.getByName(args[1]), 1000, 2000, 10, neighbours)).start();
             } catch (UnknownHostException e){
                 e.printStackTrace();
             }
             try {
-                neighbours.wait();
+                synchronized (neighbours) {
+                    neighbours.wait();
+                }
             } catch (InterruptedException e){
                 e.printStackTrace();
             }
@@ -32,7 +34,7 @@ public class fullDuplex {
 
         // Phase 2
         Thread t1, t2;
-        try(DatagramSocket socket = new DatagramSocket(Integer.parseInt(args[0]))){
+        try(DatagramSocket socket = new DatagramSocket(5000)){
             Sender sender = new Sender(socket);
             t1 = new Thread(sender);
             t1.start();
