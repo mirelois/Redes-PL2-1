@@ -6,6 +6,14 @@ import java.util.HashMap;
 
 public class BootClient {
 
+    public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
+        
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        ObjectInputStream is = new ObjectInputStream(in);
+        return is.readObject();
+        
+    }
+
     public static void askNeighbours(InetAddress bootStraperIP, int bootStraperPort, int port, int timeOut) {
 
         DatagramSocket socket = new DatagramSocket(port);
@@ -34,9 +42,14 @@ public class BootClient {
 
             Bop bopReceived = new Bop(packet);
 
-            if (bopReceived.getChecksum() == Checksum(packet)){
-                //entra aqui quando receber o pacote bem
+            if (bopReceived.getChecksum() == 0) { // TODO checksum
+
+                // entra aqui quando receber o pacote bem
                 t.interrupt();
+
+                ArrayList<InetAddress> neighbour = deserialize(bopReceived.getPayload());
+
+                System.out.println(neighbour);
 
                 Bop bop_ack = new Bop(true, null, 0, bootStraperIP, bootStraperPort);
 

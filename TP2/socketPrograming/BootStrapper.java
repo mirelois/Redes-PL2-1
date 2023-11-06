@@ -16,6 +16,14 @@ import java.util.Random;
 import java.util.regex.*;
 
 public class BootStrapper {
+    
+    public static byte[] serialize(Object obj) throws IOException {
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(out);
+        os.writeObject(obj);
+        return out.toByteArray();
+    }
 
     private static HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
 
@@ -132,17 +140,13 @@ public class BootStrapper {
                 } else {
 
                     // get neighbours from tree
-                    ArrayList<InetAddress> neighbours = tree.get(bop.getAddress());
+                    // ArrayList<InetAddress> neighbours = tree.get(bop.getAddress());
                     // ------
 
                     // write neighbours into byte array payload
                     try {
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        ObjectOutputStream oos = new ObjectOutputStream(baos);
 
-                        oos.writeObject(neighbours);
-
-                        byte[] payload = baos.toByteArray();
+                        byte[] payload = serialize(tree.get(bop.getAddress()));
 
                         // ------
 
