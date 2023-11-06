@@ -13,8 +13,7 @@ public class fullDuplex {
 
         // Setup Phase:
         if(args.length == 1) {
-            HashMap<InetAddress, ArrayList<InetAddress>> tree = BootStrapper.getTree("/usr/bin/passwd");
-            BootStrapper.runBoot(2000); // Falta mega ir removendo as entradas no dicionario quando receber ACKS do clientes de que têm os seus vizinhos
+            BootStrapper.runBoot(2000, "/usr/bin/passwd", 1000); // Falta mega ir removendo as entradas no dicionario quando receber ACKS do clientes de que têm os seus vizinhos
         }
         else
             BootClient.askNeighbours(); // falta return e guardar o estado dos vizinhos

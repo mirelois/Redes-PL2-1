@@ -1,3 +1,6 @@
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+
 public class Bop {
 
     static int HEADER_SIZE = 3;
@@ -8,7 +11,7 @@ public class Bop {
 
     int checksum; // 2
 
-    boolean Ack;
+    boolean ack;
 
     byte[] header;
 
@@ -16,11 +19,17 @@ public class Bop {
 
     int payload_size;
 
-    public Bop(/* int sequence_number, */boolean Ack, byte[] payload, int payload_size) {
+    InetAddress address;
+    
+    int port;
 
-        this.Ack = Ack;
+    public Bop(/* int sequence_number, */boolean ack, byte[] payload, int payload_size, InetAddress address, int port) {
 
-        if (Ack) {
+        this.ack = ack;
+        this.address = address;
+        this.port = port;
+
+        if (ack) {
             this.header_size = 1;
 
             this.header = new byte[1];
@@ -45,6 +54,7 @@ public class Bop {
             for (int i = 0; i < payload.length; i++) {
                 this.payload[i] = payload[i];
             }
+            
         }
 
         // this.sequence_number = sequence_number;
@@ -63,11 +73,11 @@ public class Bop {
 
         // TODO: check packet_size
 
-        this.Ack = packet[0] != 0;
+        this.ack = packet[0] != 0;
 
 
 
-        if (Ack) {
+        if (ack) {
             this.header_size = 1;
             this.header = new byte[1];
         } else {
@@ -95,7 +105,7 @@ public class Bop {
     // }
     
     public boolean getAck() {
-        return this.Ack;
+        return this.ack;
     }
 
     public int getChecksum() {
@@ -146,6 +156,10 @@ public class Bop {
 
     public int getPacketLength() {
         return header_size + this.payload_size;
+    }
+
+    public DatagramPacket toDatagramPacket() {
+        return new DatagramPacket(this.getPacket() ,this.getPacketLength(), address, port);
     }
 
     // public void printheader() {

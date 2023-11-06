@@ -18,12 +18,6 @@ import java.lang.instrument.Instrumentation;
 
 public class BootStrapper {
 
-    String filePath;
-
-    int port;
-
-    int timeout = 1000;
-
     private static HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
 
         FileInputStream stream = null;
@@ -102,13 +96,13 @@ public class BootStrapper {
         return tree;
     }
 
-    public HashMap<InetAddress, ArrayList<InetAddress>> runBoot(int bootPort) {
+    public static void runBoot(int bootPort, String filePath, int timeout) {
 
         // buffer to receive datagramPacket
         byte[] buff = new byte[1024];
 
         // neighbour tree from file
-        HashMap<InetAddress, ArrayList<InetAddress>> tree = getTree(this.filePath);
+        HashMap<InetAddress, ArrayList<InetAddress>> tree = getTree(filePath);
 
         // initialize map to store clients for whom wainting for ack
         HashMap<InetAddress, Thread> wait_map = new HashMap<InetAddress, Thread>();
@@ -158,22 +152,21 @@ public class BootStrapper {
 
                         // ------
 
-                        Bop send_bop = new Bop(false, payload, payload.length);
+                        Bop send_bop = new Bop(false, payload, payload.length, address, port);
 
-                        DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(),
-                                send_bop.getPacketLength(), address, port);
+                        //DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(), send_bop.getPacketLength(), address, port);
 
-                        socket.send(send_datagram_packet);
+                        socket.send(send_bop.toDatagramPacket());
 
                         Thread t = new Thread(() -> {
                             while (true) {
                                 try {
                                     try {
-                                        Thread.sleep(this.timeout);
+                                        Thread.sleep(timeout);
                                     } catch (InterruptedException e) {
                                         return;
                                     }
-                                    socket.send(send_datagram_packet);
+                                    socket.send(send_bop.toDatagramPacket());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
