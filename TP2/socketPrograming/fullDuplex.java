@@ -3,7 +3,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class fullDuplex {
     public static void main(String[] args){
@@ -12,14 +11,21 @@ public class fullDuplex {
             return;
         }
 
+        ArrayList<InetAddress> neighbours = new ArrayList<>(0);
+
         // Setup Phase:
         if(args.length == 1) {
             new Thread(new BootStrapper(2000, args[0], 1000)).start(); // no one will get this one #LMAO
         }
         else {
             try {
-                new Thread(new BootClient(InetAddress.getByName(args[1]), 1000, 1000, 10)).start();
+                new Thread(new BootClient(InetAddress.getByName(args[1]), 1000, 1000, 10, neighbours)).start();
             } catch (UnknownHostException e){
+                e.printStackTrace();
+            }
+            try {
+                neighbours.wait();
+            } catch (InterruptedException e){
                 e.printStackTrace();
             }
         }

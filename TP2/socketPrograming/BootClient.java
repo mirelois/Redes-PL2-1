@@ -12,11 +12,14 @@ public class BootClient implements Runnable{
 
     private InetAddress bootStrapperIP;
 
-    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut){
+    private ArrayList<InetAddress> neighbours;
+
+    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut, ArrayList<InetAddress> neighbours){
         this.bootStrapperIP = bootStrapperIP;
         this.bootStrapperPort = bootStrapperPort;
         this.port = port;
         this.timeOut = timeOut;
+        this.neighbours = neighbours;
     }
     private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
         
@@ -26,7 +29,6 @@ public class BootClient implements Runnable{
         
     }
 
-    @Override
     public void run() {
         try(DatagramSocket socket = new DatagramSocket(port)) {
 
@@ -67,13 +69,16 @@ public class BootClient implements Runnable{
                     // entra aqui quando receber o pacote bem
                     t.interrupt();
 
-                    ArrayList<InetAddress> neighbour = (ArrayList<InetAddress>) deserialize(bopReceived.getPayload());
+                    //System.out.println(neighbour);
 
-                    System.out.println(neighbour);
+                    this.neighbours.addAll((ArrayList<InetAddress>) deserialize(bopReceived.getPayload()));
+
+                    this.neighbours.notify();
 
                     Bop bop_ack = new Bop(true, null, 0, bootStrapperIP, bootStrapperPort);
 
                     socket.send(bop_ack.toDatagramPacket());
+
                 }
 
             }
