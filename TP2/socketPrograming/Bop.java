@@ -7,11 +7,13 @@ public class Bop {
 
     int header_size;
 
+    // Header
+
     // int sequence_number; // 4
 
     int checksum; // 2
 
-    boolean ack;
+    boolean ack; // 1
 
     byte[] header;
 
@@ -156,6 +158,14 @@ public class Bop {
 
     public int getPacketLength() {
         return header_size + this.payload_size;
+    }
+
+    public InetAddress getAddress() {
+        return this.address;
+    }
+
+    public int getPort() {
+        return this.port;
     }
 
     public DatagramPacket toDatagramPacket() {

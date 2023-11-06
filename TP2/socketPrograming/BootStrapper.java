@@ -123,22 +123,17 @@ public class BootStrapper {
                 }
                 // -------------
 
-                // ------get sender address and port number ------
-                InetAddress address = datagramPacket.getAddress();
-                int port = datagramPacket.getPort();
-                // ------
-
                 // unpack BOP packet
                 Bop bop = new Bop(datagramPacket);
                 // ------
 
                 if (bop.getAck()) {
-                    wait_map.get(address).interrupt();
-                    wait_map.remove(address);
+                    wait_map.get(bop.getAddress()).interrupt();
+                    wait_map.remove(bop.getAddress());
                 } else {
 
                     // get neighbours from tree
-                    ArrayList<InetAddress> neighbours = tree.get(address);
+                    ArrayList<InetAddress> neighbours = tree.get(bop.getAddress());
                     // ------
 
                     // write neighbours into byte array payload
@@ -152,7 +147,7 @@ public class BootStrapper {
 
                         // ------
 
-                        Bop send_bop = new Bop(false, payload, payload.length, address, port);
+                        Bop send_bop = new Bop(false, payload, payload.length, bop.getAddress(), bop.getPort());
 
                         //DatagramPacket send_datagram_packet = new DatagramPacket(send_bop.getPacket(), send_bop.getPacketLength(), address, port);
 
@@ -173,7 +168,7 @@ public class BootStrapper {
                             }
                         });
 
-                        wait_map.put(address, t);
+                        wait_map.put(bop.getAddress(), t);
                         t.start();
                     } catch (IOException e) {
                         e.printStackTrace();
