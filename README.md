@@ -230,14 +230,16 @@
  * O protocolo utilizado é o *BOP*:
    * Os *Bootstrapper Clients* mandam um *BOP* packet recorrente, por *timeout*, a pedir os dados;
      * Termina quando receberem os dados do *Bootstrapper*
-   * O *Bootstrapper* envia um *BOP* packet recorrente, por *timeout*, com os vizinhos do *Client*;
-     * Começa a enviar quando receber o Pedido dos Dados
-     * Termina quando receber a acusação de receção do *Client*
+   * O *Bootstrapper* envia um *BOP* packet com os vizinhos do *Client*;
+     * Envia **sempre** que receber o Pedido dos Dados
+     * Termina quando receber a acusação de receção do *Client* **matando o BootSrapper**
    * O *Cliente* envia um *BOP* packet a acusar a receção.
-     * Envia **sempre** que receber os dados pelo *Bootstrapper* (o *Ack* foi perdido)
+     * Envia apenas uma vez e depois sai, os *Client* morrem sempre
 
 ### Estado dos Nodos
  * Vizinhos do *Overlay*
+   * Segundos vizinhos do *Overlay*?
+ * Métricas de cada caminho seguindo os vizinhos
 
 ### Conexões *Overlay*
  * Para cada um dos vizinhos, criar um ***Listener*** *Thread* que gere a conexão, com um *Socket* para cada

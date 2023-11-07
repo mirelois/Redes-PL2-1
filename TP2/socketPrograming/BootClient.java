@@ -83,7 +83,7 @@ public class BootClient implements Runnable{
 
             }
         } catch (SocketException e){
-
+            e.printStackTrace();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

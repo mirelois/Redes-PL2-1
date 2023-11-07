@@ -52,11 +52,12 @@ public class Bop {
             this.checksum = 0; // TODO checksum
                                // 
             this.header_size = HEADER_SIZE;
+
             this.header = new byte[HEADER_SIZE];
-            
             this.header[0] = 0x00;
             this.header[1] = (byte) (checksum >> 8);
             this.header[2] = (byte) (checksum);
+
             if (payload_size > 0){
 
                 this.payload = new byte[payload_size];
@@ -64,10 +65,9 @@ public class Bop {
                 for (int i = 0; i < payload.length; i++) {
                     this.payload[i] = payload[i];
                 }
-            }else{
+            } else {
                 this.payload = null;
             }
-
             
         }
 
@@ -89,8 +89,11 @@ public class Bop {
 
         byte[] packet = udpPacket.getData();
 
+        this.address = udpPacket.getAddress();
+        this.port = udpPacket.getPort();
         this.ack = packet[0] != 0;
         
+
         if (ack) {
             this.header_size = 1;
             this.header = new byte[1];
@@ -154,23 +157,21 @@ public class Bop {
 
     public byte[] getPacket() {
 
-        byte[] packet = new byte[header_size + payload_size];
+        byte[] packet = new byte[this.header_size + this.payload_size];
 
-        for (int i = 0; i < header_size; i++) {
+        for (int i = 0; i < this.header_size; i++) {
             packet[i] = this.header[i];
         }
 
-        if (this.payload_size > 0) {
-            for (int i = 0; i < payload_size; i++) {
-                packet[i + header_size] = this.payload[i];
-            }
-        }
+        for (int i = 0; i < this.payload_size; i++) {
+            packet[i + this.header_size] = this.payload[i];
+        }        
 
         return packet;
     }
 
     public int getPacketLength() {
-        return header_size + this.payload_size;
+        return this.header_size + this.payload_size;
     }
 
     public InetAddress getAddress() {
@@ -182,7 +183,7 @@ public class Bop {
     }
 
     public DatagramPacket toDatagramPacket() {
-        return new DatagramPacket(this.getPacket() ,this.getPacketLength(), address, port);
+        return new DatagramPacket(this.getPacket(), this.getPacketLength(), address, port);
     }
 
     // public void printheader() {
