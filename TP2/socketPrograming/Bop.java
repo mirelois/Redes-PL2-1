@@ -88,9 +88,9 @@ public class Bop {
         // TODO: check packet_size
 
         byte[] packet = udpPacket.getData();
+
         this.ack = packet[0] != 0;
-
-
+        
         if (ack) {
             this.header_size = 1;
             this.header = new byte[1];
@@ -98,6 +98,7 @@ public class Bop {
             
             this.header_size = HEADER_SIZE;
             this.header = new byte[HEADER_SIZE];
+            this.payload = new byte[packet.length - this.header_size];    
             
             for (int i = 0; i < packet.length - this.header_size; i++) {
                 this.payload[i] = packet[header_size + i];
