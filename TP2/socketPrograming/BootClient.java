@@ -37,7 +37,7 @@ public class BootClient implements Runnable{
                     try {
                         Thread.sleep(timeOut);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException("Neighbour Asking Interrupted");
                     }
 
                     // send neighbour request
