@@ -102,7 +102,7 @@ public class Bop {
             this.header_size = HEADER_SIZE;
             this.header = new byte[HEADER_SIZE];
             this.payload = new byte[packet.length - this.header_size];    
-            
+            this.payload_size = packet.length - this.header_size;
             for (int i = 0; i < packet.length - this.header_size; i++) {
                 this.payload[i] = packet[header_size + i];
             }
