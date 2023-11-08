@@ -11,25 +11,25 @@ public class fullDuplex {
             return;
         }
 
+        // Setup Phase:
+        if(args.length == 2) {
+            new Thread(new BootStrapper(2000, args[1], 1000)).start();
+        }
+
         ArrayList<InetAddress> neighbours = new ArrayList<>(0);
 
-        // Setup Phase:
-        if(args.length == 1) {
-            new Thread(new BootStrapper(2000, args[0], 1000)).start(); // no one will get this one #LMAO
+        try {
+            new Thread(new BootClient(InetAddress.getByName(args[0]), 2000, 2001, 1000, neighbours)).start();
+        } catch (UnknownHostException e){
+            e.printStackTrace();
         }
-        else {
-            try {
-                new Thread(new BootClient(InetAddress.getByName(args[1]), 2000, 2000, 1000, neighbours)).start();
-            } catch (UnknownHostException e){
-                e.printStackTrace();
+
+        try {
+            synchronized (neighbours) {
+                neighbours.wait();
             }
-            try {
-                synchronized (neighbours) {
-                    neighbours.wait();
-                }
-            } catch (InterruptedException e){
-                e.printStackTrace();
-            }
+        } catch (InterruptedException e){
+            e.printStackTrace();
         }
 
         // Phase 2
