@@ -78,7 +78,7 @@ public class BootClient implements Runnable{
                     Bop bop_ack = new Bop(true, null, 0, bootStrapperIP, bootStrapperPort);
 
                     socket.send(bop_ack.toDatagramPacket());
-
+                    break; // senão ele fica a pedir 5 vezes
                 }
 
             }
