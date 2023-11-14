@@ -1,13 +1,18 @@
 import java.net.InetAddress;
 
-public class Simp {
+public class Simp extends Packet {
+
+    static int HEADER_SIZE = 10;
+    
     int time_stamp; //2
-    int latency; //2
-    int throughput; //2 (Max. 9999)
+                    
+    // int latency; //2
+                 
+    // int throughput; //2 (Max. 9999)
+                    
     InetAddress sourceAddress; //4
+                               
     int checksum; //4
-    byte[] header;
-    byte[] payload;
 
     /*
     Definir uma Socket para cada uma das funcionalidades deste protocolo:
@@ -21,4 +26,14 @@ public class Simp {
     3????. Acks da receção de pacotes da Stream
         A ideia era limitar o tamanho da rede, mas precisava do ack# então se calhar não funciona
     */
+
+    public Simp(int time_stamp, InetAddress sourceAddress,  InetAddress address, int port){
+
+        this.time_stamp = time_stamp;
+
+
+        super(HEADER_SIZE, null, 0, null, address, port);
+        
+    }
+
 }
