@@ -20,11 +20,9 @@ public class Sup extends Packet {
 
         this.acknowledgment_number = acknowledgment_number;
 
-        LocalTime now = LocalTime.now();
+        this.time_stamp = Packet.getCurrTime();
 
-        this.time_stamp = now.getSecond() * 1000 + now.getNano() / 1000000;
-
-        this.checksum = 0;
+        this.checksum = 0; //TODO make good checksum, not bad checksum, only good checksum
 
         this.header[0] = (byte) (this.time_stamp >> 8 /* & 0xFF */);
         this.header[1] = (byte) (this.time_stamp      /* & 0xFF */);

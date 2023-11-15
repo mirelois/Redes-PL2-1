@@ -35,9 +35,7 @@ public class Simp extends Packet {
 
         super(HEADER_SIZE, payload, payload_size, address, port);
 
-        LocalTime now = LocalTime.now();
-
-        this.time_stamp = now.getSecond() * 1000 + now.getNano() / 1000000;
+        this.time_stamp = Packet.getCurrTime();
 
         this.sourceAddress = sourceAddress;
 

@@ -1,5 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.time.LocalTime;
 
 public class Packet {
 
@@ -120,6 +121,13 @@ public class Packet {
 
     public InetAddress getAddress() {
         return this.address;
+    }
+
+    public static int getCurrTime(){
+        
+        LocalTime now = LocalTime.now();
+        
+        return now.getSecond() * 1000 + now.getNano() / 1000000;
     }
 
 }
