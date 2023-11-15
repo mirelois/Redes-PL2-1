@@ -36,6 +36,13 @@ public class fullDuplex {
         }
 
         // Phase 2
+        //Thread client = new Thread(new Client()); // criar um client a priori não funcional que só fazemos run quando o user pede,
+        // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e ver a stream porque também somos clientes
+        // senão tinhamos de por o nome do cliente destino no packet, do be cringe sometimes
+
+        Thread streaming = new Thread(new Streaming(5000, 1000, neighbours));
+        streaming.start();
+        /*
         Thread t1, t2;
         try(DatagramSocket socket = new DatagramSocket(5000)){
             Sender sender = new Sender(socket);
@@ -51,5 +58,7 @@ public class fullDuplex {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+        */
+
     }
 }

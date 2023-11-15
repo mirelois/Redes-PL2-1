@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
-public class Client {
+public class Client implements Runnable{
 
     //GUI
     //----
@@ -23,7 +23,7 @@ public class Client {
     //RTP variables:
     //----------------
     DatagramPacket rcvdp; //UDP packet received from the server (to receive)
-    DatagramSocket RTPsocket; //socket to be used to send and receive UDP packet
+    // DatagramSocket RTPsocket; //socket to be used to send and receive UDP packet
     static int RTP_RCV_PORT = 25000; //port where the client will receive the RTP packets
 
     Timer cTimer; //timer used to receive data from the UDP socket
@@ -73,6 +73,7 @@ public class Client {
         cTimer.setCoalesce(true);
         cBuf = new byte[15000]; //allocate enough memory for the buffer used to receive data from the server
 
+        /*
         try {
             // socket e video
             RTPsocket = new DatagramSocket(RTP_RCV_PORT); //init RTP socket (o mesmo para o cliente e servidor)
@@ -80,6 +81,14 @@ public class Client {
         } catch (SocketException e) {
             System.out.println("Cliente: erro no socket: " + e.getMessage());
         }
+         */
+    }
+
+
+    // Run
+    @Override
+    public void run() {
+        System.out.println("Do something"); // TODO fazer alguma coisa com o client tipo ler cenas
     }
 
     //------------------------------------
@@ -115,26 +124,27 @@ public class Client {
     //------------------------------------
 
     class clientTimerListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) { // TODO enviar o SUP do Streaming para cima (aka aqui) se o cliente estiver em funcionamento
+            /*
 
             //Construct a DatagramPacket to receive data from the UDP socket
-            rcvdp = new DatagramPacket(cBuf, cBuf.length);
+            //rcvdp = new DatagramPacket(cBuf, cBuf.length);
 
             try{
                 //receive the DP from the socket:
-                RTPsocket.receive(rcvdp);
+                //RTPsocket.receive(rcvdp);
 
                 //create an RTPpacket object from the DP
-                Packet rtp_packet = new Packet(rcvdp.getData(), rcvdp.getLength());
+                //Sup rtp_packet = new Sup(rcvdp.getData(), rcvdp.getLength());
 
                 //print important header fields of the RTP packet received:
-                System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getSequenceNumber() +" TimeStamp "+rtp_packet.getTimeStamp());//+" ms, of type "+rtp_packet.getpayloadtype());
+                //System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getSequenceNumber() +" TimeStamp "+rtp_packet.getTimeStamp());//+" ms, of type "+rtp_packet.getpayloadtype());
 
                 //print header bitstream:
-                rtp_packet.printheader();
+                //rtp_packet.printheader();
 
                 //get the payload bitstream from the RTPpacket object
-                byte [] payload = rtp_packet.getPayload();
+                //byte [] payload = rtp_packet.getPayload();
 
                 //get an Image object from the payload bitstream
                 Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -150,6 +160,8 @@ public class Client {
             catch (IOException ioe) {
                 System.out.println("Exception caught: "+ioe);
             }
+            */
+             */
         }
     }
 }
