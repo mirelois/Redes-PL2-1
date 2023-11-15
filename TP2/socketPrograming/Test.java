@@ -1,49 +1,47 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-import java.util.Scanner;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class Test {
 
-    public static void main(String[] args) {
-        // Thread t;
+    public static void main(String[] args) throws UnknownHostException {
 
-        Socket socket = null;
-
-        // BootStraper bootStraper = new BootStraper(1233);
-        // t = new Thread(bootStraper);
-
-        // t.start();
+        InetAddress address = InetAddress.getByName("localhost");
         
-        try {
+        Rip rip_source = new Rip(12, 13,address, 2000);
 
-            socket = new Socket("localhost", 1234);
+        Rip rip_dest = new Rip(rip_source.toDatagramPacket());
 
-            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        assert(rip_dest.getLatency() == 12);
+        assert(rip_dest.getThroughput() == 13);
+        assert(rip_dest.getAddress().equals(address));
+        assert(rip_dest.getPort() == 2000);
 
-            Scanner scanner = new Scanner(System.in);
+        //------------------------------------------------
+        
+        Simp simp_source = new Simp(address, address, 2000, 5, "hello".getBytes());
 
-            while (true) {
+        Simp simp_dest = new Simp(simp_source.toDatagramPacket());
 
-                String msg = scanner.nextLine();
+        System.out.println(simp_dest.getTime_stamp());
+        assert(simp_dest.getSourceAddress().equals(address));
+        assert(simp_dest.getChecksum() == 0);
+        assert(simp_dest.getPort() == 2000);
+        assert(simp_dest.getAddress().equals(address));
+        assert(simp_dest.getPayload().equals("hello".getBytes()));
 
-                bufferedWriter.write(msg);
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
+        //------------------------------------------------
 
-                String s = bufferedReader.readLine();
-                System.out.println(s);
-            }
-                
+        Sup sup_source = new Sup(1000, 1001, address, 2000, 5, "hello".getBytes());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Sup sup_dest = new Sup(sup_source.toDatagramPacket());
+
+        assert(sup_dest.getSequence_number() == 1000);
+        assert(sup_dest.getAcknowledgment_number() == 1001);
+        assert(sup_dest.getChecksum() == 0);
+        assert(sup_dest.getPort() == 2000);
+        assert(sup_dest.getAddress().equals(address));
+        assert(sup_dest.getPayload().equals("hello".getBytes()));
+        
 
     }
-
 }

@@ -22,6 +22,8 @@ public class Packet {
         this.header = new byte[header_size];
         this.payload_size = payload_size;
         this.payload = new byte[payload_size];
+
+        this.address = address;
         this.port = port;
 
         if(payload_size == 0){
