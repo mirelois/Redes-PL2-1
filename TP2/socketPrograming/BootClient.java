@@ -5,16 +5,16 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
+import java.util.*;
 
 public class BootClient implements Runnable{
     private int bootStrapperPort, port, timeOut;
 
     private InetAddress bootStrapperIP;
 
-    private ArrayList<InetAddress> neighbours;
+    private Map<InetAddress, Set<InetAddress>> neighbours;
 
-    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut, ArrayList<InetAddress> neighbours){
+    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut, Map<InetAddress, Set<InetAddress>> neighbours){
         this.bootStrapperIP = bootStrapperIP;
         this.bootStrapperPort = bootStrapperPort;
         this.port = port;
@@ -69,7 +69,10 @@ public class BootClient implements Runnable{
                     // entra aqui quando receber o pacote bem
                     t.interrupt();
 
-                    this.neighbours.addAll((ArrayList<InetAddress>) deserialize(bopReceived.getPayload()));
+                    for(InetAddress inetAddress: (Set<InetAddress>) deserialize(bopReceived.getPayload())){
+                        this.neighbours.put(inetAddress, new HashSet<>());
+                    }
+
                     System.out.println(neighbours);
                     synchronized (neighbours) {
                         this.neighbours.notify();

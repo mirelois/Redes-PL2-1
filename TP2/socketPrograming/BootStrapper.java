@@ -10,9 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.*;
 
 public class BootStrapper implements Runnable{
@@ -34,11 +32,11 @@ public class BootStrapper implements Runnable{
         return out.toByteArray();
     }
 
-    private HashMap<InetAddress, ArrayList<InetAddress>> getTree(String filePath) {
+    private HashMap<InetAddress, Set<InetAddress>> getTree(String filePath) {
 
         FileInputStream stream = null;
 
-        HashMap<InetAddress, ArrayList<InetAddress>> tree = new HashMap<InetAddress, ArrayList<InetAddress>>();
+        HashMap<InetAddress, Set<InetAddress>> tree = new HashMap<>();
 
         try {
             stream = new FileInputStream(filePath);
@@ -85,7 +83,7 @@ public class BootStrapper implements Runnable{
                         // TODO error
                     }
 
-                    tree.put(map.get(node), new ArrayList<InetAddress>());
+                    tree.put(map.get(node), new HashSet<>());
 
                     pattern = Pattern.compile("[^ ,]+");
 
@@ -119,7 +117,7 @@ public class BootStrapper implements Runnable{
         byte[] buff = new byte[1024];
 
         // neighbour tree from file
-        HashMap<InetAddress, ArrayList<InetAddress>> tree = getTree(filePath);
+        HashMap<InetAddress, Set<InetAddress>> tree = getTree(filePath);
 
         // initialize map to store clients for whom wainting for ack
         HashMap<InetAddress, Thread> wait_map = new HashMap<InetAddress, Thread>();
