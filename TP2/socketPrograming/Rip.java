@@ -9,9 +9,9 @@ public class Rip extends Packet { // Responce information protocol
 
 	int throughput; // 2 (technicaly only 14 bits are used)
                     
-	public Rip(int latency, int throughput, InetAddress address, int port, int payload_size, byte[] payload) {
+	public Rip(int latency, int throughput, InetAddress address, int port) {
 
-        super(HEADER_SIZE, payload, payload_size, address, port);
+        super(HEADER_SIZE, null, 0, address, port);
 
         this.latency = latency;
         this.throughput = throughput;
