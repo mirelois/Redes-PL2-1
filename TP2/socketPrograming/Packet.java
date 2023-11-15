@@ -16,16 +16,23 @@ public class Packet {
     int port;
 
     public Packet(int header_size, byte[] payload, int payload_size, InetAddress address, int port) {
+
         this.header_size = header_size;
         this.header = new byte[header_size];
         this.payload_size = payload_size;
         this.payload = new byte[payload_size];
-        this.address = address;
         this.port = port;
 
-        for (int i = 0; i < payload_size; i++) {
-            this.payload[i] = payload[i];
+        if(payload_size == 0){
+            this.payload = null;
+        }else{
+            this.address = address;
+            
+            for (int i = 0; i < payload_size; i++) {
+                this.payload[i] = payload[i];
+            }
         }
+
     }
 
     public Packet(DatagramPacket packet, int header_size) {
@@ -51,6 +58,10 @@ public class Packet {
     }
 
     public byte[] getPayload() {
+
+        if(this.payload_size == 0){
+            return null;
+        }
 
         byte[] payload = new byte[payload_size];
 
@@ -91,6 +102,7 @@ public class Packet {
         for (int i = 0; i < header_size; i++) {
             packet[i] = this.header[i];
         }
+            
         for (int i = 0; i < payload_size; i++) {
             packet[i + header_size] = this.payload[i];
         }
