@@ -106,7 +106,7 @@ public class Bop {
             for (int i = 0; i < packet.length - this.header_size; i++) {
                 this.payload[i] = packet[header_size + i];
             }
-            this.checksum = packet[2] | (packet[1] >> 8);
+            this.checksum = packet[2] | (packet[1] << 8);
         }
         
         for (int i = 0; i < header_size; i++) {
