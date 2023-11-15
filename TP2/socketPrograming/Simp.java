@@ -61,6 +61,7 @@ public class Simp extends Packet {
     }
 
     public Simp(DatagramPacket packet) throws java.net.UnknownHostException{
+        
         super(packet, HEADER_SIZE);
 
         this.time_stamp = (this.header[0] << 8) | this.header[1];
