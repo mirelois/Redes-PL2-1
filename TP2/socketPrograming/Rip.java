@@ -19,7 +19,7 @@ public class Rip extends Packet { // Responce information protocol
         this.header[0] = (byte) (latency >> 8 /* & 0xFF */);
         this.header[1] = (byte) (latency      /* & 0xFF */);
         
-        this.header[2] = (byte) (throughput >> 8 /* & 0xFF */);
+        this.header[2] = (byte) (throughput >> 8 & 0x3F   );
         this.header[3] = (byte) (throughput      /* & 0xFF */);
         
     }
