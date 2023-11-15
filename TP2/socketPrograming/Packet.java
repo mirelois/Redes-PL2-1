@@ -3,19 +3,51 @@ import java.net.InetAddress;
 
 public class Packet {
 
+    int header_size;
+
+    public byte[] header;
+
     public int payload_size;
 
     public byte[] payload;
 
     InetAddress address;
-    
+
     int port;
 
-    public Packet(int payload_size, byte[] payload, InetAddress address, int port){
-		this.payload_size = payload_size;
-		this.payload = payload;
-		this.address = address;
-		this.port = port;
+    public Packet(int header_size, byte[] payload, int payload_size, InetAddress address, int port) {
+        this.header_size = header_size;
+        this.header = new byte[header_size];
+        this.payload_size = payload_size;
+        this.payload = new byte[payload_size];
+        this.address = address;
+        this.port = port;
+
+        for (int i = 0; i < payload_size; i++) {
+            this.payload[i] = payload[i];
+        }
+    }
+
+    public Packet(DatagramPacket packet, int header_size) {
+
+        this.header_size = header_size;
+        this.header = new byte[header_size];
+        this.address = packet.getAddress();
+        this.port = packet.getPort();
+
+        byte[] data = packet.getData();
+        
+        this.payload_size = data.length - header_size;
+        this.payload = new byte[this.payload_size]; // TODO: check data length
+
+        for (int i = 0; i < data.length - this.header_size; i++) {
+            this.payload[i] = data[header_size + i];
+        }
+
+        for (int i = 0; i < header_size; i++) {
+            this.header[i] = data[i];
+        }
+
     }
 
     public byte[] getPayload() {
@@ -33,30 +65,45 @@ public class Packet {
         return this.payload_size;
     }
 
+    public byte[] getHeader() {
+
+        byte[] header = new byte[header_size];
+
+        for (int i = 0; i < header_size; i++) {
+            header[i] = this.header[i];
+        }
+
+        return header;
+    }
+
+    public int getHeaderSize() {
+        return header_size;
+    }
+
     public int getPort() {
         return this.port;
     }
 
-    public byte[] getPacket(byte[] header) {
+    public byte[] getPacket() {
 
-        byte[] packet = new byte[header.length+payload_size];
+        byte[] packet = new byte[header_size + payload_size];
 
-        for (int i = 0; i < header.length; i++) {
-            packet[i] = header[i];
+        for (int i = 0; i < header_size; i++) {
+            packet[i] = this.header[i];
         }
         for (int i = 0; i < payload_size; i++) {
-            packet[i + header.length] = this.payload[i];
+            packet[i + header_size] = this.payload[i];
         }
 
         return packet;
     }
 
-    public int getPacketLength(int header_size) {
+    public int getPacketLength() {
         return header_size + this.payload_size;
     }
-    
-    public DatagramPacket toDatagramPacket(byte[] header, int header_size) {
-        return new DatagramPacket(this.getPacket(header), this.getPacketLength(header_size), address, port);
+
+    public DatagramPacket toDatagramPacket() {
+        return new DatagramPacket(this.getPacket(), this.getPacketLength(), address, port);
     }
 
     public InetAddress getAddress() {
