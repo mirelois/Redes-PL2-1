@@ -35,11 +35,16 @@ public class Rip extends Packet { // Responce information protocol
 
         super(packet, HEADER_SIZE);
 
-        this.latency = (Byte.toUnsignedInt(this.header[0]) << 8) | Byte.toUnsignedInt(this.header[1]);
+        this.latency = (Byte.toUnsignedInt(this.header[0]) << 8) |
+                        Byte.toUnsignedInt(this.header[1]);
 
-        this.acknowledgment = (Byte.toUnsignedInt(this.header[2]) << 24) | (Byte.toUnsignedInt(this.header[3]) << 16) | (Byte.toUnsignedInt(this.header[4]) << 8) | Byte.toUnsignedInt(this.header[5]);
+        this.acknowledgment = (Byte.toUnsignedInt(this.header[2]) << 24) |
+                              (Byte.toUnsignedInt(this.header[3]) << 16) |
+                              (Byte.toUnsignedInt(this.header[4]) << 8)  |
+                               Byte.toUnsignedInt(this.header[5]);
         
-        this.lossRate = (Byte.toUnsignedInt(this.header[6]) << 8) | Byte.toUnsignedInt(this.header[7]);
+        this.lossRate = (Byte.toUnsignedInt(this.header[6]) << 8) |
+                         Byte.toUnsignedInt(this.header[7]);
     }
     
     public int getLatency() {

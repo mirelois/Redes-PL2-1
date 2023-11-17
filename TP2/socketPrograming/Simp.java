@@ -60,7 +60,8 @@ public class Simp extends Packet {
         
         super(packet, HEADER_SIZE);
 
-        this.time_stamp = (Byte.toUnsignedInt(this.header[0]) << 8) | (Byte.toUnsignedInt(this.header[1]));
+        this.time_stamp = (Byte.toUnsignedInt(this.header[0]) << 8) |
+                           Byte.toUnsignedInt(this.header[1]);
 
         StringBuilder ip = new StringBuilder(15);
 
@@ -74,7 +75,8 @@ public class Simp extends Packet {
 
         this.sourceAddress = InetAddress.getByName(ip.toString());
 
-        this.checksum = (Byte.toUnsignedInt(this.header[6]) << 8) | Byte.toUnsignedInt(this.header[7]);
+        this.checksum = (Byte.toUnsignedInt(this.header[6]) << 8) |
+                         Byte.toUnsignedInt(this.header[7]);
 
     }
 
