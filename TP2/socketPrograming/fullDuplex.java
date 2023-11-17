@@ -49,6 +49,9 @@ public class fullDuplex {
 
         Thread streaming = new Thread(new Streaming(5000, 1000, neighbours));
         streaming.start();
+        if((args.length == 2 && args[1].equals("-s")) || (args.length == 3 && args[2].equals("-s"))){
+            //new Thread(new Server(5000, 1000, neighbours))
+        }
         /*
         Thread t1, t2;
         try(DatagramSocket socket = new DatagramSocket(5000)){
