@@ -218,6 +218,47 @@
 #### Recuperação de Perda
  * Baseado na diferença entre as frames, fazer uma interpolação?
   
+#### Routing da Stream
+ * **Tabela de Ativação** - Cada nodo avisa os seus vizinhos se o *link* está disponível, para uma dada *stream*
+   * Precisa de uma tabela que associa a cada *stream* os seus vizinhos ativos
+   * Os pacotes têm de identificar qual a sua *stream*
+   * Os nodos enviam as streams que recebem para os seus links ativos
+   * Quando um nodo decide ativar outro link, avisa a ativação ao seu superior
+     * O seu superior ativa algum *link* até ao RP (se desativado)
+       * Se já tivesse ativo, podia haver o problema de estar a receber *streams* desnecessárias
+         * Apenas se o caminho até ao RP estivesse ativo
+           * O RP não pode ser mais esperto que isso, implicava comunicação até ele na mesma
+       * Ativar os caminhos todos exige um certo flood em todos os ramos 
+   * Também tem de avisar a desativação do anterior
+     * Se esse anterior não tiver a servir mais ninguém, desativa também
+   * Pros:
+     * 
+   * Cons:
+     * Exige métricas cumulativas
+     * WRONG: Escala "mal" com o aumentar de streams diferentes
+       * Not really, basta ter uma lista e manda-se para toda a gente na mesma
+     * Existe uma espécie de flood para braços diferentes, de modo a desativar/ativar partes da rede
+ * **Identificação de Destino** - Cada nodo sabe que vizinhos levam a certos nodos especiais
+   * Precisa de uma tabela que associa a cada vizinho quais os nodos especiais nesse trajeto
+   * Os pacotes têm de identificar qual o seu Cliente destino **(pode ser mais do que um)**
+   * Os nodos enviam para o vizinho que determinarem com melhor métrica, desde que siga o trajeto correto
+     * Uma Thread em cada nodo pode decidir ativar ou desativar links, como em cima
+     * Esta ativação e desativação não utiliza a rede
+   * Pros:
+     * 
+   * Cons:
+     * Exige métricas cumulativas
+     * Escala mal com o aumento do *multicasting*
+       * Os pacotes têm de identificar **todos** os seus destinos
+         * Eventualmente, uma bifurcação exige a retirada desses detalhes
+         * 
+
+#### Troca de Servidor
+ * Cada servidor irá guardar certos vídeos
+ * O RP tem a responsabilidade de pedir ao Servidor com melhor métricas
+ * Quando decide trocar, envia o último pacote cumulativo ao novo servidor e um Opt-Out ao antigo
+ * Vai receber pacotes repetidos de ambas as streams, guarda o mais recente
+
 ### Extras
  * Vídeos visualmente distintos para facilitar a apresentação
    * escrever a letra A, B, C no paint para o vídeo A, B, C...
