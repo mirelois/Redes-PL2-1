@@ -4,7 +4,7 @@ import java.time.LocalTime;
 
 public class Simp extends Packet {
 
-    static int HEADER_SIZE = 10;
+    static int HEADER_SIZE = 8;
 
     int time_stamp; // 2
 
@@ -14,7 +14,7 @@ public class Simp extends Packet {
 
     InetAddress sourceAddress; // 4
 
-    int checksum; // 4
+    int checksum; // 2
 
     /*
      * Definir uma Socket para cada uma das funcionalidades deste protocolo:
@@ -51,10 +51,8 @@ public class Simp extends Packet {
         this.header[4] = Byte.parseByte(ip_values[2]);
         this.header[5] = Byte.parseByte(ip_values[3]);
 
-        this.header[6] = (byte) (this.checksum >> 24 /* & 0xFF */);
-        this.header[7] = (byte) (this.checksum >> 16 /* & 0xFF */);
-        this.header[8] = (byte) (this.checksum >> 8  /* & 0xFF */);
-        this.header[9] = (byte) (this.checksum       /* & 0xFF */);
+        this.header[6] = (byte) (this.checksum >> 8  /* & 0xFF */);
+        this.header[7] = (byte) (this.checksum       /* & 0xFF */);
 
     }
 
@@ -62,7 +60,7 @@ public class Simp extends Packet {
         
         super(packet, HEADER_SIZE);
 
-        this.time_stamp = (this.header[0] << 8) | this.header[1];
+        this.time_stamp = (Byte.toUnsignedInt(this.header[0]) << 8) | (Byte.toUnsignedInt(this.header[1]));
 
         StringBuilder ip = new StringBuilder(15);
 
@@ -76,7 +74,7 @@ public class Simp extends Packet {
 
         this.sourceAddress = InetAddress.getByName(ip.toString());
 
-        this.checksum = (this.header[6] << 24) | (this.header[7] << 16) | (this.header[8] << 8) | this.header[9];
+        this.checksum = (Byte.toUnsignedInt(this.header[6]) << 8) | Byte.toUnsignedInt(this.header[7]);
 
     }
 
