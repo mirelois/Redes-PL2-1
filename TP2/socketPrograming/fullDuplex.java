@@ -9,22 +9,27 @@ import java.util.stream.Collectors;
 
 public class fullDuplex {
     public static void main(String[] args){
-        if(args.length<1 || args.length>2) {
-            System.out.println("Wrong Arguments");
+        if(args.length<1 || args.length>3) {
+            System.out.println("Wrong Arguments!" +
+                    "\nIP_Bootstrapper [-b] [-s]" +
+                    "\n -b: Bootstrapper, -s: Server");
             return;
         }
 
-        // Setup Phase:
-        if(args.length == 2) {
-            new Thread(new BootStrapper(2000, args[1], 1000)).start();
-        }
-
-        HashMap<InetAddress, Set<InetAddress>> neighbours = new HashMap<InetAddress, Set<InetAddress>>(0);
-
+        HashMap<InetAddress, Set<InetAddress>> neighbours = new HashMap<>(0);
+        InetAddress ip_bootstrapper;
         try {
-            new Thread(new BootClient(InetAddress.getByName(args[0]), 2000, 2001, 1000, neighbours)).start();
+            ip_bootstrapper = InetAddress.getByName(args[0]);
+
+            // Setup Phase:
+            if((args.length == 2 && args[1].equals("-b")) || (args.length == 3 && args[2].equals("-b"))) {
+                new Thread(new BootStrapper(2000, args[1], 1000)).start();
+            }
+
+            new Thread(new BootClient(ip_bootstrapper, 2000, 2001, 1000, neighbours)).start();
+
         } catch (UnknownHostException e){
-            e.printStackTrace();
+            System.out.println("The IP " + args[0] + " is Invalid for IP_Bootstrapper");
         }
 
         try {
@@ -34,6 +39,8 @@ public class fullDuplex {
         } catch (InterruptedException e){
             e.printStackTrace();
         }
+
+
 
         // Phase 2
         //Thread client = new Thread(new Client()); // criar um client a priori não funcional que só fazemos run quando o user pede,
