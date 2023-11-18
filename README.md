@@ -251,7 +251,6 @@
      * Escala mal com o aumento do *multicasting*
        * Os pacotes têm de identificar **todos** os seus destinos
          * Eventualmente, uma bifurcação exige a retirada desses detalhes
-         * 
 
 #### Troca de Servidor
  * Cada servidor irá guardar certos vídeos
