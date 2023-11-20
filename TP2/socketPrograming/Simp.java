@@ -2,7 +2,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.time.LocalTime;
 
-public class Simp extends Packet {
+public class Simp extends Packet {  //Stream Initiation Management Protocol
 
     static int HEADER_SIZE = 8;
 

@@ -1,7 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
-public class Rip extends Packet { // Responce information protocol
+public class Rip extends Packet { // Response and Idle Protocol
                                   
     static int HEADER_SIZE = 8;
 
