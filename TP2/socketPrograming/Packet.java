@@ -125,6 +125,14 @@ public class Packet {
         return this.address;
     }
 
+    public static int checksum(byte[] data){
+        int sum = 0;
+        for (byte b : data) {
+            sum += b;
+        }
+        return ~sum;
+    }
+    
     public static int getCurrTime(){
         
         LocalTime now = LocalTime.now();
