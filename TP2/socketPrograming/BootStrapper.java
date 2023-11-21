@@ -5,23 +5,23 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.lang.instrument.Instrumentation;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.*;
-import java.util.regex.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BootStrapper implements Runnable {
 
-    private int bootPort, timeout;
+    private int bootPort;
     private String filePath;
 
     public BootStrapper(int bootPort, String filePath, int timeout) {
         this.bootPort = bootPort;
         this.filePath = filePath;
-        this.timeout = timeout;
     }
 
     private byte[] serialize(Object obj) throws IOException {
@@ -129,7 +129,6 @@ public class BootStrapper implements Runnable {
                 DatagramPacket datagramPacket = new DatagramPacket(buff, buff.length);
 
                 socket.receive(datagramPacket);
-                // -------------
 
                 // unpack BOP packet
                 Bop bop = new Bop(datagramPacket);
