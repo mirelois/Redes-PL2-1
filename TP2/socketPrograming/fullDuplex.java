@@ -1,11 +1,6 @@
-import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 public class fullDuplex {
     public static void main(String[] args){
@@ -50,9 +45,10 @@ public class fullDuplex {
         Thread client = new Thread(new Client());
         Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, client));
         streaming.start();
-        if((args.length == 2 && args[1].equals("-s")) || (args.length == 3 && args[2].equals("-s"))){
+        Thread simpManager = new Thread(new SimpManager(7000, 7001, neighbours));
+        //if((args.length == 2 && args[1].equals("-s")) || (args.length == 3 && args[2].equals("-s"))){
             //new Thread(new Server(5000, 1000, neighbours))
-        }
+        //}
 
     }
 }

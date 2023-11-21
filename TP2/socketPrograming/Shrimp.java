@@ -9,7 +9,7 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
     int streamId; //1
     InetAddress sourceAddress; //4
 
-    public Shrimp(InetAddress sourceAddress, boolean flag, int streamId, int port, InetAddress address, int payload_size, byte[] payload) {
+    public Shrimp(InetAddress sourceAddress, int streamId, int port, InetAddress address, int payload_size, byte[] payload) {
         super(HEADER_SIZE, payload, payload_size, address, port);
 
         this.streamId = streamId;
