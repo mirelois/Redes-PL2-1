@@ -2,21 +2,19 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Streaming implements Runnable{
     private int port, timeOut;
-    private Map<InetAddress, Set<InetAddress>> neighbours;
+    private NeighbourInfo neighbourInfo;
 
     private final Lock destLock;
 
-    public Streaming(int port, int timeOut, Map<InetAddress, Set<InetAddress>> neighbours){
+    public Streaming(int port, int timeOut, NeighbourInfo neighbourInfo){
         this.port = port;
         this.timeOut = timeOut;
-        this.neighbours = neighbours;
+        this.neighbourInfo = this.neighbourInfo;
         this.destLock = new ReentrantLock();
     }
 
@@ -32,17 +30,9 @@ public class Streaming implements Runnable{
                 //int currTime = Packet.getCurrTime();
                 Sup stream = new Sup(packet);
                 //int latency = stream.getTime_stamp() - currTime;
-                if(!neighbours.keySet().isEmpty()) {
-                    InetAddress v = null;
-                    for (InetAddress i : neighbours.keySet()) {
-                        v = i;
-                        break;
-                    }
-
-                    socket.send(new Sup(stream.getVideo_time_stamp(), stream.getSequence_number(),
-                            v, this.port, stream.getPayloadSize(), stream.getPayload())
-                            .toDatagramPacket());
-                }
+                socket.send(new Sup(stream.getVideo_time_stamp(), stream.getSequence_number(),
+                        InetAddress.getByName("deez"), this.port, stream.getPayloadSize(), stream.getPayload())
+                        .toDatagramPacket());
                 // TODO testar CheckSum
 
                 // Decidir Vizinho mais adequado para enviar stream

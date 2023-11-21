@@ -16,7 +16,7 @@ public class fullDuplex {
             return;
         }
 
-        HashMap<InetAddress, Set<InetAddress>> neighbours = new HashMap<>(0);
+        NeighbourInfo neighbours = new NeighbourInfo();
         InetAddress ip_bootstrapper;
         try {
             ip_bootstrapper = InetAddress.getByName(args[0]);

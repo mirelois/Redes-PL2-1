@@ -5,23 +5,21 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.lang.instrument.Instrumentation;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.*;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BootStrapper implements Runnable {
 
-    private int bootPort, timeout;
+    private int bootPort;
     private String filePath;
 
     public BootStrapper(int bootPort, String filePath, int timeout) {
         this.bootPort = bootPort;
         this.filePath = filePath;
-        this.timeout = timeout;
     }
 
     private byte[] serialize(Object obj) throws IOException {
@@ -32,11 +30,11 @@ public class BootStrapper implements Runnable {
         return out.toByteArray();
     }
 
-    private HashMap<InetAddress, Set<InetAddress>> getTree(String filePath) {
+    private HashMap<InetAddress, List<InetAddress>> getTree(String filePath) {
 
         FileInputStream stream = null;
 
-        HashMap<InetAddress, Set<InetAddress>> tree = new HashMap<>();
+        HashMap<InetAddress, List<InetAddress>> tree = new HashMap<>();
 
         try {
             stream = new FileInputStream(filePath);
@@ -83,7 +81,7 @@ public class BootStrapper implements Runnable {
                         // TODO error
                     }
 
-                    tree.put(map.get(node), new HashSet<>());
+                    tree.put(map.get(node), new ArrayList<>());
 
                     pattern = Pattern.compile("[^ ,]+");
 
@@ -117,7 +115,7 @@ public class BootStrapper implements Runnable {
         byte[] buff = new byte[1024];
 
         // neighbour tree from file
-        HashMap<InetAddress, Set<InetAddress>> tree = getTree(filePath);
+        HashMap<InetAddress, List<InetAddress>> tree = getTree(filePath);
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(bootPort)) {
@@ -129,7 +127,6 @@ public class BootStrapper implements Runnable {
                 DatagramPacket datagramPacket = new DatagramPacket(buff, buff.length);
 
                 socket.receive(datagramPacket);
-                // -------------
 
                 // unpack BOP packet
                 Bop bop = new Bop(datagramPacket);
@@ -144,7 +141,6 @@ public class BootStrapper implements Runnable {
 
         } catch (PacketSizeException | IOException e) {
             e.printStackTrace();
-            return;
         }
     }
 }
