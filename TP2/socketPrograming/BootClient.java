@@ -53,13 +53,12 @@ public class BootClient implements Runnable{
             });
             t.start();
 
-            for (int i = 0; i < 5; i++) {
+            // receber os vizinhos
+            byte[] buf = new byte[1024];
 
-                // receber os vizinhos
-                byte[] buf = new byte[1024];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
+            while(true) {
                 socket.receive(packet);
 
                 Bop bopReceived = new Bop(packet);
@@ -76,16 +75,14 @@ public class BootClient implements Runnable{
                         this.neighbours.notify();
                     }
 
-                    Bop bop_ack = new Bop(null, 0, bootStrapperIP, bootStrapperPort);
+                    break;
 
-                    socket.send(bop_ack.toDatagramPacket());
-                    break; // senão ele fica a pedir 5 vezes
                 }
-
             }
+
         } catch (SocketException e){
             e.printStackTrace();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException | PacketSizeException e) {
             throw new RuntimeException(e);
         }
     }
