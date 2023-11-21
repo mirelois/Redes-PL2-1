@@ -12,9 +12,9 @@ public class BootClient implements Runnable{
 
     private InetAddress bootStrapperIP;
 
-    private Map<InetAddress, Set<InetAddress>> neighbours;
+    private NeighbourInfo neighbours;
 
-    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut, Map<InetAddress, Set<InetAddress>> neighbours){
+    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut, NeighbourInfo neighbours){
         this.bootStrapperIP = bootStrapperIP;
         this.bootStrapperPort = bootStrapperPort;
         this.port = port;
@@ -41,7 +41,7 @@ public class BootClient implements Runnable{
                     }
 
                     // send neighbour request
-                    Bop bop = new Bop(false, null, 0, bootStrapperIP, bootStrapperPort);
+                    Bop bop = new Bop(null, 0, bootStrapperIP, bootStrapperPort);
 
                     try {
                         socket.send(bop.toDatagramPacket());
@@ -69,16 +69,14 @@ public class BootClient implements Runnable{
                     // entra aqui quando receber o pacote bem
                     t.interrupt();
 
-                    for(InetAddress inetAddress: (Set<InetAddress>) deserialize(bopReceived.getPayload())){
-                        this.neighbours.put(inetAddress, new HashSet<>());
-                    }
+                    this.neighbours.neighbours = (List<InetAddress>) deserialize(bopReceived.getPayload());
 
-                    System.out.println(neighbours);
+                    //System.out.println(neighbours);
                     synchronized (neighbours) {
                         this.neighbours.notify();
                     }
 
-                    Bop bop_ack = new Bop(true, null, 0, bootStrapperIP, bootStrapperPort);
+                    Bop bop_ack = new Bop(null, 0, bootStrapperIP, bootStrapperPort);
 
                     socket.send(bop_ack.toDatagramPacket());
                     break; // senão ele fica a pedir 5 vezes

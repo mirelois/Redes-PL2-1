@@ -8,9 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,11 +30,11 @@ public class BootStrapper implements Runnable {
         return out.toByteArray();
     }
 
-    private HashMap<InetAddress, Set<InetAddress>> getTree(String filePath) {
+    private HashMap<InetAddress, List<InetAddress>> getTree(String filePath) {
 
         FileInputStream stream = null;
 
-        HashMap<InetAddress, Set<InetAddress>> tree = new HashMap<>();
+        HashMap<InetAddress, List<InetAddress>> tree = new HashMap<>();
 
         try {
             stream = new FileInputStream(filePath);
@@ -83,7 +81,7 @@ public class BootStrapper implements Runnable {
                         // TODO error
                     }
 
-                    tree.put(map.get(node), new HashSet<>());
+                    tree.put(map.get(node), new ArrayList<>());
 
                     pattern = Pattern.compile("[^ ,]+");
 
@@ -117,7 +115,7 @@ public class BootStrapper implements Runnable {
         byte[] buff = new byte[1024];
 
         // neighbour tree from file
-        HashMap<InetAddress, Set<InetAddress>> tree = getTree(filePath);
+        HashMap<InetAddress, List<InetAddress>> tree = getTree(filePath);
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(bootPort)) {
@@ -143,7 +141,6 @@ public class BootStrapper implements Runnable {
 
         } catch (PacketSizeException | IOException e) {
             e.printStackTrace();
-            return;
         }
     }
 }
