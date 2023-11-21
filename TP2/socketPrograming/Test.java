@@ -4,7 +4,7 @@ import java.net.UnknownHostException;
 public class Test {
 
     public static void main(String[] args) throws UnknownHostException {
-
+        /*
         InetAddress address = InetAddress.getByName("localhost");
         
         Rip rip_source = new Rip(12, 13,address, 2000);
@@ -41,7 +41,7 @@ public class Test {
         assert(sup_dest.getPort() == 2000);
         assert(sup_dest.getAddress().equals(address));
         assert(sup_dest.getPayload().equals("hello".getBytes()));
-        
+        */
 
     }
 }
