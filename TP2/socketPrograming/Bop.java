@@ -3,14 +3,6 @@ import java.net.InetAddress;
 
 public class Bop extends Packet{
 
-    public int checksum(byte[] data){
-        int sum = 0;
-        for (byte b : data) {
-            sum += b;
-        }
-        return ~sum;
-    }
-
     static int HEADER_SIZE = 2;
 
     int checksum; // 2
@@ -24,7 +16,7 @@ public class Bop extends Packet{
 
     }
 
-    public Bop(DatagramPacket packet) {
+    public Bop(DatagramPacket packet) throws PacketSizeException {
 
         super(packet, HEADER_SIZE);
 

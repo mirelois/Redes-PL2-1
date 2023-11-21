@@ -38,20 +38,29 @@ public class Packet {
 
     }
 
-    public Packet(DatagramPacket packet, int header_size) {
+    public Packet(DatagramPacket packet, int header_size) throws PacketSizeException{
+
+        byte[] data = packet.getData();
+        
+        if(data.length < header_size){
+            throw new PacketSizeException("Packet size to smol");
+        }
 
         this.header_size = header_size;
         this.header = new byte[header_size];
         this.address = packet.getAddress();
         this.port = packet.getPort();
 
-        byte[] data = packet.getData();
-        
         this.payload_size = data.length - header_size;
-        this.payload = new byte[this.payload_size]; // TODO: check data length
+        
+        if(payload_size == 0){
+            this.payload = null;
+        }else{
+            this.payload = new byte[this.payload_size]; // TODO: check data length
 
-        for (int i = 0; i < data.length - this.header_size; i++) {
-            this.payload[i] = data[header_size + i];
+            for (int i = 0; i < data.length - this.header_size; i++) {
+                this.payload[i] = data[header_size + i];
+            }
         }
 
         for (int i = 0; i < header_size; i++) {
