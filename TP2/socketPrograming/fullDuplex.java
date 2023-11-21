@@ -47,28 +47,12 @@ public class fullDuplex {
         // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e ver a stream porque também somos clientes
         // senão tinhamos de por o nome do cliente destino no packet, do be cringe sometimes
 
-        Thread streaming = new Thread(new Streaming(5000, 1000, neighbours));
+        Thread client = new Thread(new Client());
+        Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, client));
         streaming.start();
         if((args.length == 2 && args[1].equals("-s")) || (args.length == 3 && args[2].equals("-s"))){
             //new Thread(new Server(5000, 1000, neighbours))
         }
-        /*
-        Thread t1, t2;
-        try(DatagramSocket socket = new DatagramSocket(5000)){
-            Sender sender = new Sender(socket);
-            t1 = new Thread(sender);
-            t1.start();
-            
-            Receiver receiver = new Receiver(socket);
-            t2 = new Thread(receiver);
-            t2.start();
-
-            t1.join();
-            t2.join();
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        */
 
     }
 }
