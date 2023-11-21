@@ -7,7 +7,7 @@ public class Bop extends Packet{
 
     int checksum; // 2
 
-    public Bop(/* int sequence_number, */boolean ack, byte[] payload, int payload_size, InetAddress address, int port) {
+    public Bop(byte[] payload, int payload_size, InetAddress address, int port) {
 
         super(HEADER_SIZE, payload, payload_size, address, port);
 

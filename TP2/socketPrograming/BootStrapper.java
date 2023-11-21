@@ -13,19 +13,19 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.regex.*;
 
-public class BootStrapper implements Runnable{
+public class BootStrapper implements Runnable {
 
     private int bootPort, timeout;
     private String filePath;
 
-    public BootStrapper(int bootPort, String filePath, int timeout){
+    public BootStrapper(int bootPort, String filePath, int timeout) {
         this.bootPort = bootPort;
         this.filePath = filePath;
         this.timeout = timeout;
     }
 
-    private byte[] serialize(Object obj) throws IOException{
-        
+    private byte[] serialize(Object obj) throws IOException {
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
@@ -119,9 +119,6 @@ public class BootStrapper implements Runnable{
         // neighbour tree from file
         HashMap<InetAddress, Set<InetAddress>> tree = getTree(filePath);
 
-        // initialize map to store clients for whom wainting for ack
-        HashMap<InetAddress, Thread> wait_map = new HashMap<InetAddress, Thread>();
-
         // open socket
         try (DatagramSocket socket = new DatagramSocket(bootPort)) {
 
@@ -131,68 +128,23 @@ public class BootStrapper implements Runnable{
                 // ------ get DatagramPacket from socket -------
                 DatagramPacket datagramPacket = new DatagramPacket(buff, buff.length);
 
-                try {
-                    socket.receive(datagramPacket);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                socket.receive(datagramPacket);
                 // -------------
 
                 // unpack BOP packet
                 Bop bop = new Bop(datagramPacket);
+                
+                byte[] payload = serialize(tree.get(bop.getAddress()));
+
+                Bop send_bop = new Bop(payload, payload.length, bop.getAddress(), bop.getPort());
                 // ------
-
-                if (bop.getAck()) {
-                    wait_map.get(bop.getAddress()).interrupt();
-                    wait_map.remove(bop.getAddress());
-                } else {
-
-                    // get neighbours from tree
-                    // ArrayList<InetAddress> neighbours = tree.get(bop.getAddress());
-                    // ------
-
-                    // write neighbours into byte array payload
-                    try {
-
-                        byte[] payload = serialize(tree.get(bop.getAddress()));
-
-                        // ------
-
-                        Bop send_bop = new Bop(false, payload, payload.length, bop.getAddress(), bop.getPort());
-
-                        // DatagramPacket send_datagram_packet = new
-                        // DatagramPacket(send_bop.getPacket(), send_bop.getPacketLength(), address,
-                        // port);
-
-                        socket.send(send_bop.toDatagramPacket());
-
-                        Thread t = new Thread(() -> {
-                            while (true) {
-                                try {
-                                    try {
-                                        Thread.sleep(timeout);
-                                    } catch (InterruptedException e) {
-                                        return;
-                                    }
-                                    socket.send(send_bop.toDatagramPacket());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-
-                        wait_map.put(bop.getAddress(), t);
-                        t.start();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
+                socket.send(send_bop.toDatagramPacket());
 
             }
-        } catch (SocketException e) {
+
+        } catch (PacketSizeException | IOException e) {
             e.printStackTrace();
+            return;
         }
     }
-
 }
