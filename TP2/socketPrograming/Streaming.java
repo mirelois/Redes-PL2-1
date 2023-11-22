@@ -56,7 +56,7 @@ public class Streaming implements Runnable{
                     if(this.neighbourInfo.streamActiveLinks.get(0).iterator().hasNext())
                         vizinhomegafixe = this.neighbourInfo.streamActiveLinks.get(0).iterator().next();
                 }
-                
+
                 if(vizinhomegafixe!=null) {
                     socket.send(new Sup(0, stream.getVideo_time_stamp(), stream.getSequence_number(),
                             vizinhomegafixe, this.port, stream.getPayloadSize(), stream.getPayload())

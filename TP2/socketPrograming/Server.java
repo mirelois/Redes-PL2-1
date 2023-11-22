@@ -89,14 +89,17 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
         
         try {
-            RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, 8005, 0, null).toDatagramPacket());
+            RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, 5000, 0, null).toDatagramPacket());
             while(true){
                 byte[] buf = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 RTPsocket.receive(packet);
+                Simp simp = new Simp(packet);
             }
         } catch (IOException e){
             e.printStackTrace();
+        } catch (PacketSizeException e) {
+            throw new RuntimeException(e);
         }
     }
 

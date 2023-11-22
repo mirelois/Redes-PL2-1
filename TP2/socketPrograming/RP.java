@@ -4,12 +4,14 @@ import java.net.InetAddress;
 
 public class RP implements Runnable {
 
-    int port;
+    int port, serverPort;
 
     ServerInfo serverInfo;
 
-    public RP(int port) {
+    public RP(int port, int serverPort, ServerInfo serverInfo) {
         this.port = port;
+        this.serverPort = serverPort;
+        this.serverInfo = serverInfo;
     }
 
     private InetAddress chooseBestServer(ServerInfo serverInfo){
@@ -33,7 +35,7 @@ public class RP implements Runnable {
                 Simp simp = new Simp(packet);
                 //TODO tratar isto com shrinps
 
-                Simp send_simp = new Simp(InetAddress.getByName("localhost"), chooseBestServer(serverInfo), port, 0, null);
+                Simp send_simp = new Simp(InetAddress.getByName("localhost"), chooseBestServer(serverInfo), this.serverPort, 0, null);
 
                 socket.send(send_simp.toDatagramPacket());
 

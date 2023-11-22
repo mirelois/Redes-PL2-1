@@ -3,11 +3,11 @@ import java.net.UnknownHostException;
 
 
 public class fullDuplex {
-    public static void main(String[] args){
-        if(args.length<1 || args.length>3) {
+    public static void main(String[] args) throws UnknownHostException {
+        if (args.length < 1 || args.length > 5) {
             System.out.println("Wrong Arguments!" +
-                    "\nIP_Bootstrapper [-b] [-s]" +
-                    "\n -b: Bootstrapper, -s: Server");
+                    "\nIP_Bootstrapper [-b] [-s] [-r]" +
+                    "\n -b: Bootstrapper, -s: Server, -r: RP");
             return;
         }
 
@@ -17,13 +17,13 @@ public class fullDuplex {
             ip_bootstrapper = InetAddress.getByName(args[0]);
 
             // Setup Phase:
-            if((args.length == 2 && args[1].equals("-b")) || (args.length == 3 && args[2].equals("-b"))) {
+            if ((args.length == 2 && args[1].equals("-b")) || (args.length == 3 && args[2].equals("-b"))) {
                 new Thread(new BootStrapper(2000, args[1], 1000)).start();
             }
 
             new Thread(new BootClient(ip_bootstrapper, 2000, 2001, 1000, neighbours)).start();
 
-        } catch (UnknownHostException e){
+        } catch (UnknownHostException e) {
             System.out.println("The IP " + args[0] + " is Invalid for IP_Bootstrapper");
         }
 
@@ -31,10 +31,9 @@ public class fullDuplex {
             synchronized (neighbours) {
                 neighbours.wait();
             }
-        } catch (InterruptedException e){
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 
 
         // Phase 2
@@ -45,10 +44,21 @@ public class fullDuplex {
         Thread client = new Thread(new Client());
         Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, client));
         streaming.start();
-        Thread simpManager = new Thread(new SimpManager(7000, 7001, neighbours));
-        //if((args.length == 2 && args[1].equals("-s")) || (args.length == 3 && args[2].equals("-s"))){
-            //new Thread(new Server(5000, 1000, neighbours))
-        //}
+        // está ugly mas temos de testar isto
+        if (args.length == 4 && args[1].equals("-s")) {
+            new Thread(new Server(InetAddress.getByName(args[2]), 6005)).start();
+        } else if (args.length == 5 && args[2].equals("-s")) {
+            new Thread(new Server(InetAddress.getByName(args[3]), 6005)).start();
+        } else if ((args.length == 4 && args[3].equals("-r")) || (args.length == 5 && args[4].equals("-r"))){
+            ServerInfo serverInfo = new ServerInfo();
+            new Thread(new RP(9000, 6005, serverInfo)).start();
+            new Thread(new RPServerAdder(9001, serverInfo)).start();
+        }else {
+            Thread simpManager = new Thread(new SimpManager(7000, 7001, neighbours));
+            simpManager.start();
+            Thread shrimpManager = new Thread(new ShrimpManager(7001, neighbours));
+            shrimpManager.start();
+        }
 
     }
 }
