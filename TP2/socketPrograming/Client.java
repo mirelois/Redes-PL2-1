@@ -29,7 +29,7 @@ public class Client implements Runnable{
     Timer cTimer; //timer used to receive data from the UDP socket
     byte[] cBuf; //buffer used to store data received from the server
 
-    public Client() {
+    public Client(stream stream) {
 
         //build GUI
         //--------------------------
@@ -68,7 +68,7 @@ public class Client implements Runnable{
 
         //init para a parte do cliente
         //--------------------------
-        cTimer = new Timer(20, new clientTimerListener());
+        cTimer = new Timer(20, new clientTimerListener(stream));
         cTimer.setInitialDelay(0);
         cTimer.setCoalesce(true);
         cBuf = new byte[15000]; //allocate enough memory for the buffer used to receive data from the server
@@ -124,43 +124,42 @@ public class Client implements Runnable{
     //------------------------------------
 
     class clientTimerListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) { // TODO enviar o SUP do Streaming para cima (aka aqui) se o cliente estiver em funcionamento
-            /*
+        final stream stream;
 
+        clientTimerListener(stream stream){
+            this.stream = stream;
+        }
+
+        public void actionPerformed(ActionEvent e) {
             //Construct a DatagramPacket to receive data from the UDP socket
-            //rcvdp = new DatagramPacket(cBuf, cBuf.length);
+            //rcvdp = new DatagramPacket(cBuf, cBuf.length); // não fazemos isto
 
-            try{
-                //receive the DP from the socket:
-                //RTPsocket.receive(rcvdp);
+            //receive the DP from the socket:
+            //RTPsocket.receive(rcvdp);
 
-                //create an RTPpacket object from the DP
-                //Sup rtp_packet = new Sup(rcvdp.getData(), rcvdp.getLength());
+            //create an RTPpacket object from the DP
+            //Sup rtp_packet = new Sup(rcvdp.getData(), rcvdp.getLength());
 
-                //print important header fields of the RTP packet received:
-                //System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getSequenceNumber() +" TimeStamp "+rtp_packet.getTimeStamp());//+" ms, of type "+rtp_packet.getpayloadtype());
+            //print important header fields of the RTP packet received:
+            //System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getSequenceNumber() +" TimeStamp "+rtp_packet.getTimeStamp());//+" ms, of type "+rtp_packet.getpayloadtype());
 
-                //print header bitstream:
-                //rtp_packet.printheader();
+            //print header bitstream:
+            //rtp_packet.printheader();
 
-                //get the payload bitstream from the RTPpacket object
-                //byte [] payload = rtp_packet.getPayload();
+            //get the payload bitstream from the RTPpacket object
+            //byte [] payload = rtp_packet.getPayload();
 
-                //get an Image object from the payload bitstream
-                Toolkit toolkit = Toolkit.getDefaultToolkit();
-                Image image = toolkit.createImage(payload, 0, payload.length);
-
-                //display the image as an ImageIcon object
-                icon = new ImageIcon(image);
-                iconLabel.setIcon(icon);
+            //get an Image object from the payload bitstream
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            byte[] payload;
+            synchronized (this.stream){
+                payload = this.stream.stream;
             }
-            catch (InterruptedIOException iioe){
-                System.out.println("Nothing to read");
-            }
-            catch (IOException ioe) {
-                System.out.println("Exception caught: "+ioe);
-            }
-            */
+            Image image = toolkit.createImage(payload, 0, payload.length);
+
+            //display the image as an ImageIcon object
+            icon = new ImageIcon(image);
+            iconLabel.setIcon(icon);
 
         }
     }

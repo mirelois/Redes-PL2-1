@@ -6,24 +6,16 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Streaming implements Runnable{
-    private int port, timeOut;
+    private final int port, timeOut;
     private final NeighbourInfo neighbourInfo;
 
-    private Thread my_client;
+    private final stream stream;
 
-    private byte[][] stream;
-    private int streamN;
-
-    private ReadWriteLock rwl;
-
-    public Streaming(int port, int timeOut, NeighbourInfo neighbourInfo, Thread my_client){
+    public Streaming(int port, int timeOut, NeighbourInfo neighbourInfo, stream stream){
         this.port = port;
         this.timeOut = timeOut;
         this.neighbourInfo = neighbourInfo;
-        this.my_client = my_client;
-        this.stream = new byte[10][]; // 10 frames?
-        this.streamN = 0;
-        this.rwl = new ReentrantReadWriteLock();
+        this.stream = stream;
     }
 
     @Override
@@ -36,14 +28,9 @@ public class Streaming implements Runnable{
             while (true){
                 socket.receive(packet);
 
-                if(this.my_client.isAlive()){
-                    this.rwl.writeLock().lock();
-                    try {
-                        if(this.streamN < this.stream.length)
-                            this.streamN = 0;
-                        this.stream[this.streamN++] = packet.getData();
-                    } finally {
-                        this.rwl.writeLock().unlock();
+                synchronized (this.stream){
+                    if(stream.streamId!=0){
+                        this.stream.stream = packet.getData();
                     }
                 }
 

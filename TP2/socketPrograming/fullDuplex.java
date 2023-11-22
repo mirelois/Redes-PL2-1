@@ -1,11 +1,18 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+class stream{
+    int streamId = 0;
+    byte[] stream;
+}
 
 public class fullDuplex {
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws IOException {
         if (args.length < 1 || args.length > 5) {
             System.out.println("Wrong Arguments!" +
                     "\nIP_Bootstrapper [-b] [-s] [-r]" +
@@ -65,9 +72,8 @@ public class fullDuplex {
         //Thread client = new Thread(new Client()); // criar um client a priori não funcional que só fazemos run quando o user pede,
         // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e ver a stream porque também somos clientes
         // senão tinhamos de por o nome do cliente destino no packet, do be cringe sometimes
-
-        Thread client = new Thread(new Client());
-        Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, client));
+        stream stream = new stream();
+        Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, stream));
         streaming.start();
 
         if (isServer) {
@@ -82,6 +88,15 @@ public class fullDuplex {
             Thread shrimpManager = new Thread(new ShrimpManager(7001, neighbours));
             shrimpManager.start();
         }
-
+        boolean isClientAlive = false;
+        boolean keepLooping = true;
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        while(keepLooping){
+            String inputStr = input.readLine();
+            if(inputStr.contains("client") && !isClientAlive)
+                new Client(stream);
+            else if(inputStr.contains("kill"))
+                keepLooping = false;
+        }
     }
 }
