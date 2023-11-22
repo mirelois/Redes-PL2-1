@@ -20,25 +20,27 @@ public class RPServerAdder implements Runnable{
 
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
-        try (DatagramSocket socket = new DatagramSocket(this.port)) {
+        while(true){
+            try (DatagramSocket socket = new DatagramSocket(this.port)) {
 
-            socket.receive(packet);
+                socket.receive(packet);
 
-            Simp simp = new Simp(packet);
+                Simp simp = new Simp(packet);
 
-            // int latency = Packet.getCurrTime() - simp.getTime_stamp();
+                // int latency = Packet.getCurrTime() - simp.getTime_stamp();
 
-            synchronized(this.serverInfo){
-                this.serverInfo.servers.add(simp.getSourceAddress());
+                synchronized(this.serverInfo){
+                    this.serverInfo.servers.add(simp.getSourceAddress());
+                }
+
+
+                //TODO fazer check de perdas para nao dar barraco
+
+
+            } catch (IOException | PacketSizeException e) {
+                //TODO: handle exception
+                e.printStackTrace();
             }
-
-
-            //TODO fazer check de perdas para nao dar barraco
-            
-            
-        } catch (IOException | PacketSizeException e) {
-            //TODO: handle exception
-            e.printStackTrace();
         }
         
     }
