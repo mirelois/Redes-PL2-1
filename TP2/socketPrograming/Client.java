@@ -29,7 +29,7 @@ public class Client implements Runnable{
     Timer cTimer; //timer used to receive data from the UDP socket
     byte[] cBuf; //buffer used to store data received from the server
 
-    public Client(stream stream) {
+    public Client(int port, stream stream) {
 
         //build GUI
         //--------------------------
@@ -68,7 +68,7 @@ public class Client implements Runnable{
 
         //init para a parte do cliente
         //--------------------------
-        cTimer = new Timer(20, new clientTimerListener(stream));
+        cTimer = new Timer(20, new clientTimerListener(port, stream));
         cTimer.setInitialDelay(0);
         cTimer.setCoalesce(true);
         cBuf = new byte[15000]; //allocate enough memory for the buffer used to receive data from the server
@@ -124,42 +124,51 @@ public class Client implements Runnable{
     //------------------------------------
 
     class clientTimerListener implements ActionListener {
-        final stream stream;
 
-        clientTimerListener(stream stream){
-            this.stream = stream;
+        int port;
+
+        stream stream;
+
+        clientTimerListener(int port, stream stream){
+            this.port = port;
         }
 
         public void actionPerformed(ActionEvent e) {
             //Construct a DatagramPacket to receive data from the UDP socket
-            //rcvdp = new DatagramPacket(cBuf, cBuf.length); // não fazemos isto
-
+            rcvdp = new DatagramPacket(cBuf, cBuf.length);
             //receive the DP from the socket:
-            //RTPsocket.receive(rcvdp);
+            try(DatagramSocket RTPsocket = new DatagramSocket(this.port)) {
 
-            //create an RTPpacket object from the DP
-            //Sup rtp_packet = new Sup(rcvdp.getData(), rcvdp.getLength());
+                // TODO falta só configurar isto aqui, mandar o simp para o meu nodo aka o streaming de mim mesmo
+                //RTPsocket.send(new Simp(InetAddress.getByName("localhost"), simp.getAddress(), this.port, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket()));
+                while(true) {
+                    RTPsocket.receive(rcvdp);
 
-            //print important header fields of the RTP packet received:
-            //System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getSequenceNumber() +" TimeStamp "+rtp_packet.getTimeStamp());//+" ms, of type "+rtp_packet.getpayloadtype());
+                    //create an RTPpacket object from the DP
+                    Sup rtp_packet = new Sup(rcvdp);
 
-            //print header bitstream:
-            //rtp_packet.printheader();
+                    //print important header fields of the RTP packet received:
+                    //System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getSequenceNumber() +" TimeStamp "+rtp_packet.getTimeStamp());//+" ms, of type "+rtp_packet.getpayloadtype());
 
-            //get the payload bitstream from the RTPpacket object
-            //byte [] payload = rtp_packet.getPayload();
+                    //print header bitstream:
+                    //rtp_packet.printheader();
 
-            //get an Image object from the payload bitstream
-            Toolkit toolkit = Toolkit.getDefaultToolkit();
-            byte[] payload;
-            synchronized (this.stream){
-                payload = this.stream.stream;
+                    //get the payload bitstream from the RTPpacket object
+                    byte[] payload = rtp_packet.getPayload();
+
+                    //get an Image object from the payload bitstream
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    Image image = toolkit.createImage(payload, 0, payload.length);
+
+                    //display the image as an ImageIcon object
+                    icon = new ImageIcon(image);
+                    iconLabel.setIcon(icon);
+                }
+            } catch (IOException eio){
+                eio.printStackTrace();
+            } catch (PacketSizeException ex) {
+                throw new RuntimeException(ex);
             }
-            Image image = toolkit.createImage(payload, 0, payload.length);
-
-            //display the image as an ImageIcon object
-            icon = new ImageIcon(image);
-            iconLabel.setIcon(icon);
 
         }
     }

@@ -28,14 +28,16 @@ public class Streaming implements Runnable{
             while (true){
                 socket.receive(packet);
 
-                synchronized (this.stream){
-                    if(stream.streamId!=0){
-                        this.stream.stream = packet.getData();
-                    }
-                }
-
                 Sup stream = new Sup(packet);
                 //int latency = stream.getTime_stamp() - Packet.getCurrTime();
+
+                synchronized (this.stream){
+                    if(this.stream.id!=0){
+                        socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
+                                InetAddress.getByName("localhost"), 8389, stream.getPayloadSize(), stream.getPayload())
+                                .toDatagramPacket());
+                    }
+                }
 
                 // Decidir Vizinho(s) mais adequado(s) para enviar stream(s)
                 InetAddress vizinhomegafixe=null;

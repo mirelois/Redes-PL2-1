@@ -7,8 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class stream{
-    int streamId = 0;
-    byte[] stream;
+    int id = 0;
 }
 
 public class fullDuplex {
@@ -80,7 +79,7 @@ public class fullDuplex {
             new Thread(new Server(InetAddress.getByName(args[0]), 6005)).start();
         } else if (isRP){
             ServerInfo serverInfo = new ServerInfo();
-            new Thread(new RP(9000, 6005, serverInfo)).start();
+            new Thread(new RP(9000, 7001, 6005, serverInfo, neighbours)).start();
             new Thread(new RPServerAdder(9001, serverInfo)).start();
         }else {
             Thread simpManager = new Thread(new SimpManager(7000, 7001, neighbours));
@@ -94,7 +93,7 @@ public class fullDuplex {
         while(keepLooping){
             String inputStr = input.readLine();
             if(inputStr.contains("client") && !isClientAlive)
-                new Client(stream);
+                new Client(8389, stream);
             else if(inputStr.contains("kill"))
                 keepLooping = false;
         }
