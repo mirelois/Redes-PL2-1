@@ -51,16 +51,19 @@ public class Streaming implements Runnable{
                 //int latency = stream.getTime_stamp() - Packet.getCurrTime();
 
                 // Decidir Vizinho(s) mais adequado(s) para enviar stream(s)
-                InetAddress vizinhomegafixe;
+                InetAddress vizinhomegafixe=null;
                 synchronized (this.neighbourInfo) {
-                    vizinhomegafixe = this.neighbourInfo.streamActiveLinks.get(0).get(0);
+                    if(this.neighbourInfo.streamActiveLinks.get(0).iterator().hasNext())
+                        vizinhomegafixe = this.neighbourInfo.streamActiveLinks.get(0).iterator().next();
                 }
-
-                socket.send(new Sup(0,stream.getVideo_time_stamp(), stream.getSequence_number(),
-                        vizinhomegafixe, this.port, stream.getPayloadSize(), stream.getPayload())
-                        .toDatagramPacket());
+                
+                if(vizinhomegafixe!=null) {
+                    socket.send(new Sup(0, stream.getVideo_time_stamp(), stream.getSequence_number(),
+                            vizinhomegafixe, this.port, stream.getPayloadSize(), stream.getPayload())
+                            .toDatagramPacket());
+                }
             }
-        } catch (IOException e) {
+        } catch (IOException | PacketSizeException e) {
             throw new RuntimeException(e);
         }
     }
