@@ -40,12 +40,12 @@ public class Streaming implements Runnable{
                 // Decidir Vizinho(s) mais adequado(s) para enviar stream(s)
                 InetAddress vizinhomegafixe=null;
                 synchronized (this.neighbourInfo) {
-                    if(this.neighbourInfo.streamActiveLinks.get(0).iterator().hasNext())
-                        vizinhomegafixe = this.neighbourInfo.streamActiveLinks.get(0).iterator().next();
+                    if(this.neighbourInfo.streamActiveLinks.get(stream.getStreamId()).iterator().hasNext())
+                        vizinhomegafixe = this.neighbourInfo.streamActiveLinks.get(stream.getStreamId()).iterator().next();
                 }
 
                 if(vizinhomegafixe!=null) {
-                    socket.send(new Sup(0, stream.getVideo_time_stamp(), stream.getSequence_number(),
+                    socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
                             vizinhomegafixe, this.port, stream.getPayloadSize(), stream.getPayload())
                             .toDatagramPacket());
                 }
