@@ -34,25 +34,58 @@ public class SimpManager implements Runnable{
 
                 InetAddress clientIP = simp.getSourceAddress();
 
-                boolean hasStream;
+                Integer streamId;
+                Set<InetAddress> adjacent;
+                byte[] streamName = simp.getPayload();
+
+
                 synchronized (this.neighbourInfo) {
-                    hasStream = this.neighbourInfo.nameHash.containsKey(new String(simp.getPayload()));
+                    streamId = this.neighbourInfo.nameHash.get(new String(simp.getPayload()));
+
+                    adjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
+                    if(adjacent == null){
+                        adjacent = new HashSet<>();
+                        this.neighbourInfo.clientAdjacent.put(clientIP, adjacent);
+                    }
+
+                    adjacent.add(simp.getAddress());
+
+                    //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
+                    if (this.neighbourInfo.connectionToRP == 0) {
+                        this.neighbourInfo.nameHash.put(new String(simp.getPayload()), 0);
+                        socket.send(new Shrimp(clientIP, 0, this.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
+                        continue;
+                    }
                 }
 
-                byte[] streamName = simp.getPayload();
-                if(hasStream){
+                if (streamId == null) {
+                    //Stream nunca foi testada
 
-                    Set<InetAddress> adjacent;
-                    synchronized (this.neighbourInfo) {
-                        adjacent = this.neighbourInfo.clientAdjacent.getOrDefault(clientIP, new HashSet<>());
-                        if(adjacent.isEmpty()){
-                            adjacent.add(simp.getAddress());
-                            this.neighbourInfo.clientAdjacent.put(clientIP, adjacent);
-                        }
+                    synchronized(neighbourInfo) {
+                        //if (this.neighbourInfo.streamAdjacent.values().isEmpty()) {
+                            //Enviar para todos os vizinhos se não conhecer caminhos para o RP
+                            for (InetAddress neighbour : this.neighbourInfo.neighbours) 
+                                if (!neighbour.equals(simp.getAddress())) {
+                                    socket.send(new Simp(clientIP, simp.getAddress(), this.port, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
+                                    //Adicionar pedido feito por Simp
+                                    this.neighbourInfo.rpRequest.add(neighbour);
+                                }
+                        /*} else {
+                            //Enviar apenas para os caminhos conhecidos do RP
+                            for (Set<InetAddress> neighbourSet : this.neighbourInfo.streamAdjacent.values().) 
+                                for (InetAddress neighbour : neighbourSet) {
+                                    if (!neighbour.equals(simp.getAddress())) 
+                                       socket.send(new Simp(clientIP, simp.getAddress(), this.port, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());    
+                                }
+                        }*/
                     }
-                    socket.send(new Shrimp(clientIP, 0, this.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
-                }else{
-                    socket.send(new Simp(clientIP, simp.getAddress(), this.port, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
+                    this.neighbourInfo.nameHash.put(new String(simp.getPayload()), -1);
+
+                } else {
+                    //Stream existe (porque existe conexão)
+                    synchronized (this.neighbourInfo) {
+                        socket.send(new Shrimp(clientIP, this.neighbourInfo.nameHash.get(new String(simp.getPayload())), this.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
+                    }
                 }
             }
 

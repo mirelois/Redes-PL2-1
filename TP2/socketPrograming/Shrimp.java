@@ -46,7 +46,7 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
 
     }
 
-    public int getTime_stamp() {
+    public int getStreamId() {
 		return streamId;
 	}
 
