@@ -1,11 +1,10 @@
 import java.io.IOException;
-import java.net.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 public class ShrimpManager implements Runnable{
@@ -103,10 +102,10 @@ public class ShrimpManager implements Runnable{
                 }
             }
 
-        } catch (SocketException e){
+        } catch (SocketException | PacketSizeException e){
             e.printStackTrace();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+		}
     }
 }

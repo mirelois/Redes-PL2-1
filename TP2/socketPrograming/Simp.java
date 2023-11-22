@@ -56,7 +56,7 @@ public class Simp extends Packet {  //Stream Initiation Management Protocol
 
     }
 
-    public Simp(DatagramPacket packet) throws java.net.UnknownHostException{
+    public Simp(DatagramPacket packet) throws java.net.UnknownHostException, PacketSizeException{
         
         super(packet, HEADER_SIZE);
 

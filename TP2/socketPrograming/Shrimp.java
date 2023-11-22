@@ -26,7 +26,7 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
         this.header[4] = Byte.parseByte(ip_values[3]);
     }
 
-    public Shrimp(DatagramPacket packet) throws java.net.UnknownHostException {
+    public Shrimp(DatagramPacket packet) throws java.net.UnknownHostException, PacketSizeException {
         
         super(packet, HEADER_SIZE);
 

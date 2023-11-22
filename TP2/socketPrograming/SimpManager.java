@@ -89,10 +89,10 @@ public class SimpManager implements Runnable{
                 }
             }
 
-        } catch (SocketException e){
+        } catch (SocketException | PacketSizeException e){
             e.printStackTrace();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+		}
     }
 }
