@@ -1,5 +1,7 @@
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class fullDuplex {
@@ -11,14 +13,37 @@ public class fullDuplex {
             return;
         }
 
+        // Fase 0: Tratar argumentos
+        StringBuilder arguments = new StringBuilder();
+        for(int i=1; i<args.length; i++){
+            arguments.append(" ").append(args[i]);
+        }
+
+        String filePath = null;
+        boolean isServer = false;
+        boolean isRP = false;
+        Pattern pattern = Pattern.compile("(?:(-b|-s|-r) ([^- \\n]*))");
+        Matcher matcher = pattern.matcher(arguments.toString());
+        while(matcher.find()){
+            String flag = matcher.group(1);
+            if(flag.equals("-b"))
+                filePath = matcher.group(2);
+            else{
+                if(flag.equals("-s"))
+                    isServer = true;
+                else if(flag.equals("-r"))
+                    isRP = true;
+            }
+        }
+
         NeighbourInfo neighbours = new NeighbourInfo();
         InetAddress ip_bootstrapper;
         try {
             ip_bootstrapper = InetAddress.getByName(args[0]);
 
             // Setup Phase:
-            if ((args.length == 2 && args[1].equals("-b")) || (args.length == 3 && args[2].equals("-b"))) {
-                new Thread(new BootStrapper(2000, args[1], 1000)).start();
+            if (filePath!=null) {
+                new Thread(new BootStrapper(2000, filePath, 1000)).start();
             }
 
             new Thread(new BootClient(ip_bootstrapper, 2000, 2001, 1000, neighbours)).start();
@@ -44,12 +69,10 @@ public class fullDuplex {
         Thread client = new Thread(new Client());
         Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, client));
         streaming.start();
-        // está ugly mas temos de testar isto
-        if (args.length == 4 && args[1].equals("-s")) {
-            new Thread(new Server(InetAddress.getByName(args[2]), 6005)).start();
-        } else if (args.length == 5 && args[2].equals("-s")) {
-            new Thread(new Server(InetAddress.getByName(args[3]), 6005)).start();
-        } else if ((args.length == 4 && args[3].equals("-r")) || (args.length == 5 && args[4].equals("-r"))){
+
+        if (isServer) {
+            new Thread(new Server(InetAddress.getByName(args[0]), 6005)).start();
+        } else if (isRP){
             ServerInfo serverInfo = new ServerInfo();
             new Thread(new RP(9000, 6005, serverInfo)).start();
             new Thread(new RPServerAdder(9001, serverInfo)).start();
