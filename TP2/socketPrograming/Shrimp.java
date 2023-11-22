@@ -34,13 +34,13 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
 
         StringBuilder ip = new StringBuilder(15);
 
+        ip.append(this.header[1]);
+        ip.append('.');
         ip.append(this.header[2]);
         ip.append('.');
         ip.append(this.header[3]);
         ip.append('.');
         ip.append(this.header[4]);
-        ip.append('.');
-        ip.append(this.header[5]);
 
         this.sourceAddress = InetAddress.getByName(ip.toString());
 
