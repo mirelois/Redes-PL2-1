@@ -24,7 +24,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
     DatagramPacket senddp; //UDP packet containing the video frames (to send)A
     DatagramSocket RTPsocket; //socket to be used to send and receive UDP packet
     int RTP_dest_port; //destination port for RTP packets
-    InetAddress rpIPAddr; //Client IP address
+    InetAddress rpIPAddr; //RP IP address
 
     static String VideoFileName; //video file to request to the server
 
@@ -86,7 +86,10 @@ public class Server extends JFrame implements ActionListener, Runnable {
     //------------------------------------
     @Override
     public void run() {
+
+        
         try {
+            RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, 8005, 0, null).toDatagramPacket());
             while(true){
                 byte[] buf = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
