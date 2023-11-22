@@ -35,20 +35,20 @@ public class SimpManager implements Runnable{
                 InetAddress clientIP = simp.getSourceAddress();
 
                 Integer streamId;
-                Set<InetAddress> adjacent;
+                Set<InetAddress> clientAdjacent;
                 byte[] streamName = simp.getPayload();
 
 
                 synchronized (this.neighbourInfo) {
                     streamId = this.neighbourInfo.nameHash.get(new String(simp.getPayload()));
 
-                    adjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
-                    if(adjacent == null){
-                        adjacent = new HashSet<>();
-                        this.neighbourInfo.clientAdjacent.put(clientIP, adjacent);
+                    clientAdjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
+                    if(clientAdjacent == null){
+                        clientAdjacent = new HashSet<>();
+                        this.neighbourInfo.clientAdjacent.put(clientIP, clientAdjacent);
                     }
 
-                    adjacent.add(simp.getAddress());
+                    clientAdjacent.add(simp.getAddress());
 
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.connectionToRP == 0) {

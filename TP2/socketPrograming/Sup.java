@@ -1,7 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
-public class Sup extends Packet {
+public class Sup extends Packet { //Streaming over UDP Protocol
 
     static int HEADER_SIZE = 12;
 

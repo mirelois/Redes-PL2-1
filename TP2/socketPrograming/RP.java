@@ -1,17 +1,24 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RP implements Runnable {
 
-    int port, serverPort;
+    int port, shrimpPort, serverPort, next_stream = 1;
 
     ServerInfo serverInfo;
 
-    public RP(int port, int serverPort, ServerInfo serverInfo) {
+    private final NeighbourInfo neighbourInfo;
+
+    public RP(int port, int shrimpPort, int serverPort, ServerInfo serverInfo, NeighbourInfo neighbourInfo) {
         this.port = port;
+        this.shrimpPort = shrimpPort;
         this.serverPort = serverPort;
         this.serverInfo = serverInfo;
+        this.neighbourInfo = neighbourInfo;
+        this.neighbourInfo.connectionToRP = 1;
     }
 
     private InetAddress chooseBestServer(ServerInfo serverInfo){
@@ -33,11 +40,56 @@ public class RP implements Runnable {
                 socket.receive(packet);
 
                 Simp simp = new Simp(packet);
-                //TODO tratar isto com shrinps
+                //TODO tratar isto com shrimps
 
                 Simp send_simp = new Simp(InetAddress.getByName("localhost"), chooseBestServer(serverInfo), this.serverPort, 0, null);
 
                 socket.send(send_simp.toDatagramPacket());
+
+                Integer streamId;
+                InetAddress clientIP = simp.getSourceAddress();
+                String streamName = simp.getPayload().toString();
+                Set<InetAddress> clientAdjacent, streamActiveLinks, streamClients;
+                synchronized(this.neighbourInfo) {
+                    streamId = this.neighbourInfo.nameHash.get(streamName);
+                    if (streamId == null) {
+                        streamId = next_stream++;
+                        this.neighbourInfo.nameHash.put(streamName, streamId);
+                    }
+
+                    //Colocar o nome da Stream associado ao seu Id
+                    clientAdjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
+                    streamClients = this.neighbourInfo.streamClients.get(streamId);
+                    streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
+                    
+                    //Criar novas estruturas
+                    if(clientAdjacent == null){
+                        clientAdjacent = new HashSet<>();
+                        this.neighbourInfo.clientAdjacent.put(clientIP, clientAdjacent);
+                    }
+                    if(streamActiveLinks == null) {
+                        streamActiveLinks = new HashSet<>();
+                        this.neighbourInfo.streamActiveLinks.put(streamId, streamActiveLinks);
+                    }
+                    if(streamClients == null){
+                        streamClients = new HashSet<>();
+                        this.neighbourInfo.streamClients.put(streamId, streamClients);
+                    }
+                    
+                    //Adicionar caminho para Cliente
+                    clientAdjacent.add(simp.getAddress());
+                    
+                    //TODO decidir qual dos links está ativo é dinâmico
+                    //Se o cliente é novo, colocar o primeiro link para CLiente como o primeiro link
+                    if (!streamClients.contains(clientIP)) 
+                        streamActiveLinks.add(clientAdjacent.iterator().next());
+
+                    //Adicionar Cliente à Stream (Porque existe!)
+                    streamClients.add(clientIP);
+                }
+
+                Shrimp shrimp = new Shrimp(simp.getSourceAddress(), streamId, this.shrimpPort, simp.getAddress(), simp.getPayloadSize(), simp.getPayload());
+                socket.send(shrimp.toDatagramPacket());
 
             } catch (Exception e) {
                 // TODO: handle exception
