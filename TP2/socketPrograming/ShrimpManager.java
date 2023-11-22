@@ -21,6 +21,7 @@ public class ShrimpManager implements Runnable{
     @Override
     public void run(){
         try(DatagramSocket socket = new DatagramSocket(this.port)){
+            
             byte[] buf = new byte[1024]; // 1024 is enough?
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
@@ -98,7 +99,7 @@ public class ShrimpManager implements Runnable{
                                 
                             }
                         }
-                    }   
+                    }
                 }
             }
 

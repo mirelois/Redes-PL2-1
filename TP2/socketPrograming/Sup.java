@@ -48,7 +48,7 @@ public class Sup extends Packet {
         this.header[12] = (byte) (this.streamId        /* & 0xFF */);
     }
 
-    public Sup(DatagramPacket packet) throws java.net.UnknownHostException{
+    public Sup(DatagramPacket packet) throws java.net.UnknownHostException, PacketSizeException{
         
         super(packet, HEADER_SIZE);
 

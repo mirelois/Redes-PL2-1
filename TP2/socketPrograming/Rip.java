@@ -31,7 +31,7 @@ public class Rip extends Packet { // Response and Idle Protocol
         
     }
 
-    public Rip(DatagramPacket packet){
+    public Rip(DatagramPacket packet) throws PacketSizeException{
 
         super(packet, HEADER_SIZE);
 
