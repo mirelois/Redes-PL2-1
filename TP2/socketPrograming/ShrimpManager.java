@@ -88,10 +88,12 @@ public class ShrimpManager implements Runnable{
                         rpAdjacent.add(shrimp.getAddress());
                         //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
                         for (InetAddress linkToClient : clientAdjacent) {
-                            System.out.println("Enviado SHRIMP para " + linkToClient.getHostAddress() +
-                                               " da stream com id " + streamId +
-                                               " pedida por " + clientIP.getHostAddress());
-                            socket.send(new Shrimp(clientIP, streamId, shrimp.getPort(), linkToClient, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
+                            if (!linkToClient.equals(InetAddress.getByName("localhost"))) {
+                                System.out.println("Enviado SHRIMP para " + linkToClient.getHostAddress() +
+                                                   " da stream com id " + streamId +
+                                                   " pedida por " + clientIP.getHostAddress());
+                                socket.send(new Shrimp(clientIP, streamId, shrimp.getPort(), linkToClient, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
+                            }
                         }
 
                     } else if (streamId == 0) {
