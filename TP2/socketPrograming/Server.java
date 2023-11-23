@@ -63,20 +63,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
         } catch (SocketException e) {
             System.out.println("Servidor: erro no socket: " + e.getMessage());
         }
-
-        //Handler to close the main window
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                //stop the timer and exit
-                sTimer.stop();
-                System.exit(0);
-            }});
-
-        //GUI:
-        label = new JLabel("Send frame #        ", JLabel.CENTER);
-        getContentPane().add(label, BorderLayout.CENTER);
-
-        sTimer.start();
     }
 
     //------------------------------------
@@ -84,8 +70,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
     //------------------------------------
     @Override
     public void run() {
-
-        
         try {
             RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, this.rpAdderPort, 0, null).toDatagramPacket());
             while(true){
