@@ -29,7 +29,7 @@ public class SimpManager implements Runnable{
 
             while(true){
                 socket.receive(packet);
-
+                System.out.println("Recebeu Pedido de Stream");
                 Simp simp = new Simp(packet);
 
                 InetAddress clientIP = simp.getSourceAddress();
@@ -48,8 +48,10 @@ public class SimpManager implements Runnable{
                         this.neighbourInfo.clientAdjacent.put(clientIP, clientAdjacent);
                     }
 
-                    if (!simp.getAddress().equals(InetAddress.getByName("localhost")))
+                    if (!simp.getAddress().equals(InetAddress.getByName("localhost"))) {
                         clientAdjacent.add(simp.getAddress());
+                        System.out.println("Recebeu Pedido de Stream de Nodo Adjacente");
+                    }
 
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.connectionToRP == 0) {
