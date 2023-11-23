@@ -30,9 +30,9 @@ public class RPServerAdder implements Runnable{
                 // int latency = Packet.getCurrTime() - simp.getTime_stamp();
 
                 synchronized(this.serverInfo){
-                    this.serverInfo.servers.add(simp.getSourceAddress());
+                    this.serverInfo.servers.add(simp.getAddress());
                 }
-                System.out.println("Adicionado servidor de endereço " + simp.getSourceAddress().getHostAddress());
+                System.out.println("Adicionado servidor de endereço " + simp.getAddress().getHostAddress());
 
                 //TODO fazer check de perdas para nao dar barraco
 

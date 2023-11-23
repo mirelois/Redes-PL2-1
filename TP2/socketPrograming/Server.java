@@ -72,7 +72,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
     public void run() {
         try {
             System.out.println("Avisar RP da existência");
-            RTPsocket.send(new Simp(InetAddress.getLocalHost(), rpIPAddr, this.rpAdderPort, 0, null).toDatagramPacket());
+            RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, this.rpAdderPort, 0, null).toDatagramPacket());
             while(true){
                 byte[] buf = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
