@@ -134,6 +134,7 @@ public class Client implements Runnable{
         clientTimerListener(int port, stream stream, int simpPort){
             this.port = port;
             this.simpPort = simpPort;
+            stream = new stream();
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -144,7 +145,7 @@ public class Client implements Runnable{
 
                 // TODO falta só configurar isto aqui, mandar o simp para o meu nodo aka o streaming de mim mesmo
                 RTPsocket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), this.simpPort, stream.file.length(), stream.file.getBytes()).toDatagramPacket());
-                
+
                 while(true) {
                     RTPsocket.receive(rcvdp);
 
