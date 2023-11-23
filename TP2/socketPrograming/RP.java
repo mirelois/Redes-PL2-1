@@ -102,7 +102,9 @@ public class RP implements Runnable {
 
                 Shrimp shrimp = new Shrimp(simp.getSourceAddress(), streamId, this.shrimpPort, simp.getAddress(), simp.getPayloadSize(), simp.getPayload());
                 socket.send(shrimp.toDatagramPacket());
-
+                System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
+                                               " da stream com id " + streamId +
+                                               " pedida por " + clientIP.getHostAddress());
             } catch (Exception e) {
                 // TODO: handle exception
             }
