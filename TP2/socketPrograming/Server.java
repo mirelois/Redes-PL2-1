@@ -160,7 +160,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
             this.streamId = streamId;
             this.rpIPAddr = rpIPAddr;
             try {
-                video = new VideoStream(VideoFileName); //init the VideoStream object:
+                video = new VideoStream("./" + VideoFileName); //init the VideoStream object:
             } catch (Exception e) {
                 System.out.println("Servidor: erro no video: " + e.getMessage());
             }
