@@ -60,13 +60,10 @@ public class Server extends JFrame implements ActionListener, Runnable {
             this.rpAdderPort = rpAdderPort;
             this.RTP_dest_port = streamPort;
             //System.out.println("Servidor: socket " + ClientIPAddr);
-            video = new VideoStream(VideoFileName); //init the VideoStream object:
             System.out.println("Servidor: vai enviar video da file " + VideoFileName);
 
         } catch (SocketException e) {
             System.out.println("Servidor: erro no socket: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("Servidor: erro no video: " + e.getMessage());
         }
 
         //Handler to close the main window
@@ -169,11 +166,17 @@ public class Server extends JFrame implements ActionListener, Runnable {
         InetAddress rpIPAddr; //RP IP address
         int imagenb = 0; //image nb of the image currently transmitted
         int VIDEO_LENGTH = 500; //length of the video in frames
+        VideoStream video; //VideoStream object used to access video frames
 
         public ServerSender(String VideoFileName, Integer streamId, InetAddress rpIPAddr) {
             this.VideoFileName = VideoFileName;
             this.streamId = streamId;
             this.rpIPAddr = rpIPAddr;
+            try {
+                video = new VideoStream(VideoFileName); //init the VideoStream object:
+            } catch (Exception e) {
+                System.out.println("Servidor: erro no video: " + e.getMessage());
+            }
         }
 
         @Override
