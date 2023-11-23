@@ -71,6 +71,10 @@ public class fullDuplex {
         //Thread client = new Thread(new Client()); // criar um client a priori não funcional que só fazemos run quando o user pede,
         // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e ver a stream porque também somos clientes
         // senão tinhamos de por o nome do cliente destino no packet, do be cringe sometimes
+        System.out.println("Os meus Adjacentes:");
+        for (InetAddress neighbour : neighbours.neighbours) {
+            System.out.println(neighbour.getHostName());
+        }
         stream stream = new stream();
         Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, stream));
         streaming.start();

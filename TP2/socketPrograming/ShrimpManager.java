@@ -30,6 +30,7 @@ public class ShrimpManager implements Runnable{
 
                 Shrimp shrimp = new Shrimp(packet);
                 InetAddress clientIP = shrimp.getSourceAddress();
+                System.out.println("Recebido SHRIMP de " + clientIP.toString() + " com streamId " + shrimp.getStreamId());
 
                 synchronized(this.neighbourInfo) {
                     //Remover pedido feito por Simp
@@ -91,6 +92,7 @@ public class ShrimpManager implements Runnable{
                         synchronized (neighbourInfo) {
                             if (this.neighbourInfo.rpRequest.isEmpty() && this.neighbourInfo.rpAdjacent.isEmpty()) {
                                 this.neighbourInfo.nameHash.put(new String(shrimp.getPayload()), streamId);
+                                System.out.println("Não existe conexão!");
                                 this.neighbourInfo.connectionToRP = 0;
                                 //Avisar todos os Clientes da falta de conexão
                                 //TODO escolher o melhor link para avisar
