@@ -48,10 +48,9 @@ public class SimpManager implements Runnable{
                         this.neighbourInfo.clientAdjacent.put(clientIP, clientAdjacent);
                     }
 
-                    if (!simp.getAddress().equals(InetAddress.getByName("localhost"))) {
-                        clientAdjacent.add(simp.getAddress());
-                        System.out.println("Recebeu Pedido de Stream de Nodo Adjacente");
-                    }
+                    //Adicionar caminho para o cliente
+                    clientAdjacent.add(simp.getAddress());
+                    
 
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.connectionToRP == 0) {

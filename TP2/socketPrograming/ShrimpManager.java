@@ -30,7 +30,9 @@ public class ShrimpManager implements Runnable{
 
                 Shrimp shrimp = new Shrimp(packet);
                 InetAddress clientIP = shrimp.getSourceAddress();
-                System.out.println("Recebido SHRIMP de " + clientIP.toString() + " com streamId " + shrimp.getStreamId());
+                System.out.println( "Recebido SHRIMP de " + clientIP.toString() + 
+                                    " vindo de " + shrimp.getAddress().getHostAddress() +
+                                    " com streamId " + shrimp.getStreamId());
 
                 synchronized(this.neighbourInfo) {
                     //Remover pedido feito por Simp
@@ -78,7 +80,7 @@ public class ShrimpManager implements Runnable{
                         //Se o cliente é novo, colocar o primeiro link para CLiente como o primeiro link
                         if (!streamClients.contains(clientIP)) 
                             streamActiveLinks.add(clientAdjacent.iterator().next());
-
+                        
                         //Adicionar Cliente à Stream (Porque existe!)
                         streamClients.add(clientIP);
 
