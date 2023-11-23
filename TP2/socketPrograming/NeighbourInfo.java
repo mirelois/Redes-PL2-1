@@ -3,7 +3,7 @@ import java.util.*;
 
 public class NeighbourInfo {
 
-    int connectionToRP = -1;
+    int connectionToRP = 255; //255 significa que ainda não sabe 
 
     public List<InetAddress> neighbours = new ArrayList<>(); // lista de vizinhos
 

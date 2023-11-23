@@ -56,7 +56,7 @@ public class ShrimpManager implements Runnable{
                     clientAdjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
                     
                     //Existe Stream (conseguiu caminho até ao RP)
-                    if (streamId != 0) {
+                    if (streamId != 0 && streamId != 255) {
                         this.neighbourInfo.connectionToRP = 1;
 
                         this.neighbourInfo.nameHash.put(new String(shrimp.getPayload()), streamId);

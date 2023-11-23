@@ -83,7 +83,8 @@ public class SimpManager implements Runnable{
                                 }
                         }*/
                     }
-                    this.neighbourInfo.nameHash.put(new String(simp.getPayload()), -1);
+                    //255 significa que ainda não se sabe se a stream existe
+                    this.neighbourInfo.nameHash.put(new String(simp.getPayload()), 255);
 
                 } else {
                     //Stream existe (porque existe conexão)
