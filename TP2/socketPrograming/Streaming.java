@@ -2,6 +2,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -31,25 +34,29 @@ public class Streaming implements Runnable{
                 Sup stream = new Sup(packet);
                 //int latency = stream.getTime_stamp() - Packet.getCurrTime();
 
-                synchronized (this.stream){
-                    if(this.stream.id!=0){
+                // Decidir Vizinho(s) mais adequado(s) para enviar stream(s)
+                Integer streamId = stream.getStreamId();
+                Set<InetAddress> streamActiveLinks;
+                
+                synchronized (this.neighbourInfo) {
+                    streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
+                    if (streamActiveLinks.contains(InetAddress.getByName("localhost"))) {
                         socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
-                                InetAddress.getByName("localhost"), 8389, stream.getPayloadSize(), stream.getPayload())
-                                .toDatagramPacket());
+                            InetAddress.getByName("localhost"), 8389, stream.getPayloadSize(), stream.getPayload())
+                            .toDatagramPacket());
                     }
                 }
 
-                // Decidir Vizinho(s) mais adequado(s) para enviar stream(s)
-                InetAddress vizinhomegafixe=null;
-                synchronized (this.neighbourInfo) {
-                    if(this.neighbourInfo.streamActiveLinks.get(stream.getStreamId()).iterator().hasNext())
-                        vizinhomegafixe = this.neighbourInfo.streamActiveLinks.get(stream.getStreamId()).iterator().next();
-                }
-
-                if(vizinhomegafixe!=null) {
-                    socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
-                            vizinhomegafixe, this.port, stream.getPayloadSize(), stream.getPayload())
+                for (InetAddress activeLink : streamActiveLinks) {
+                    if (activeLink.equals(InetAddress.getByName("localhost"))) {
+                        socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
+                            InetAddress.getByName("localhost"), 8389, stream.getPayloadSize(), stream.getPayload())
                             .toDatagramPacket());
+                    } else {
+                        socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
+                            activeLink, this.port, stream.getPayloadSize(), stream.getPayload())
+                            .toDatagramPacket());
+                    }
                 }
             }
         } catch (IOException | PacketSizeException e) {

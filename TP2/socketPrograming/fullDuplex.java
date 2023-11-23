@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class stream{
-    int id = 0;
+    String file = "movie.Mjpeg";
 }
 
 public class fullDuplex {
@@ -93,7 +93,7 @@ public class fullDuplex {
         while(keepLooping){
             String inputStr = input.readLine();
             if(inputStr.contains("client") && !isClientAlive)
-                new Client(8389, stream);
+                new Client(8389, stream, 7000);
             else if(inputStr.contains("kill"))
                 keepLooping = false;
         }
