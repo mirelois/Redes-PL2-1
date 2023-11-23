@@ -28,7 +28,8 @@ public class fullDuplex {
         String filePath = null;
         boolean isServer = false;
         boolean isRP = false;
-        Pattern pattern = Pattern.compile("(?:(-b|-s|-r) ([^- \\n]*))");
+        //cuidado, é preciso fazer -b*ESPAÇO*
+        Pattern pattern = Pattern.compile("(?:(-b|-s|-r) ?([^- \\n]*))");
         Matcher matcher = pattern.matcher(arguments.toString());
         while(matcher.find()){
             String flag = matcher.group(1);
