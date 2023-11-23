@@ -102,6 +102,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
         } catch (IOException e){
             e.printStackTrace();
         } catch (PacketSizeException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
