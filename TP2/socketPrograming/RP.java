@@ -61,7 +61,8 @@ public class RP implements Runnable {
                     streamId = next_stream;
                     Shrimp serverShrimp = new Shrimp(InetAddress.getByName("localhost"), next_stream, this.serverPort, chooseBestServer(serverInfo), simp.getPayloadSize(), simp.getPayload());
                     next_stream++;
-
+                    System.out.println("Pedido de stream enviado ao servidor " + chooseBestServer(serverInfo) +
+                                       " com payload " + new String(simp.getPayload()));
                     socket.send(serverShrimp.toDatagramPacket());
                 }
                 

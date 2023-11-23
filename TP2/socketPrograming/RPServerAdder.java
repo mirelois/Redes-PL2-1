@@ -32,7 +32,7 @@ public class RPServerAdder implements Runnable{
                 synchronized(this.serverInfo){
                     this.serverInfo.servers.add(simp.getSourceAddress());
                 }
-
+                System.out.println("Adicionado servidor de endereço " + simp.getSourceAddress().getHostAddress());
 
                 //TODO fazer check de perdas para nao dar barraco
 

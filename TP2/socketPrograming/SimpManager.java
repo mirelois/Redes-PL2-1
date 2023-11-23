@@ -30,7 +30,8 @@ public class SimpManager implements Runnable{
             while(true){
                 socket.receive(packet);
                 Simp simp = new Simp(packet);
-                System.out.println("Recebeu Pedido de Stream " + simp.getAddress().toString());
+                System.out.println("Recebeu Pedido de Stream " + simp.getAddress().toString() +
+                                   " com payload " + new String(simp.getPayload()));
 
                 InetAddress clientIP = simp.getSourceAddress();
 
@@ -51,7 +52,6 @@ public class SimpManager implements Runnable{
                     //Adicionar caminho para o cliente
                     clientAdjacent.add(simp.getAddress());
                     
-
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.connectionToRP == 0) {
                         this.neighbourInfo.nameHash.put(new String(simp.getPayload()), 0);
