@@ -134,7 +134,7 @@ public class Client implements Runnable{
         clientTimerListener(int port, stream stream, int simpPort){
             this.port = port;
             this.simpPort = simpPort;
-            stream = new stream();
+            this.stream = stream;
         }
 
         public void actionPerformed(ActionEvent e) {
