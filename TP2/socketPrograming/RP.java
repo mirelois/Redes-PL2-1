@@ -43,10 +43,10 @@ public class RP implements Runnable {
                 //TODO tratar isto com shrimps
 
                 System.out.println("Recebido SIMP de " + simp.getAddress().getHostAddress() +
-                                   " Pede Stream " + simp.getPayload().toString());
+                                   " Pede Stream " + new String(simp.getPayload()));
                 Integer streamId;
                 InetAddress clientIP = simp.getSourceAddress();
-                String streamName = simp.getPayload().toString();
+                String streamName = new String(simp.getPayload());
                 Set<InetAddress> clientAdjacent, streamActiveLinks, streamClients;
 
                 synchronized(this.neighbourInfo) {
