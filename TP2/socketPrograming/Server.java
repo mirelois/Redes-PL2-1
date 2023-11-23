@@ -60,8 +60,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
             this.rpAdderPort = rpAdderPort;
             this.RTP_dest_port = streamPort;
             //System.out.println("Servidor: socket " + ClientIPAddr);
-            System.out.println("Servidor: vai enviar video da file " + VideoFileName);
-
         } catch (SocketException e) {
             System.out.println("Servidor: erro no socket: " + e.getMessage());
         }
