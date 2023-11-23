@@ -29,8 +29,8 @@ public class SimpManager implements Runnable{
 
             while(true){
                 socket.receive(packet);
-                System.out.println("Recebeu Pedido de Stream");
                 Simp simp = new Simp(packet);
+                System.out.println("Recebeu Pedido de Stream " + simp.getAddress().toString());
 
                 InetAddress clientIP = simp.getSourceAddress();
 
@@ -68,7 +68,8 @@ public class SimpManager implements Runnable{
                         //if (this.neighbourInfo.streamAdjacent.values().isEmpty()) {
                             //Enviar para todos os vizinhos se não conhecer caminhos para o RP
                             for (InetAddress neighbour : this.neighbourInfo.neighbours) 
-                                if (!neighbour.equals(simp.getAddress())) {
+                                if (!neighbour.equals(simp.getAddress()) && |neighbour.equals(simp.getSourceAddress())) {
+                                    System.out.println("Enviado SIMP para " + neighbour.getAddress().toString());
                                     socket.send(new Simp(clientIP, simp.getAddress(), this.port, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
                                     //Adicionar pedido feito por Simp
                                     this.neighbourInfo.rpRequest.add(neighbour);

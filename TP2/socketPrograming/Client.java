@@ -144,8 +144,8 @@ public class Client implements Runnable{
             try(DatagramSocket RTPsocket = new DatagramSocket(this.port)) {
 
                 // TODO falta só configurar isto aqui, mandar o simp para o meu nodo aka o streaming de mim mesmo
-                RTPsocket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), this.simpPort, stream.file.length(), stream.file.getBytes()).toDatagramPacket());
                 System.out.println("Enviado pacote de pedido ao Nodo correspondente");
+                RTPsocket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), this.simpPort, stream.file.length(), stream.file.getBytes()).toDatagramPacket());
                 while(true) {
                     RTPsocket.receive(rcvdp);
                     System.out.println("Recebeu Stream");
