@@ -76,7 +76,7 @@ public class fullDuplex {
         streaming.start();
 
         if (isServer) {
-            new Thread(new Server(InetAddress.getByName(args[0]), 6005)).start();
+            new Thread(new Server(InetAddress.getByName(args[0]), 6005, 9001, 5000)).start();
         } else if (isRP){
             ServerInfo serverInfo = new ServerInfo();
             new Thread(new RP(9000, 7001, 6005, serverInfo, neighbours)).start();

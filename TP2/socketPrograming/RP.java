@@ -42,10 +42,6 @@ public class RP implements Runnable {
                 Simp simp = new Simp(packet);
                 //TODO tratar isto com shrimps
 
-                Simp send_simp = new Simp(InetAddress.getByName("localhost"), chooseBestServer(serverInfo), this.serverPort, 0, null);
-
-                socket.send(send_simp.toDatagramPacket());
-
                 Integer streamId;
                 InetAddress clientIP = simp.getSourceAddress();
                 String streamName = simp.getPayload().toString();
@@ -53,10 +49,19 @@ public class RP implements Runnable {
                 synchronized(this.neighbourInfo) {
                     streamId = this.neighbourInfo.nameHash.get(streamName);
                     if (streamId == null) {
-                        streamId = next_stream++;
-                        this.neighbourInfo.nameHash.put(streamName, streamId);
+                        this.neighbourInfo.nameHash.put(streamName, next_stream);
                     }
+                }
+                
+                if (streamId == null) {
+                    streamId = next_stream;
+                    next_stream++;
+                    Shrimp serverShrimp = new Shrimp(InetAddress.getByName("localhost"), next_stream, this.serverPort, chooseBestServer(serverInfo), simp.getPayloadSize(), simp.getPayload());
 
+                    socket.send(serverShrimp.toDatagramPacket());
+                }
+                
+                synchronized(this.neighbourInfo) {
                     //Colocar o nome da Stream associado ao seu Id
                     clientAdjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
                     streamClients = this.neighbourInfo.streamClients.get(streamId);
@@ -78,7 +83,7 @@ public class RP implements Runnable {
                     
                     //Adicionar caminho para Cliente
                     clientAdjacent.add(simp.getAddress());
-                    
+
                     //TODO decidir qual dos links está ativo é dinâmico
                     //Se o cliente é novo, colocar o primeiro link para CLiente como o primeiro link
                     if (!streamClients.contains(clientIP)) 
