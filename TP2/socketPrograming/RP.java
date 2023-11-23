@@ -42,10 +42,12 @@ public class RP implements Runnable {
                 Simp simp = new Simp(packet);
                 //TODO tratar isto com shrimps
 
+                System.out.println("Recebido SIMP de " + simp.getAddress().getHostAddress());
                 Integer streamId;
                 InetAddress clientIP = simp.getSourceAddress();
                 String streamName = simp.getPayload().toString();
                 Set<InetAddress> clientAdjacent, streamActiveLinks, streamClients;
+
                 synchronized(this.neighbourInfo) {
                     streamId = this.neighbourInfo.nameHash.get(streamName);
                     if (streamId == null) {
@@ -54,6 +56,7 @@ public class RP implements Runnable {
                 }
                 
                 if (streamId == null) {
+                    System.out.println("Nova Stream Pedida, dar novo ID");
                     streamId = next_stream;
                     next_stream++;
                     Shrimp serverShrimp = new Shrimp(InetAddress.getByName("localhost"), next_stream, this.serverPort, chooseBestServer(serverInfo), simp.getPayloadSize(), simp.getPayload());
@@ -82,6 +85,7 @@ public class RP implements Runnable {
                     }
                     
                     //Adicionar caminho para Cliente
+                    System.out.println("Adicionado caminho " + simp.getAddress().getHostAddress() + " para " + simp.getSourceAddress().getHostAddress());
                     clientAdjacent.add(simp.getAddress());
 
                     //TODO decidir qual dos links está ativo é dinâmico
