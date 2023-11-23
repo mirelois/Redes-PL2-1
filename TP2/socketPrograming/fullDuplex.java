@@ -80,12 +80,15 @@ public class fullDuplex {
         streaming.start();
 
         if (isServer) {
+            System.out.println("Começo de Servidor!");
             new Thread(new Server(InetAddress.getByName(args[0]), 6005, 9001, 5000)).start();
         } else if (isRP){
+            System.out.println("Começo de RP!");
             ServerInfo serverInfo = new ServerInfo();
             new Thread(new RP(9000, 7001, 6005, serverInfo, neighbours)).start();
             new Thread(new RPServerAdder(9001, serverInfo)).start();
         }else {
+            System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(7000, 7001, neighbours));
             simpManager.start();
             Thread shrimpManager = new Thread(new ShrimpManager(7001, neighbours));
