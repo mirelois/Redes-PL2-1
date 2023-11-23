@@ -71,13 +71,15 @@ public class Server extends JFrame implements ActionListener, Runnable {
     @Override
     public void run() {
         try {
+            System.out.println("Avisar RP da existência");
             RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, this.rpAdderPort, 0, null).toDatagramPacket());
             while(true){
                 byte[] buf = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 RTPsocket.receive(packet);
                 Shrimp shrimp = new Shrimp(packet);
-                System.out.println("Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() + " de id " + shrimp.getStreamId());
+                System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() + 
+                                    " de id " + shrimp.getStreamId());
                 if (senders.get(shrimp.getStreamId()) == null) {
                     System.out.println("Criada Thread que envia a stream com ficheiro de nome: " + shrimp.getPayload().toString());
                     Thread serverSender = new Thread(new ServerSender(shrimp.getPayload().toString(), shrimp.getStreamId(), this.rpIPAddr));
