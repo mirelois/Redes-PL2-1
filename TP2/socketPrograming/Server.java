@@ -81,8 +81,8 @@ public class Server extends JFrame implements ActionListener, Runnable {
                 System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() + 
                                     " de id " + shrimp.getStreamId());
                 if (senders.get(shrimp.getStreamId()) == null) {
-                    System.out.println("Criada Thread que envia a stream com ficheiro de nome: " + shrimp.getPayload().toString());
-                    Thread serverSender = new Thread(new ServerSender(shrimp.getPayload().toString(), shrimp.getStreamId(), this.rpIPAddr));
+                    System.out.println("Criada Thread que envia a stream com ficheiro de nome: " + new String(shrimp.getPayload()));
+                    Thread serverSender = new Thread(new ServerSender(new String(shrimp.getPayload()), shrimp.getStreamId(), this.rpIPAddr));
                     senders.put(shrimp.getStreamId(), serverSender);
                     serverSender.start();
                 }
