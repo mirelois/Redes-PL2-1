@@ -135,7 +135,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
             }
             catch(Exception ex)
             {
-                System.out.println("Exception caught: "+ex);
+                ex.printStackTrace();
                 System.exit(0);
             }
         }

@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class stream{
-    String file = "videoA.mp4";
+    String file = "movie.Mjpeg";
 }
 
 public class fullDuplex {
