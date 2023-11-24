@@ -3,7 +3,7 @@ import java.net.InetAddress;
 
 public class Sup extends Packet { //Streaming over UDP Protocol
 
-    static int HEADER_SIZE = 12;
+    static int HEADER_SIZE = 13;
 
     
     int time_stamp; //2
