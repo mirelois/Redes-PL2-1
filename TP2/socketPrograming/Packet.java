@@ -141,11 +141,15 @@ public class Packet {
         return ~sum;
     }
     
-    public static int getCurrTime(){
+    private static int getCurrTime(){
         
         LocalTime now = LocalTime.now();
         
         return now.getSecond() * 1000 + now.getNano() / 1000000;
+    }
+
+    public static int getLatency(int timeStamp){
+        return (getCurrTime() - timeStamp) % 60000;
     }
 
 }
