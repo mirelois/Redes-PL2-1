@@ -21,7 +21,6 @@ public class Packet {
         this.header_size = header_size;
         this.header = new byte[header_size];
         this.payload_size = payload_size;
-        this.payload = new byte[payload_size];
 
         this.address = address;
         this.port = port;
@@ -29,7 +28,7 @@ public class Packet {
         if(payload_size == 0){
             this.payload = null;
         }else{
-            this.address = address;
+            this.payload = new byte[payload_size];
             
             for (int i = 0; i < payload_size; i++) {
                 this.payload[i] = payload[i];
@@ -42,7 +41,9 @@ public class Packet {
 
         byte[] data = packet.getData();
         
-        if(data.length < header_size){
+        this.payload_size = packet.getLength() - header_size;
+
+        if(packet.getLength() < header_size){
             throw new PacketSizeException("Packet size to smol");
         }
 
@@ -51,14 +52,12 @@ public class Packet {
         this.address = packet.getAddress();
         this.port = packet.getPort();
 
-        this.payload_size = data.length - header_size;
-        
         if(payload_size == 0){
             this.payload = null;
         }else{
             this.payload = new byte[this.payload_size]; // TODO: check data length
 
-            for (int i = 0; i < data.length - this.header_size; i++) {
+            for (int i = 0; i < packet.getLength() - this.header_size; i++) {
                 this.payload[i] = data[header_size + i];
             }
         }

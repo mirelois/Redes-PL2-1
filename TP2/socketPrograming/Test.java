@@ -1,47 +1,49 @@
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 public class Test {
 
-    public static void main(String[] args) throws UnknownHostException {
-        /*
-        InetAddress address = InetAddress.getByName("localhost");
-        
-        Rip rip_source = new Rip(12, 13,address, 2000);
+    public static void main(String[] args) throws IOException, PacketSizeException{
+        try (DatagramSocket socket = new DatagramSocket(2000)) {
 
-        Rip rip_dest = new Rip(rip_source.toDatagramPacket());
+            String file = "videoA.mp4";
 
-        assert(rip_dest.getLatency() == 12);
-        assert(rip_dest.getThroughput() == 13);
-        assert(rip_dest.getAddress().equals(address));
-        assert(rip_dest.getPort() == 2000);
+            byte[] buf = new byte[1024];
 
-        //------------------------------------------------
-        
-        Simp simp_source = new Simp(address, address, 2000, 5, "hello".getBytes());
+            DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
 
-        Simp simp_dest = new Simp(simp_source.toDatagramPacket());
+            System.out.println(file.length());
 
-        System.out.println(simp_dest.getTime_stamp());
-        assert(simp_dest.getSourceAddress().equals(address));
-        assert(simp_dest.getChecksum() == 0);
-        assert(simp_dest.getPort() == 2000);
-        assert(simp_dest.getAddress().equals(address));
-        assert(simp_dest.getPayload().equals("hello".getBytes()));
+            socket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), 2000, file.length(), file.getBytes(StandardCharsets.US_ASCII)).toDatagramPacket());
 
-        //------------------------------------------------
+            socket.receive(datagramPacket);
 
-        Sup sup_source = new Sup(1000, 1001, address, 2000, 5, "hello".getBytes());
+            Simp simp = new Simp(datagramPacket);
 
-        Sup sup_dest = new Sup(sup_source.toDatagramPacket());
+            System.out.println(simp.getPacket().length);
+            System.out.println(simp.getPacketLength());
+            System.out.println(simp.getHeader().length);
+            System.out.println(simp.getHeaderSize());
+            System.out.println(simp.getPacket().length);
+            System.out.println(simp.getPayloadSize());
+            System.out.println(datagramPacket.getLength());
 
-        assert(sup_dest.getSequence_number() == 1000);
-        assert(sup_dest.getAcknowledgment_number() == 1001);
-        assert(sup_dest.getChecksum() == 0);
-        assert(sup_dest.getPort() == 2000);
-        assert(sup_dest.getAddress().equals(address));
-        assert(sup_dest.getPayload().equals("hello".getBytes()));
-        */
+            String newfile = new String(simp.getPayload(), StandardCharsets.US_ASCII);
 
+            System.out.println(newfile);
+
+            System.out.println(file.equals(newfile));
+            
+
+            
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
