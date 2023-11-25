@@ -26,8 +26,7 @@ public final class Define {
 
     //-------buffersize-------
 
-    static int bootClientBuffer  = 1024;
-    static int bootStraperBuffer = 1024;
-    static int streamBuffer      = 1024;
+    static int streamBuffer = 1024;
+    static int infoBuffer   = 1024;
 
 }

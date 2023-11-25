@@ -2,30 +2,23 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Streaming implements Runnable{
-    private final int port, timeOut;
     private final NeighbourInfo neighbourInfo;
 
     private final stream stream;
 
-    public Streaming(int port, int timeOut, NeighbourInfo neighbourInfo, stream stream){
-        this.port = port;
-        this.timeOut = timeOut;
+    public Streaming(NeighbourInfo neighbourInfo, stream stream){
         this.neighbourInfo = neighbourInfo;
         this.stream = stream;
     }
 
     @Override
     public void run(){
-        try(DatagramSocket socket = new DatagramSocket(this.port)){
+        try(DatagramSocket socket = new DatagramSocket(Define.streamingPort)){
 
-            byte[] buf = new byte[1024]; // 1024 is enough?
+            byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough?
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
             while (true){
@@ -54,7 +47,7 @@ public class Streaming implements Runnable{
                             .toDatagramPacket());
                     } else {
                         socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
-                            activeLink, this.port, stream.getPayloadSize(), stream.getPayload())
+                            activeLink, Define.streamingPort, stream.getPayloadSize(), stream.getPayload())
                             .toDatagramPacket());
                     }
                 }

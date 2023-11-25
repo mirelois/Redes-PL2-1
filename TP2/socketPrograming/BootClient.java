@@ -50,7 +50,7 @@ public class BootClient implements Runnable{
             t.start();
 
             // receber os vizinhos
-            byte[] buf = new byte[Define.bootClientBuffer];
+            byte[] buf = new byte[Define.infoBuffer];
 
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 

@@ -9,20 +9,17 @@ import java.util.Set;
 
 public class ShrimpManager implements Runnable{
 
-    private final int port;
-
     private final NeighbourInfo neighbourInfo;
 
-    public ShrimpManager(int port, NeighbourInfo neighbourInfo){
-        this.port = port;
+    public ShrimpManager( NeighbourInfo neighbourInfo){
         this.neighbourInfo = neighbourInfo;
     }
 
     @Override
     public void run(){
-        try(DatagramSocket socket = new DatagramSocket(this.port)){
+        try(DatagramSocket socket = new DatagramSocket(Define.shrimpPort)){
             
-            byte[] buf = new byte[1024]; // 1024 is enough?
+            byte[] buf = new byte[Define.infoBuffer]; // 1024 is enough?
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
             while(true){

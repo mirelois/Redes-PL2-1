@@ -110,7 +110,7 @@ public class BootStrapper implements Runnable {
     public void run() {
 
         // buffer to receive datagramPacket
-        byte[] buff = new byte[Define.bootStraperBuffer];
+        byte[] buff = new byte[Define.infoBuffer];
 
         // neighbour tree from file
         HashMap<InetAddress, List<InetAddress>> tree = getTree(filePath);
