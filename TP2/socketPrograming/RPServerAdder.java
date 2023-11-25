@@ -4,35 +4,33 @@ import java.net.DatagramSocket;
 
 public class RPServerAdder implements Runnable{
     
-    private int port;
-
     private final ServerInfo serverInfo;
 
-    public RPServerAdder(int port, ServerInfo serverInfo){
-        this.port = port;
+    public RPServerAdder(ServerInfo serverInfo){
         this.serverInfo = serverInfo;
     }
 
     @Override
     public void run(){
 
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[Define.infoBuffer];
 
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
         while(true){
-            try (DatagramSocket socket = new DatagramSocket(this.port)) {
+            try (DatagramSocket socket = new DatagramSocket(Define.RPServerAdderPort)) {
 
                 socket.receive(packet);
 
-                Simp simp = new Simp(packet);
+                Shrimp shrimp = new Shrimp(packet); // servidor manda shrimps
 
-                // int latency = Packet.getCurrTime() - simp.getTime_stamp();
+                int latency = Packet.getLatency(shrimp.getTimeStamp());
 
                 synchronized(this.serverInfo){
-                    this.serverInfo.servers.add(simp.getAddress());
+                    serverInfo.latencyMap.put(shrimp.getAddress(), latency);
                 }
-                System.out.println("Adicionado servidor de endereço " + simp.getAddress().getHostAddress());
+                
+                System.out.println("Adicionado servidor de endereço " + shrimp.getAddress().getHostAddress());
 
                 //TODO fazer check de perdas para nao dar barraco
 

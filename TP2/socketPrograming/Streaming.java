@@ -18,36 +18,37 @@ public class Streaming implements Runnable{
     public void run(){
         try(DatagramSocket socket = new DatagramSocket(Define.streamingPort)){
 
-            byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough?
+            byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough? no
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
             while (true){
                 socket.receive(packet);
 
-                Sup stream = new Sup(packet);
+                Sup sup = new Sup(packet);
+                
                 //int latency = stream.getTime_stamp() - Packet.getCurrTime();
 
                 // Decidir Vizinho(s) mais adequado(s) para enviar stream(s)
-                Integer streamId = stream.getStreamId();
+                Integer streamId = sup.getStreamId();
                 Set<InetAddress> streamActiveLinks;
                 
                 synchronized (this.neighbourInfo) {
                     streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
                     if (streamActiveLinks.contains(InetAddress.getByName("localhost"))) {
-                        socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
-                            InetAddress.getByName("localhost"), 8389, stream.getPayloadSize(), stream.getPayload())
+                        socket.send(new Sup(sup.getStreamId(), sup.getVideo_time_stamp(), sup.getSequence_number(),
+                            InetAddress.getByName("localhost"), 8389, sup.getPayloadSize(), sup.getPayload())
                             .toDatagramPacket());
                     }
                 }
 
                 for (InetAddress activeLink : streamActiveLinks) {
                     if (activeLink.equals(InetAddress.getByName("localhost"))) {
-                        socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
-                            InetAddress.getByName("localhost"), 8389, stream.getPayloadSize(), stream.getPayload())
+                        socket.send(new Sup(sup.getStreamId(), sup.getVideo_time_stamp(), sup.getSequence_number(),
+                            InetAddress.getByName("localhost"), 8389, sup.getPayloadSize(), sup.getPayload())
                             .toDatagramPacket());
                     } else {
-                        socket.send(new Sup(stream.getStreamId(), stream.getVideo_time_stamp(), stream.getSequence_number(),
-                            activeLink, Define.streamingPort, stream.getPayloadSize(), stream.getPayload())
+                        socket.send(new Sup(sup.getStreamId(), sup.getVideo_time_stamp(), sup.getSequence_number(),
+                            activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
                             .toDatagramPacket());
                     }
                 }

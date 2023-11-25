@@ -1,10 +1,7 @@
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 
 public class ServerInfo {
-
-    public ArrayList<InetAddress> servers = new ArrayList<>();
-    // public HashMap<InetAddress, ServerInfo> serverMap;
+    public HashMap<InetAddress, Integer> latencyMap;
 }
 

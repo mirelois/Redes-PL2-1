@@ -74,7 +74,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
             System.out.println("Avisar RP da existência");
             RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, this.rpAdderPort, 0, null).toDatagramPacket());
             while(true){
-                byte[] buf = new byte[1024];
+                byte[] buf = new byte[Define.infoBuffer];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 RTPsocket.receive(packet);
                 Shrimp shrimp = new Shrimp(packet);
