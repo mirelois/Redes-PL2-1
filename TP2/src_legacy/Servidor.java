@@ -24,7 +24,6 @@ public class Servidor extends JFrame implements ActionListener {
   //----------------
   DatagramPacket senddp; //UDP packet containing the video frames (to send)A
   DatagramSocket RTPsocket; //socket to be used to send and receive UDP packet
-  int RTP_dest_port = 25000; //destination port for RTP packets 
   InetAddress ClientIPAddr; //Client IP address
   
   static String VideoFileName; //video file to request to the server
@@ -51,7 +50,7 @@ public class Servidor extends JFrame implements ActionListener {
     sTimer = new Timer(FRAME_PERIOD, this); //init Timer para servidor
     sTimer.setInitialDelay(0);
     sTimer.setCoalesce(true);
-    sBuf = new byte[15000]; //allocate memory for the sending buffer
+    sBuf = new byte[Define.streamBuffer]; //allocate memory for the sending buffer
 
     try {
 	RTPsocket = new DatagramSocket(); //init RTP socket 
@@ -132,7 +131,7 @@ public class Servidor extends JFrame implements ActionListener {
 	  rtp_packet.getpacket(packet_bits);
 
 	  //send the packet as a DatagramPacket over the UDP socket 
-	  senddp = new DatagramPacket(packet_bits, packet_length, ClientIPAddr, RTP_dest_port);
+	  senddp = new DatagramPacket(packet_bits, packet_length, ClientIPAddr, Define.streamingPort);
 	  RTPsocket.send(senddp);
 
 	  System.out.println("Send frame #"+imagenb);

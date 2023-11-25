@@ -50,10 +50,10 @@ public class fullDuplex {
 
             // Setup Phase:
             if (filePath!=null) {
-                new Thread(new BootStrapper(2000, filePath, 1000)).start();
+                new Thread(new BootStrapper( filePath)).start();
             }
 
-            new Thread(new BootClient(ip_bootstrapper, 2000, 2001, 1000, neighbours)).start();
+            new Thread(new BootClient(ip_bootstrapper, neighbours)).start();
 
         } catch (UnknownHostException e) {
             System.out.println("The IP " + args[0] + " is Invalid for IP_Bootstrapper");
