@@ -141,7 +141,7 @@ public class Packet {
         return ~sum;
     }
     
-    protected static int getCurrTime(){
+    public static int getCurrTime(){
         
         LocalTime now = LocalTime.now();
         

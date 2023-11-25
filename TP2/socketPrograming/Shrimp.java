@@ -3,14 +3,19 @@ import java.net.InetAddress;
 
 public class Shrimp extends Packet{ //Stream Hard Response Initiation Management Protocol
 
-    static int HEADER_SIZE = 5;
+    static int HEADER_SIZE = 7;
 
     //Se estiver a 0, a stream não existe
     int streamId; //1
+                  
     InetAddress sourceAddress; //4
+                               
+    int timeStamp; //2;
 
-    public Shrimp(InetAddress sourceAddress, int streamId, int port, InetAddress address, int payload_size, byte[] payload) {
+	public Shrimp(int timeStamp, InetAddress sourceAddress, int streamId, int port, InetAddress address, int payload_size, byte[] payload) {
         super(HEADER_SIZE, payload, payload_size, address, port);
+
+        this.timeStamp = timeStamp;
 
         this.streamId = streamId;
 
@@ -24,6 +29,9 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
         this.header[2] = Byte.parseByte(ip_values[1]);
         this.header[3] = Byte.parseByte(ip_values[2]);
         this.header[4] = Byte.parseByte(ip_values[3]);
+
+        this.header[5] = (byte) (this.time_stamp >> 8 /* & 0xFF */);
+        this.header[6] = (byte) (this.time_stamp      /* & 0xFF */);
     }
 
     public Shrimp(DatagramPacket packet) throws java.net.UnknownHostException, PacketSizeException {
@@ -43,7 +51,14 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
         ip.append(this.header[4]);
 
         this.sourceAddress = InetAddress.getByName(ip.toString());
+        
+        this.checksum = (Byte.toUnsignedInt(this.header[5]) << 8) |
+                         Byte.toUnsignedInt(this.header[6]);
 
+    }
+
+    public int getTimeStamp() {
+        return timeStamp;
     }
 
     public int getStreamId() {
