@@ -8,17 +8,13 @@ import java.net.SocketException;
 import java.util.*;
 
 public class BootClient implements Runnable{
-    private int bootStrapperPort, port, timeOut;
 
     private InetAddress bootStrapperIP;
 
     private NeighbourInfo neighbours;
 
-    public BootClient(InetAddress bootStrapperIP, int bootStrapperPort, int port, int timeOut, NeighbourInfo neighbours){
+    public BootClient(InetAddress bootStrapperIP, NeighbourInfo neighbours){
         this.bootStrapperIP = bootStrapperIP;
-        this.bootStrapperPort = bootStrapperPort;
-        this.port = port;
-        this.timeOut = timeOut;
         this.neighbours = neighbours;
     }
     private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
@@ -30,18 +26,18 @@ public class BootClient implements Runnable{
     }
 
     public void run() {
-        try(DatagramSocket socket = new DatagramSocket(port)) {
+        try(DatagramSocket socket = new DatagramSocket(Define.bootClientPort)) {
 
             Thread t = new Thread(() -> {
                 while (true) {
                     try {
-                        Thread.sleep(timeOut);
+                        Thread.sleep(Define.bootClientTimeout);
                     } catch (InterruptedException e) {
                         return;
                     }
 
                     // send neighbour request
-                    Bop bop = new Bop(null, 0, bootStrapperIP, bootStrapperPort);
+                    Bop bop = new Bop(null, 0, bootStrapperIP, Define.bootStraperPort);
 
                     try {
                         socket.send(bop.toDatagramPacket());
@@ -54,7 +50,7 @@ public class BootClient implements Runnable{
             t.start();
 
             // receber os vizinhos
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[Define.bootClientBuffer];
 
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 

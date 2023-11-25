@@ -14,11 +14,9 @@ import java.util.regex.Pattern;
 
 public class BootStrapper implements Runnable {
 
-    private int bootPort;
     private String filePath;
 
-    public BootStrapper(int bootPort, String filePath, int timeout) {
-        this.bootPort = bootPort;
+    public BootStrapper( String filePath) {
         this.filePath = filePath;
     }
 
@@ -112,13 +110,13 @@ public class BootStrapper implements Runnable {
     public void run() {
 
         // buffer to receive datagramPacket
-        byte[] buff = new byte[1024];
+        byte[] buff = new byte[Define.bootStraperBuffer];
 
         // neighbour tree from file
         HashMap<InetAddress, List<InetAddress>> tree = getTree(filePath);
 
         // open socket
-        try (DatagramSocket socket = new DatagramSocket(bootPort)) {
+        try (DatagramSocket socket = new DatagramSocket(Define.bootStraperPort)) {
 
             // start waiting for packets
             while (true) {
