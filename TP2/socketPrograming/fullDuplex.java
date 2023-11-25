@@ -77,7 +77,7 @@ public class fullDuplex {
             System.out.println(neighbour.getHostName());
         }
         stream stream = new stream();
-        Thread streaming = new Thread(new Streaming(5000, 1000, neighbours, stream));
+        Thread streaming = new Thread(new Streaming(neighbours, stream));
         streaming.start();
 
         if (isServer) {
@@ -90,9 +90,9 @@ public class fullDuplex {
             new Thread(new RPServerAdder(9000, serverInfo)).start();
         }else {
             System.out.println("Começo de Nodo!");
-            Thread simpManager = new Thread(new SimpManager(7000, 7001, neighbours));
+            Thread simpManager = new Thread(new SimpManager(neighbours));
             simpManager.start();
-            Thread shrimpManager = new Thread(new ShrimpManager(7001, neighbours));
+            Thread shrimpManager = new Thread(new ShrimpManager(neighbours));
             shrimpManager.start();
         }
         boolean isClientAlive = false;
@@ -101,7 +101,7 @@ public class fullDuplex {
         while(keepLooping){
             String inputStr = input.readLine();
             if(inputStr.contains("client") && !isClientAlive)
-                new Client(8389, stream, 7000);
+                new Client(stream);
             else if(inputStr.contains("kill"))
                 keepLooping = false;
         }
