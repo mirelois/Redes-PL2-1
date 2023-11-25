@@ -24,12 +24,11 @@ public class Client implements Runnable{
     //----------------
     DatagramPacket rcvdp; //UDP packet received from the server (to receive)
     // DatagramSocket RTPsocket; //socket to be used to send and receive UDP packet
-    static int RTP_RCV_PORT = 25000; //port where the client will receive the RTP packets
 
     Timer cTimer; //timer used to receive data from the UDP socket
     byte[] cBuf; //buffer used to store data received from the server
 
-    public Client(int port, stream stream) {
+    public Client(stream stream) {
 
         //build GUI
         //--------------------------
@@ -68,7 +67,7 @@ public class Client implements Runnable{
 
         //init para a parte do cliente
         //--------------------------
-        cTimer = new Timer(20, new clientTimerListener(port, stream));
+        cTimer = new Timer(20, new clientTimerListener(stream));
         cTimer.setInitialDelay(0);
         cTimer.setCoalesce(true);
         cBuf = new byte[Define.streamBuffer]; //allocate enough memory for the buffer used to receive data from the server
@@ -125,11 +124,9 @@ public class Client implements Runnable{
 
     class clientTimerListener implements ActionListener {
 
-        int port;
         stream stream;
 
-        clientTimerListener(int port, stream stream){
-            this.port = port;
+        clientTimerListener(stream stream){
             this.stream = stream;
         }
 
@@ -137,7 +134,7 @@ public class Client implements Runnable{
             //Construct a DatagramPacket to receive data from the UDP socket
             rcvdp = new DatagramPacket(cBuf, cBuf.length);
             //receive the DP from the socket:
-            try(DatagramSocket RTPsocket = new DatagramSocket(this.port)) {
+            try(DatagramSocket RTPsocket = new DatagramSocket(Define.clientPort)) {
 
                 // TODO falta só configurar isto aqui, mandar o simp para o meu nodo aka o streaming de mim mesmo
                 System.out.println("Enviado pacote de pedido ao Nodo correspondente");
