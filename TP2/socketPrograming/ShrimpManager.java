@@ -89,7 +89,7 @@ public class ShrimpManager implements Runnable{
                                 System.out.println("Enviado SHRIMP para " + linkToClient.getHostAddress() +
                                                    " da stream com id " + streamId +
                                                    " pedida por " + clientIP.getHostAddress());
-                                socket.send(new Shrimp(clientIP, streamId, shrimp.getPort(), linkToClient, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
+                                socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, shrimp.getPort(), linkToClient, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
                             }
                         }
 
@@ -102,7 +102,7 @@ public class ShrimpManager implements Runnable{
                                 //Avisar todos os Clientes da falta de conexão
                                 //TODO escolher o melhor link para avisar
                                 for (Set<InetAddress> linksToClient : this.neighbourInfo.clientAdjacent.values())
-                                    socket.send(new Shrimp(clientIP, streamId, shrimp.getPort(), linksToClient.iterator().next(), shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
+                                    socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, shrimp.getPort(), linksToClient.iterator().next(), shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
                                 
                             }
                         }

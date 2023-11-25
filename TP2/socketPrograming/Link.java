@@ -1,10 +1,10 @@
 
-public class Link { //link initiation negation kontrol
+public class Link { //link initiation negation kontrol (kool e dinamico)
                     
     static int HEADER_SIZE = 2;
                     
-    boolean activate;  // \ 
-                 //  |-> 1
+    boolean activate;   // \ 
+                        //  |-> 1
     boolean deactivate; // /
 
     int streamId; //1
@@ -40,7 +40,7 @@ public class Link { //link initiation negation kontrol
         int flags = Byte.toUnsignedInt(this.header[0]);
 
         this.activate   = (flags & 0x02) == 0x02;
-        this.deactivate  = (flags & 0x01) == 0x01;
+        this.deactivate = (flags & 0x01) == 0x01;
         
         int streamId = Byte.toUnsignedInt(this.header[1]);
 

@@ -30,8 +30,8 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
         this.header[3] = Byte.parseByte(ip_values[2]);
         this.header[4] = Byte.parseByte(ip_values[3]);
 
-        this.header[5] = (byte) (this.time_stamp >> 8 /* & 0xFF */);
-        this.header[6] = (byte) (this.time_stamp      /* & 0xFF */);
+        this.header[5] = (byte) (this.timeStamp >> 8 /* & 0xFF */);
+        this.header[6] = (byte) (this.timeStamp      /* & 0xFF */);
     }
 
     public Shrimp(DatagramPacket packet) throws java.net.UnknownHostException, PacketSizeException {
@@ -52,7 +52,7 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
 
         this.sourceAddress = InetAddress.getByName(ip.toString());
         
-        this.checksum = (Byte.toUnsignedInt(this.header[5]) << 8) |
+        this.timeStamp = (Byte.toUnsignedInt(this.header[5]) << 8) |
                          Byte.toUnsignedInt(this.header[6]);
 
     }

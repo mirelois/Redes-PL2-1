@@ -10,7 +10,7 @@ public class NeighbourInfo {
     //Uma stream só existe se estiver neste mapa
     public Map<String, Integer> nameHash = new HashMap<>(); // nomes de ficheiros para streams
 
-    public Map<Integer, Set<InetAddress>> streamClients = new HashMap<>(); // clients daquela stream
+    // public Map<Integer, Set<InetAddress>> streamClients = new HashMap<>(); // clients daquela stream
 
     public Map<Integer, Set<InetAddress>> streamActiveLinks = new HashMap<>(); // links para enviar a stream
     

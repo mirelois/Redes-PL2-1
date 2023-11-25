@@ -11,11 +11,10 @@ public class Rip extends Packet { // Response and Idle Protocol
 
 	int lossRate; // 2 (technicaly only 14 bits are used)
                     
-	public Rip(int latency, int lossRate, InetAddress address, int port) {
+	public Rip( int lossRate, InetAddress address, int port) {
 
         super(HEADER_SIZE, null, 0, address, port);
 
-        this.latency = latency;
         this.lossRate = lossRate;
 
         // this.header[0] = (byte) (latency >> 8 /* & 0xFF */);
