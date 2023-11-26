@@ -34,12 +34,6 @@ public class Streaming implements Runnable{
                 
                 synchronized (this.neighbourInfo) {
                     streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
-                    if (streamActiveLinks.contains(InetAddress.getByName("localhost"))) {
-                        socket.send(new Sup(sup.getStreamId(), sup.getVideo_time_stamp(), sup.getSequence_number(),
-                            InetAddress.getByName("localhost"), 8389, sup.getPayloadSize(), sup.getPayload())
-                            .toDatagramPacket());
-                    }
-                }
 
                 for (InetAddress activeLink : streamActiveLinks) {
                     if (activeLink.equals(InetAddress.getByName("localhost"))) {

@@ -2,7 +2,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Set ;
 
 public class RP implements Runnable {
 
@@ -18,12 +18,6 @@ public class RP implements Runnable {
         this.neighbourInfo.connectionToRP = 1;
     }
 
-    private InetAddress chooseBestServer(ServerInfo serverInfo){
-        synchronized(serverInfo){
-            return serverInfo.servers.get(0);
-        }
-    }
-
     @Override
     public void run() {
 
@@ -36,8 +30,7 @@ public class RP implements Runnable {
 
                 socket.receive(packet);
 
-                Simp simp = new Simp(packet);
-                //TODO tratar isto com shrimps
+                Simp simp = new Simp(packet); // from client
 
                 socket.send(new Rip(0, simp.getAddress(), simp.getPort()).toDatagramPacket());
 
@@ -53,27 +46,19 @@ public class RP implements Runnable {
                     streamId = this.neighbourInfo.nameHash.get(streamName);
                     if (streamId == null) {
                         this.neighbourInfo.nameHash.put(streamName, next_stream);
+                        streamId = next_stream;
+                        next_stream++;
                     }
                 }
                 
-                if (streamId == null) {
-                    System.out.println("Nova Stream Pedida, dar novo ID");
-                    streamId = next_stream;
-                    Shrimp serverShrimp = new Shrimp(
-                        0,//nao importa
-                        InetAddress.getLocalHost(),
-                        streamId,
-                        Define.serverPort,
-                        chooseBestServer(serverInfo),
-                        simp.getPayloadSize(),
-                        simp.getPayload()
-                    );
+                if (this.serverInfo.providers.get(streamId) == null) {
                     
-                    next_stream++;
-                    System.out.println("Pedido de stream enviado ao servidor " + chooseBestServer(serverInfo) +
-                                       " com payload " + new String(simp.getPayload()));
-                    socket.send(serverShrimp.toDatagramPacket());
-                }
+                    Thread t = new Thread(new RPConectionManager(serverInfo, streamId, streamName));
+                    t.start();
+                    
+                    // System.out.println("Pedido de stream enviado ao servidor " + chooseBestServer(serverInfo) +
+                                       // " com payload " + new String(simp.getPayload()));
+            }
 
                 Shrimp shrimp = new Shrimp(
                     Packet.getCurrTime(),
