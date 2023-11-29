@@ -24,8 +24,8 @@ public class RPConectionManager implements Runnable{
         
     }
 
-    public InetAddress chooseBestServer(int streamId) throws UnknownHostException{ // TODO: make this good
-        return InetAddress.getLocalHost();
+    public InetAddress chooseBestServer(StreamInfo streamInfo) throws UnknownHostException{ // TODO: make this good
+        streamInfo.conecting = streamInfo.minServer.peek();
     }
 
     @Override
@@ -43,11 +43,21 @@ public class RPConectionManager implements Runnable{
 
                 Server server = new Server(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp()));
                 
-                if(streamInfo.toRemove.contains(server)){ 
+                if(streamInfo.disconecting.contains(server)){ 
                     //recebeu confirmação de remoção, o server
                     //vai parar de mandar cenas
-                    streamInfo.toRemove.remove(server);
-                    
+                    streamInfo.disconecting.remove(server);
+                }
+                if(streamInfo.conecting.equals(server)){ //recebeu confirmação de adição
+                                                         //vai trocar o currentBest e remover o antigo
+
+                    //TODO: kill adder thread
+
+                    streamInfo.disconecting.add(streamInfo.currentBestServer);
+
+                    streamInfo.currentBestServer = streamInfo.conecting;
+
+                    streamInfo.conecting = null;
                     
                 }
 
