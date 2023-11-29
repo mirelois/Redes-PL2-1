@@ -20,10 +20,10 @@ public class RPConectionManager implements Runnable{
     public RPConectionManager(ServerInfo serverInfo, int streamId, String streamName){
         
         this.serverInfo = serverInfo;
-        this.streamId = streamId;
+        this.streamId   = streamId;
         this.streamName = streamName;
         this.streamInfo = serverInfo.streamInfo.get(streamId);
-        
+
     }
 
     public void updateBestServer(ServerInfo.StreamInfo streamInfo, int bestServerLatency, DatagramSocket socket) throws UnknownHostException{ // TODO: currently this is never called
@@ -31,6 +31,8 @@ public class RPConectionManager implements Runnable{
         streamInfo.updateLatency(streamInfo.currentBestServer);//bestServerLatency is the latency of the current best server
 
         streamInfo.connecting = streamInfo.minServer.peek(); //this operation has complexity O(1)
+
+        streamInfo.connecting.notify();
     }
 
     @Override
