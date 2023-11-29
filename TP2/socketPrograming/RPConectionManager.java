@@ -24,8 +24,13 @@ public class RPConectionManager implements Runnable{
         
     }
 
-    public InetAddress chooseBestServer(StreamInfo streamInfo) throws UnknownHostException{ // TODO: make this good
-        streamInfo.conecting = streamInfo.minServer.peek();
+    public InetAddress chooseBestServer(StreamInfo streamInfo, int bestServerLatency) throws UnknownHostException{ // TODO: make this good
+
+        streamInfo.updateLatency(streamInfo.currentBestServer);//bestServerLatency is the latency of the current best server
+                                                                                             
+        streamInfo.connecting = streamInfo.minServer.peek();
+
+        //TODO: launch adder Thread on conecting
     }
 
     @Override
@@ -43,21 +48,21 @@ public class RPConectionManager implements Runnable{
 
                 Server server = new Server(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp()));
                 
-                if(streamInfo.disconecting.contains(server)){ 
+                if(streamInfo.disconnecting.contains(server)){ 
                     //recebeu confirmação de remoção, o server
                     //vai parar de mandar cenas
-                    streamInfo.disconecting.remove(server);
+                    streamInfo.disconnecting.remove(server);
                 }
-                if(streamInfo.conecting.equals(server)){ //recebeu confirmação de adição
+                if(streamInfo.connecting.equals(server)){ //recebeu confirmação de adição
                                                          //vai trocar o currentBest e remover o antigo
 
                     //TODO: kill adder thread
 
-                    streamInfo.disconecting.add(streamInfo.currentBestServer);
+                    streamInfo.disconnecting.add(streamInfo.currentBestServer);
 
-                    streamInfo.currentBestServer = streamInfo.conecting;
+                    streamInfo.currentBestServer = streamInfo.connecting;
 
-                    streamInfo.conecting = null;
+                    streamInfo.connecting = null;
                     
                 }
 

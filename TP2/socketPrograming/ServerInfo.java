@@ -37,8 +37,9 @@ class StreamInfo {
     public HashSet<Server> disconecting = new HashSet<Server>();
     public Server conecting;
     
-    public static void updateLatency(Server server, int latency){
-        this.minServer.remove(server)
+    public void updateLatency(Server server, int latency){//this method has O(log n) time complexity
+        this.minServer.remove(server);
+        this.minServer.add(new Server(server.address, latency));
     }
 }
 
