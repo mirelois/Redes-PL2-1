@@ -1,10 +1,7 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public class RPConectionManager implements Runnable{
 
@@ -14,7 +11,7 @@ public class RPConectionManager implements Runnable{
 
     String streamName;
 
-    StreamInfo streamInfo;
+    ServerInfo.StreamInfo streamInfo;
 
     Thread connectorThread;
 
@@ -29,39 +26,11 @@ public class RPConectionManager implements Runnable{
         
     }
 
-    public void chooseBestServer(StreamInfo streamInfo, int bestServerLatency, DatagramSocket socket) throws UnknownHostException{ // TODO: currently this is never called
+    public void updateBestServer(ServerInfo.StreamInfo streamInfo, int bestServerLatency, DatagramSocket socket) throws UnknownHostException{ // TODO: currently this is never called
 
         streamInfo.updateLatency(streamInfo.currentBestServer);//bestServerLatency is the latency of the current best server
 
-        Server bestServer = streamInfo.minServer.peek();
-                                                                                             
-        streamInfo.connecting = bestServer;
-
-        //TODO: launch adder Thread on conecting
-        this.connectorThread = new Thread(() -> {
-            while (true) {
-                try {
-					socket.send(new Link(
-					    true,
-					    false,
-					    this.streamId,
-					    bestServer.address,
-					    Define.serverPort,
-					    0,
-					    null
-					).toDatagramPacket());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-                try {
-					Thread.sleep(Define.RPTimeout);
-				} catch (InterruptedException e) {
-                    return;
-				}
-            }
-        });
-        connectorThread.start();
+        streamInfo.connecting = streamInfo.minServer.peek(); //this operation has complexity O(1)
     }
 
     @Override
@@ -69,6 +38,38 @@ public class RPConectionManager implements Runnable{
 
         try (DatagramSocket socket = new DatagramSocket(Define.RPConectionManagerPort)) {
             
+            connectorThread = new Thread(() -> {
+                while (true) {
+                    while (streamInfo.currentBestServer != null) {
+                        try {
+							streamInfo.currentBestServer.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                    }
+                    try {
+                        socket.send(new Link(
+                                    true,
+                                    false,
+                                    this.streamId,
+                                    streamInfo.connecting.address,
+                                    Define.serverPort,
+                                    0,
+                                    null
+                                    ).toDatagramPacket());
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    try {
+                        Thread.sleep(Define.RPTimeout);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+            });
+
             disconnectorThread = new Thread(() -> {
                 while(true){
                     while (streamInfo.disconnecting.isEmpty()) { //sleeps if there is nothing to remove
@@ -80,7 +81,7 @@ public class RPConectionManager implements Runnable{
                         }
                     }
 
-                    for (Server server : streamInfo.disconnecting) { //sends disconect link to all servers in disconnecting
+                    for (ServerInfo.StreamInfo.Server server : streamInfo.disconnecting) { //sends disconect link to all servers in disconnecting
                         try {
                             socket.send(new Link(
                                         false,
@@ -99,6 +100,8 @@ public class RPConectionManager implements Runnable{
                 }
             });
 
+            connectorThread.start();
+            
             disconnectorThread.start();
             
 
@@ -111,7 +114,7 @@ public class RPConectionManager implements Runnable{
                 
                 Shrimp shrimp = new Shrimp(packet);
 
-                Server server = new Server(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp()));
+                ServerInfo.StreamInfo.Server server = new ServerInfo.StreamInfo.Server(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp()));
                 
                 if(streamInfo.disconnecting.contains(server)){ 
                     //recebeu confirmação de remoção, o server
