@@ -3,7 +3,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;
 
-public class RPConectionManager implements Runnable{
+public class RPConectionManager implements Runnable{ //TODO: ver concorrencia e meter synchronized para ai
 
     ServerInfo serverInfo;
 
