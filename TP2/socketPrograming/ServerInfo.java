@@ -32,14 +32,14 @@ class Server {
 
 class StreamInfo {
     
-    public PriorityQueue<Server> minServer = new PriorityQueue<>();//TODO: make compare
+    public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
     public Server currentBestServer;
-    public HashSet<Server> disconecting = new HashSet<Server>();
-    public Server conecting;
+    public HashSet<Server> disconnecting = new HashSet<Server>();
+    public Server connecting;
     
-    public void updateLatency(Server server, int latency){//this method has O(log n) time complexity
+    public void updateLatency(Server server){//this method has O(log n) time complexity
         this.minServer.remove(server);
-        this.minServer.add(new Server(server.address, latency));
+        this.minServer.add(server);
     }
 }
 

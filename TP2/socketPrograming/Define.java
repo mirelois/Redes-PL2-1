@@ -26,6 +26,8 @@ public final class Define {
     
     static int bootClientTimeout = 1000;
 
+    static int RPTimeout         = 1000; 
+
     //-------buffersize-------
 
     static int streamBuffer = 15000;
