@@ -46,11 +46,11 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         }
 
         public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
+        
         public Server currentBestServer;
 
-		public HashSet<Server> disconnecting = new HashSet<Server>();
 		public Server connecting;
-        public HashSet<Server> deprecatedConnecting = new HashSet<>(); 
+        public HashSet<Server> disconnecting = new HashSet<Server>();
 
         public Integer streamId;
 

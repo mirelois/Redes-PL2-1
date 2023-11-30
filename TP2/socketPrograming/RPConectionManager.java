@@ -113,7 +113,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
         synchronized (streamInfo.connecting) {
             synchronized (streamInfo.minServer) {
                 if (streamInfo.connecting != null) {
-                    streamInfo.deprecatedConnecting.add(streamInfo.connecting);
+                    streamInfo.disconnecting.add(streamInfo.connecting); //add unactivated packet to the remove list
                 }
                 streamInfo.connecting = streamInfo.minServer.peek(); // this operation has complexity O(1)
             }
@@ -135,17 +135,17 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                 socket.receive(packet);
 
-                Shrimp shrimp = new Shrimp(packet);
+                Link link = new Link(packet);
 
-                this.streamInfo = serverInfo.streamInfo.get(shrimp.getStreamId());
+                this.streamInfo = serverInfo.streamInfo.get(link.getStreamId());
 
                 ServerInfo.StreamInfo.Server server = 
-                    new ServerInfo.StreamInfo.Server(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp()));
+                    new ServerInfo.StreamInfo.Server(link.getAddress(), -1);
 
                 if (streamInfo.disconnecting.contains(server)) {
                     // recebeu confirmação de remoção, o server
                     // vai parar de mandar cenas
-                    if (Byte.toUnsignedInt(shrimp.getPayload()[0]) == 0) { //isto é um disconnect acknolegment
+                    if (link.isDeactivate()) { //isto é um disconnect acknolegment
                                                                            //caso este if falhar ele recebeu um connect
                        streamInfo.disconnecting.remove(server);            //e so ignora
                         
@@ -160,13 +160,6 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     streamInfo.currentBestServer = streamInfo.connecting;
 
                     streamInfo.connecting = null;
-
-                }
-                if (streamInfo.deprecatedConnecting.contains(server)) { // recebeu confirmação de ligação de uma stream
-                                                                        // de que ja
-                   streamInfo.disconnecting.add(server);                // nao quer saber, lmao manda po lixo
-
-                    streamInfo.disconnecting.notify();
 
                 }
 

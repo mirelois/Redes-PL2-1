@@ -1,7 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
-public class Link extends Packet { //link initiation negation kontrol (kool e dinamico)
+public class Link extends Packet { //link initiation and negation kontrol (kool e dinamico)
                     
     static int HEADER_SIZE = 2;
                     
