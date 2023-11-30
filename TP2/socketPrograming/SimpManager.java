@@ -23,7 +23,7 @@ public class SimpManager implements Runnable{
             while(true){
                 socket.receive(packet);
                 Simp simp = new Simp(packet);
-                System.out.println("Recebeu Pedido de Stream " + simp.getAddress().toString() +
+                System.out.println("Recebeu Pedido de Stream de " + simp.getAddress().toString() +
                                    " com payload " + new String(simp.getPayload()));
 
                 InetAddress clientIP = simp.getSourceAddress();
