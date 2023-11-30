@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 public class RPConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
 
-    // ServerInfo serverInfo;
+    ServerInfo serverInfo;
 
     int streamId;
 
@@ -22,9 +22,9 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
     public RPConectionManager(ServerInfo serverInfo, int streamId, String streamName) {
 
         // this.serverInfo = serverInfo;
-        this.streamId = streamId;
-        this.streamName = streamName;
-        this.streamInfo = serverInfo.streamInfo.get(streamId);
+        // this.streamId = streamId;
+        // this.streamName = streamName;
+        this.serverInfo = serverInfo;
 
     }
 
@@ -81,37 +81,41 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 }
             });
 
-            disconnectorThread = new Thread(() -> {
+            disconnectorThread = new Thread(new Runnable() {
+                
+                public void run() {
 
-                HashSet<ServerInfo.StreamInfo.Server> disconnecting;
+                    HashSet<ServerInfo.StreamInfo.Server> disconnecting;
 
-                while (true) {
-                    try{
-                        synchronized(streamInfo.disconnecting){
-                            while (streamInfo.disconnecting.isEmpty()) { // sleeps if there is nothing to remove
-                                streamInfo.disconnecting.wait();
+                    while (true) {
+                        try{
+                            synchronized(streamInfo.disconnecting){
+                                while (streamInfo.disconnecting.isEmpty()) { // sleeps if there is nothing to remove
+                                    streamInfo.disconnecting.wait();
+                                }
+                                disconnecting = streamInfo.getDisconnecting();//copy of the disconnecting set
                             }
-                             disconnecting = streamInfo.getDisconnecting();//copy of the disconnecting set
-                        }
 
 
-                        for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
-                                                                                               // all servers in
-                            socket.send(new Link(
-                                        false,
-                                        true,
-                                        this.streamId,
-                                        server.address,
-                                        Define.serverPort,
-                                        0,
-                                        null).toDatagramPacket());
+                            for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
+                                                                                        // all servers in
+                                socket.send(new Link(
+                                            false,
+                                            true,
+                                            this.streamId,
+                                            server.address,
+                                            Define.serverPort,
+                                            0,
+                                            null).toDatagramPacket());
+                            }
+
+                        }catch(InterruptedException | IOException e){
+                            e.printStackTrace();
                         }
-                        
-                    }catch(InterruptedException | IOException e){
-                        e.printStackTrace();
                     }
                 }
             });
+                    
 
             connectorThread.start();
 
@@ -125,6 +129,8 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 socket.receive(packet);
 
                 Shrimp shrimp = new Shrimp(packet);
+
+                this.streamInfo = serverInfo.streamInfo.get(shrimp.getStreamId());
 
                 ServerInfo.StreamInfo.Server server = new ServerInfo.StreamInfo.Server(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp()));
 
@@ -147,7 +153,6 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 }
                 if (streamInfo.deprecatedConnecting.contains(server)) { // recebeu confirmação de ligação de uma stream de que ja
                                                                         // nao quer saber, lmao manda po lixo
-
                     streamInfo.disconnecting.add(server);
                     
                     streamInfo.disconnecting.notify();
