@@ -5,117 +5,77 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-public class ServerInfo { // NOTE: os gajos do java dizem que isto é melhor
 
+
+public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
+    
     static class StreamInfo {
 
-        class ConnectorThreads {
+        static class Server {
+            
+            final InetAddress address;
+            int latency;
+            
+            Server(InetAddress address, int latency){
+                this.address =  address;
+                this.latency = latency;
+            }
+            
+            @Override
+            public boolean equals(Object o) {
 
-            Integer streamId;
-
-            Thread connector;
-
-            Thread disconnector;
-
-            public void Connectors(Integer streamId){
-                
-                this.streamId = streamId;
-                
-            disconnector= new Thread(new Runnable() {
-
-                public void run() {
-
-                    HashSet<ServerInfo.StreamInfo.Server> disconnecting;
-
-                    while (true) {
-                        try {
-                            synchronized (StreamInfo.this.disconnecting) {
-                                while (streamInfo.disconnecting.isEmpty()) { // sleeps if there is nothing to remove
-                                    streamInfo.disconnecting.wait();
-                                }
-                                disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
-                            }
-
-                            for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
-                                                                                        // all servers in
-                                socket.send(new Link(
-                                        false,
-                                        true,
-                                        this.streamId,
-                                        server.address,
-                                        Define.serverPort,
-                                        0,
-                                        null).toDatagramPacket());
-                            }
-
-                        } catch (InterruptedException | IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                if (o == this) {
+                    return true;
                 }
+
+                /* Check if o is an instance of Complex or not
+                   "null instanceof [type]" also returns false */
+                if (!(o instanceof Server)) {
+                    return false;
+                }
+
+                Server s = (Server) o;
+
+                return this.address.equals(s.address);
             }
 
-        }
-
-            static class Server {
-                final InetAddress address;
-                int latency;
-
-                Server(InetAddress address, int latency) {
-                    this.address = address;
-                    this.latency = latency;
-                }
-
-                @Override
-                public boolean equals(Object o) {
-
-                    if (o == this) {
-                        return true;
-                    }
-
-                    /*
-                     * Check if o is an instance of Complex or not
-                     * "null instanceof [type]" also returns false
-                     */
-                    if (!(o instanceof Server)) {
-                        return false;
-                    }
-
-                    Server s = (Server) o;
-
-                    return this.address.equals(s.address);
-                }
-
-                @Override
-                public int hashCode() {
-                    return this.address.hashCode();
-                }
-            }
-
-            public PriorityQueue<Server> minServer = new PriorityQueue<>((a, b) -> a.latency - b.latency);
-            public Server currentBestServer;
-
-            public Server getConnecting() {
-                return new Server(this.connecting.address, this.connecting.latency);
-            }
-
-            public HashSet<Server> disconnecting = new HashSet<Server>();
-            public Server connecting;
-            public HashSet<Server> deprecatedConnecting = new HashSet<>();
-
-            public HashSet<Server> getDisconnecting() {
-                HashSet<Server> disconnecting = new HashSet<>();
-                disconnecting.addAll(this.disconnecting);
-                return disconnecting;
-            }
-
-            public void updateLatency(Server server) {// this method has O(log n) time complexity
-                synchronized (this.minServer) {
-                    this.minServer.remove(server);
-                    this.minServer.add(server);
-                }
+            @Override
+            public int hashCode() {
+                return this.address.hashCode();
             }
         }
 
-        public Map<Integer, StreamInfo> streamInfo = new HashMap<>();
+        public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
+        public Server currentBestServer;
+
+		public HashSet<Server> disconnecting = new HashSet<Server>();
+		public Server connecting;
+        public HashSet<Server> deprecatedConnecting = new HashSet<>(); 
+
+        public Integer streamId;
+
+        public Thread connectorThread;
+        
+        public Thread disconnectorThread;
+
+        public HashSet<Server> getDisconnecting() {
+            HashSet<Server> disconnecting = new HashSet<>();
+            disconnecting.addAll(this.disconnecting);
+            return disconnecting;
+        }
+
+        public Server getConnecting() {
+            return new Server(this.connecting.address, this.connecting.latency);
+        }
+
+        public void updateLatency(Server server){//this method has O(log n) time complexity
+            synchronized(this.minServer){
+                this.minServer.remove(server);
+                this.minServer.add(server);
+            }
+        }
+    }
+    
+    public Map<Integer, StreamInfo> streamInfo = new HashMap<>();
 }
+
