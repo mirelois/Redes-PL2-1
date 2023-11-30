@@ -139,17 +139,20 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                 this.streamInfo = serverInfo.streamInfo.get(shrimp.getStreamId());
 
-                ServerInfo.StreamInfo.Server server = new ServerInfo.StreamInfo.Server(shrimp.getAddress(),
-                        Packet.getLatency(shrimp.getTimeStamp()));
+                ServerInfo.StreamInfo.Server server = 
+                    new ServerInfo.StreamInfo.Server(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp()));
 
                 if (streamInfo.disconnecting.contains(server)) {
                     // recebeu confirmação de remoção, o server
                     // vai parar de mandar cenas
-                    streamInfo.disconnecting.remove(server);
+                    if (Byte.toUnsignedInt(shrimp.getPayload()[0]) == 0) { //isto é um disconnect acknolegment
+                                                                           //caso este if falhar ele recebeu um connect
+                       streamInfo.disconnecting.remove(server);            //e so ignora
+                        
+                    }
                 }
-                if (streamInfo.connecting.equals(server)) { // recebeu confirmação de adição
-                                                            // vai trocar o currentBest e remover o antigo
-
+                else if (streamInfo.connecting.equals(server)) { // recebeu confirmação de adição
+                                                                 // vai trocar o currentBest e remover o antigo
                     streamInfo.disconnecting.add(streamInfo.currentBestServer);
 
                     streamInfo.disconnecting.notify();
@@ -161,8 +164,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 }
                 if (streamInfo.deprecatedConnecting.contains(server)) { // recebeu confirmação de ligação de uma stream
                                                                         // de que ja
-                                                                        // nao quer saber, lmao manda po lixo
-                    streamInfo.disconnecting.add(server);
+                   streamInfo.disconnecting.add(server);                // nao quer saber, lmao manda po lixo
 
                     streamInfo.disconnecting.notify();
 
