@@ -142,25 +142,23 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 ServerInfo.StreamInfo.Server server = 
                     new ServerInfo.StreamInfo.Server(link.getAddress(), -1);
 
-                if (streamInfo.disconnecting.contains(server)) {
-                    // recebeu confirmação de remoção, o server
-                    // vai parar de mandar cenas
-                    if (link.isDeactivate()) { //isto é um disconnect acknolegment
-                                                                           //caso este if falhar ele recebeu um connect
-                       streamInfo.disconnecting.remove(server);            //e so ignora
-                        
+                if (link.isActivate()) { //this is a connection confirmation acknolegment
+                                         
+                    if (server.equals(streamInfo.connecting)) { //this checks if connection has been established
+
+                        streamInfo.disconnecting.add(streamInfo.currentBestServer);
+
+                        streamInfo.disconnecting.notify();
+
+                        streamInfo.currentBestServer = streamInfo.connecting;
+
+                        streamInfo.connecting = null;
+
                     }
-                }
-                else if (streamInfo.connecting.equals(server)) { // recebeu confirmação de adição
-                                                                 // vai trocar o currentBest e remover o antigo
-                    streamInfo.disconnecting.add(streamInfo.currentBestServer);
-
-                    streamInfo.disconnecting.notify();
-
-                    streamInfo.currentBestServer = streamInfo.connecting;
-
-                    streamInfo.connecting = null;
-
+                }else if (link.isDeactivate()) { //this means a server acepted the disconnect request
+                    
+                    streamInfo.disconnecting.remove(server);
+                                                                        
                 }
 
             }
