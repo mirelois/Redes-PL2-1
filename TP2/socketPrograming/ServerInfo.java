@@ -1,3 +1,4 @@
+import java.io.ObjectInputStream.GetField;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,7 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
     static class StreamInfo {
 
         static class Server {
-            InetAddress address;
+            final InetAddress address;
             int latency;
             Server(InetAddress address, int latency){
                 this.address =  address;
@@ -43,12 +44,26 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
 
         public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         public Server currentBestServer;
-        public HashSet<Server> disconnecting = new HashSet<Server>();
-        public Server connecting;
+        
+        public Server getConnecting() {
+			return new Server(this.connecting.address, this.connecting.latency);
+		}
+
+		public HashSet<Server> disconnecting = new HashSet<Server>();
+		public Server connecting;
+        public HashSet<Server> deprecatedConnecting = new HashSet<>(); 
+
+        public HashSet<Server> getDisconnecting() {
+            HashSet<Server> disconnecting = new HashSet<>();
+            disconnecting.addAll(this.disconnecting);
+            return disconnecting;
+        }
 
         public void updateLatency(Server server){//this method has O(log n) time complexity
-            this.minServer.remove(server);
-            this.minServer.add(server);
+            synchronized(this.minServer){
+                this.minServer.remove(server);
+                this.minServer.add(server);
+            }
         }
     }
     
