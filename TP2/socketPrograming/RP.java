@@ -43,24 +43,30 @@ public class RP implements Runnable {
                 Set<InetAddress> clientAdjacent, streamActiveLinks, streamClients;
 
                 synchronized(this.neighbourInfo) {
+                    
                     streamId = this.neighbourInfo.nameHash.get(streamName);
+                    
                     if (streamId == null) {
                         this.neighbourInfo.nameHash.put(streamName, next_stream);
                         streamId = next_stream;
                         next_stream++;
                     }
+                    
                 }
                 
-                if (this.serverInfo.providers.get(streamId) == null) {
+                if (!serverInfo.streamInfo.containsKey(streamId)) {
+
+                    ServerInfo.StreamInfo streamInfo = new ServerInfo.StreamInfo();
                     
-                    Thread t = new Thread(new RPConectionManager(serverInfo, streamId, streamName));
-                    t.start();
+                    serverInfo.streamInfo.put(streamId, streamInfo); 
+                    
+                    RPConectionManager.updateBestServer(streamInfo, streamId, Integer.MAX_VALUE, socket);
                     
                     // System.out.println("Pedido de stream enviado ao servidor " + chooseBestServer(serverInfo) +
                                        // " com payload " + new String(simp.getPayload()));
-            }
+                }
 
-                Shrimp shrimp = new Shrimp(
+                socket.send(new Shrimp(
                     Packet.getCurrTime(),
                     simp.getSourceAddress(),
                     streamId,
@@ -68,8 +74,9 @@ public class RP implements Runnable {
                     simp.getAddress(),
                     simp.getPayloadSize(),
                     simp.getPayload()
+                    ).toDatagramPacket()
                 );
-                socket.send(shrimp.toDatagramPacket());
+                
                 System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
                                                " da stream com id " + streamId +
                                                " pedida por " + clientIP.getHostAddress());
