@@ -1,8 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.HashSet;
-import java.util.Set ;
+import java.util.Set;
 
 public class RP implements Runnable {
 
@@ -23,9 +22,7 @@ public class RP implements Runnable {
 
         while (true) {
             try (DatagramSocket socket = new DatagramSocket(Define.RPPort)) {
-
                 byte[] buf = new byte[Define.infoBuffer];
-
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
                 socket.receive(packet);
@@ -35,51 +32,50 @@ public class RP implements Runnable {
                 socket.send(new Rip(0, simp.getAddress(), simp.getPort()).toDatagramPacket());
 
                 System.out.println("Recebido SIMP de " + simp.getAddress().getHostAddress() +
-                                   " Pede Stream " + new String(simp.getPayload()));
-                
+                        " Pede Stream " + new String(simp.getPayload()));
+
                 Integer streamId;
                 InetAddress clientIP = simp.getSourceAddress();
                 String streamName = new String(simp.getPayload());
                 Set<InetAddress> clientAdjacent, streamActiveLinks, streamClients;
 
-                synchronized(this.neighbourInfo) {
-                    
+                synchronized (this.neighbourInfo) {
+
                     streamId = this.neighbourInfo.nameHash.get(streamName);
-                    
+
                     if (streamId == null) {
                         this.neighbourInfo.nameHash.put(streamName, next_stream);
                         streamId = next_stream;
                         next_stream++;
                     }
-                    
+
                 }
-                
+
                 if (!serverInfo.streamInfo.containsKey(streamId)) {
 
                     ServerInfo.StreamInfo streamInfo = new ServerInfo.StreamInfo();
-                    
-                    serverInfo.streamInfo.put(streamId, streamInfo); 
-                    
+
+                    serverInfo.streamInfo.put(streamId, streamInfo);
+
                     RPConectionManager.updateBestServer(streamInfo, streamId, Integer.MAX_VALUE, socket);
-                    
-                    // System.out.println("Pedido de stream enviado ao servidor " + chooseBestServer(serverInfo) +
-                                       // " com payload " + new String(simp.getPayload()));
+
+                    // System.out.println("Pedido de stream enviado ao servidor " +
+                    // chooseBestServer(serverInfo) +
+                    // " com payload " + new String(simp.getPayload()));
                 }
 
                 socket.send(new Shrimp(
-                    Packet.getCurrTime(),
-                    simp.getSourceAddress(),
-                    streamId,
-                    Define.shrimpPort,
-                    simp.getAddress(),
-                    simp.getPayloadSize(),
-                    simp.getPayload()
-                    ).toDatagramPacket()
-                );
-                
+                        Packet.getCurrTime(),
+                        simp.getSourceAddress(),
+                        streamId,
+                        Define.shrimpPort,
+                        simp.getAddress(),
+                        simp.getPayloadSize(),
+                        simp.getPayload()).toDatagramPacket());
+
                 System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
-                                               " da stream com id " + streamId +
-                                               " pedida por " + clientIP.getHostAddress());
+                        " da stream com id " + streamId +
+                        " pedida por " + clientIP.getHostAddress());
             } catch (Exception e) {
                 // TODO: handle exception
                 e.printStackTrace();
