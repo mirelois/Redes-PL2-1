@@ -51,6 +51,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             }
 
                             socket.send(new Link(
+                                    false,
                                     true,
                                     false,
                                     streamId,
@@ -96,6 +97,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                                                                         // all servers in
                                 socket.send(new Link(
                                         false,
+                                        false,
                                         true,
                                         streamId,
                                         node.address,
@@ -107,6 +109,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             for (NeighbourInfo.Node node : deprecated) {
                                 
                                 socket.send(new Link(
+                                        false,
                                         true,
                                         false,
                                         streamId,
@@ -164,6 +167,16 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 NeighbourInfo.Node node = 
                     new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
+
+                if (link.isAck()) {
+
+                    synchronized(neighbourInfo.streamActiveLinks){
+                        neighbourInfo.streamActiveLinks.get(link.streamId).add(link.getAddress());
+                    }
+
+                    continue; //NOTE: continue ftw
+                    
+                }
 
                 if (link.isActivate()) { //this is a connection confirmation acknolegment
                                          
