@@ -1,5 +1,8 @@
 public final class Define {
 
+    //Cada Port recebe apenas um tipo de Protocolo
+    //Um tipo de Protocolo pode ser recebido por mais de um Port
+
     static int bootStraperPort             = 1000;
 
     static int simpPort                    = 2000;
@@ -29,6 +32,8 @@ public final class Define {
     static int bootClientTimeout = 1000;
 
     static int RPTimeout         = 1000; 
+
+    static int RetransTimeout    = 1000; 
 
     //-------buffersize-------
 

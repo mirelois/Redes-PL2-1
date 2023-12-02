@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 
@@ -48,6 +49,9 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         
         public Server currentBestServer;
+        
+        //locks for altering the connecting variable
+        public ReentrantLock conLock = new ReentrantLock();
 
 		public Server connecting;
         public HashSet<Server> disconnecting = new HashSet<Server>();
