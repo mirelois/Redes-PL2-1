@@ -42,4 +42,8 @@ public class ITP  extends Packet{ // Idle Tick Protocol
         this.isNode = (flags & 0x01) == 0x01;
 
     }
+
+    public int getTimeStamp() {
+        return timeStamp;
+    }
 }
