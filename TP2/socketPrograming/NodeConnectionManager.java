@@ -168,17 +168,17 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 NeighbourInfo.Node node = 
                     new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
 
-                if (link.isAck()) {
+                if (!link.isAck()) {
 
-                    synchronized(neighbourInfo.streamActiveLinks){
-                        neighbourInfo.streamActiveLinks.get(link.streamId).add(link.getAddress());
+                    if (link.isActivate()) {
+                        
+                        synchronized(neighbourInfo.streamActiveLinks){
+                            neighbourInfo.streamActiveLinks.get(link.streamId).add(link.getAddress());
+                        }
                     }
 
-                    continue; //NOTE: continue ftw
-                    
-                }
 
-                if (link.isActivate()) { //this is a connection confirmation acknolegment
+                }else if (link.isActivate()) { //this is a connection confirmation acknolegment
                                          
                     if (node.equals(streamInfo.connecting)) { //this checks if connection has been established
 

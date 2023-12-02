@@ -43,13 +43,13 @@ public class NeighbourInfo {
 
         public NeighbourInfo.Node connected;
 
-        public HashSet<Node> disconnecting = new HashSet<>();
-        public HashSet<Node> deprecated = new HashSet<>();
+        public HashSet<NeighbourInfo.Node> disconnecting = new HashSet<>();
+        public HashSet<NeighbourInfo.Node> deprecated = new HashSet<>();
 
         public Thread connectorThread;
         public Thread disconnectorThread;
 
-        public HashSet<Node> getDisconnecting() {
+        public HashSet<NeighbourInfo.Node> getDisconnecting() {
             HashSet<Node> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
             return disconnecting;
