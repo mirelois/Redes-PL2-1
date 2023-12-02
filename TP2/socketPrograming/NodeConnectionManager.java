@@ -1,34 +1,39 @@
-public class RPConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.util.HashSet;
+import java.net.UnknownHostException;
 
-    ServerInfo serverInfo;
+public class NodeConnectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
+
+    NeighbourInfo neighbourInfo;
 
     int streamId;
 
     String streamName;
 
-    ServerInfo.StreamInfo streamInfo;
+    NeighbourInfo.StreamInfo streamInfo;
 
-    public RPConectionManager(ServerInfo serverInfo) {
+    public NodeConnectionManager(NeighbourInfo neighbourInfo) {
 
         // this.serverInfo = serverInfo;
         // this.streamId = streamId;
         // this.streamName = streamName;
-        this.serverInfo = serverInfo;
+        this.neighbourInfo = neighbourInfo;
 
     }
 
-    public static void updateBestServer(ServerInfo.StreamInfo streamInfo, Integer streamId, int bestServerLatency, DatagramSocket socket)
-            throws UnknownHostException { // TODO: currently this is never called stfu
+    public static void updateBestServer(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo, Integer streamId, int bestServerLatency, DatagramSocket socket) throws UnknownHostException { // TODO: currently this is never called stfu
 
-        streamInfo.updateLatency(streamInfo.currentBestServer);// bestServerLatency is the latency of the current best
-                                                               // server
+        neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
+                                                       // server
         if (streamInfo.connectorThread == null) {
             
             streamInfo.connectorThread = new Thread(new Runnable() {
 
                 public void run() {
 
-                    ServerInfo.StreamInfo.Server connecting;
+                    NeighbourInfo.Node connecting;
 
                     try {
                         while (true) {
@@ -65,42 +70,42 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                 public void run() {
 
-                    HashSet<ServerInfo.StreamInfo.Server> disconnecting;
-                    HashSet<ServerInfo.StreamInfo.Server> deprecated;
+                    HashSet<NeighbourInfo.Node> disconnecting;
+                    HashSet<NeighbourInfo.Node> deprecated;
 
                     try {
                         while (true) {
-                            streamInfo.disconnectingDeprecatedLock.lock();
+                            // streamInfo.disconnectingDeprecatedLock.lock();
                             try {
                                 while (streamInfo.disconnecting.isEmpty() && streamInfo.deprecated.isEmpty()) { // sleeps if there is nothing to remove
-                                    streamInfo.disconnectingDeprecatedEmpty.await();
+                                    // streamInfo.disconnectingDeprecatedEmpty.await();
                                 }
 
                                 disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
                                 deprecated = streamInfo.getDeprecated();// copy of the deprecated set
                             } finally {
-                                streamInfo.disconnectingDeprecatedLock.unlock();
+                                // streamInfo.disconnectingDeprecatedLock.unlock();
                             }
 
-                            for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
+                            for (NeighbourInfo.Node node : disconnecting) { // sends disconect link to
                                                                                         // all servers in
                                 socket.send(new Link(
                                         false,
                                         true,
                                         streamId,
-                                        server.address,
+                                        node.address,
                                         Define.serverPort,
                                         0,
                                         null).toDatagramPacket());
                             }
 
-                            for (ServerInfo.StreamInfo.Server server : deprecated) {
+                            for (NeighbourInfo.Node node : deprecated) {
                                 
                                 socket.send(new Link(
                                         true,
                                         false,
                                         streamId,
-                                        server.address,
+                                        node.address,
                                         Define.serverPort,
                                         0,
                                         null).toDatagramPacket());
@@ -124,11 +129,11 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
         }
 
         synchronized (streamInfo.connecting) {
-            synchronized (streamInfo.minServer) {
+            synchronized (neighbourInfo.minNode) {
                 if (streamInfo.connecting != null) {
                     streamInfo.disconnecting.add(streamInfo.connecting); //add unactivated packet to the remove list
                 }
-                streamInfo.connecting = streamInfo.minServer.peek(); // this operation has complexity O(1)
+                streamInfo.connecting = neighbourInfo.minNode.peek(); // this operation has complexity O(1)
             }
 
             streamInfo.connecting.notify();
@@ -139,7 +144,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
     @Override
     public void run() {
 
-        try (DatagramSocket socket = new DatagramSocket(Define.RPConectionManagerPort)) {
+        try (DatagramSocket socket = new DatagramSocket(Define.<InsertPort>)) {//TODO put port
 
             byte[] buf = new byte[Define.infoBuffer];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -150,41 +155,41 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                 Link link = new Link(packet);
 
-                this.streamInfo = serverInfo.streamInfo.get(link.getStreamId());
+                this.streamInfo = neighbourInfo.streamInfo.get(link.getStreamId());
 
-                ServerInfo.StreamInfo.Server server = 
-                    new ServerInfo.StreamInfo.Server(link.getAddress(), Integer.MAX_VALUE);
+                NeighbourInfo.Node node = 
+                    new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
 
                 if (link.isActivate()) { //this is a connection confirmation acknolegment
                                          
-                    if (server.equals(streamInfo.connecting)) { //this checks if connection has been established
+                    if (node.equals(streamInfo.connecting)) { //this checks if connection has been established
 
-                        streamInfo.disconnectingDeprecatedLock.lock();
+                        // streamInfo.disconnectingDeprecatedLock.lock();
                         try{
-                            streamInfo.disconnecting.add(streamInfo.currentBestServer);
-                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                            streamInfo.disconnecting.add(streamInfo.connecting);
+                            // streamInfo.disconnectingDeprecatedEmpty.notify();
                         } finally {
-                            streamInfo.disconnectingDeprecatedLock.unlock();
+                            // streamInfo.disconnectingDeprecatedLock.unlock();
                         }
 
-                        streamInfo.currentBestServer = streamInfo.connecting;
+                        streamInfo.connected = streamInfo.connecting;
 
                         streamInfo.connecting = null;
 
-                    }else if (streamInfo.deprecated.contains(server)){
-                        streamInfo.disconnectingDeprecatedLock.lock();
+                    }else if (streamInfo.deprecated.contains(node)){
+                        // streamInfo.disconnectingDeprecatedLock.lock();
                         try{
-                            streamInfo.disconnecting.add(server);
-                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                            streamInfo.disconnecting.add(node);
+                            // streamInfo.disconnectingDeprecatedEmpty.notify();
                         }finally {
-                            streamInfo.disconnectingDeprecatedLock.unlock();
+                            // streamInfo.disconnectingDeprecatedLock.unlock();
                         }
                     }
                     
                 }else if (link.isDeactivate()) { //this means a server acepted the disconnect request
                     
                     synchronized(streamInfo.disconnecting){
-                        streamInfo.disconnecting.remove(server);
+                        streamInfo.disconnecting.remove(node);
                     }
                                                                         
                 }

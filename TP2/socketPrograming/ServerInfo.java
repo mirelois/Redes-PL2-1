@@ -50,7 +50,7 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
 
         public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         
-        public Server currentBestServer;
+        public Server connected;
         
         //locks for altering the connecting variable
         public ReentrantLock conLock = new ReentrantLock();
