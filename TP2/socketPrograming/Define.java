@@ -15,7 +15,7 @@ public final class Define {
 
     static int serverPort                  = 4000;
     
-    static int serverConnectionManagerPort = 4000;
+    static int serverConnectionManagerPort = 4001;
     
     static int streamingPort               = 5000;
 
