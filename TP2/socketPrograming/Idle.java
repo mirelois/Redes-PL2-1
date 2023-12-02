@@ -1,6 +1,8 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+import NeighbourInfo.StreamInfo;
+
 public class Idle implements Runnable{
     private final NeighbourInfo neighbourInfo;
 
@@ -27,7 +29,9 @@ public class Idle implements Runnable{
                 if(itp.isNode){
                     neighbourInfo.updateLatency(new NeighbourInfo.Node(packet.getAddress(), Packet.getLatency(itp.timeStamp)));
                 } else {
-                    ServerInfo.StreamInfo.updateLatency();
+                    for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
+                        streamInfo.updateLatency(new ServerInfo.ServerInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
+                    }
                 }
             }
         } catch (Exception e){

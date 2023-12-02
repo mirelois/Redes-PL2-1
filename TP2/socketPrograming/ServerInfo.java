@@ -92,6 +92,6 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         }
     }
     
-    public Map<Integer, StreamInfo> streamInfo = new HashMap<>();
+    public Map<Integer, StreamInfo> streamInfoMap = new HashMap<>();
 }
 

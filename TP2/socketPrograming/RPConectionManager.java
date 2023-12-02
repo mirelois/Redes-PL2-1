@@ -162,7 +162,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                 Link link = new Link(packet);
 
-                this.streamInfo = serverInfo.streamInfo.get(link.getStreamId());
+                this.streamInfo = serverInfo.streamInfoMap.get(link.getStreamId());
 
                 ServerInfo.StreamInfo.Server server = 
                     new ServerInfo.StreamInfo.Server(link.getAddress(), Integer.MAX_VALUE);

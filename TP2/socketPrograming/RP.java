@@ -49,11 +49,11 @@ public class RP implements Runnable {
 
                 }
 
-                if (!serverInfo.streamInfo.containsKey(streamId)) {
+                if (!serverInfo.streamInfoMap.containsKey(streamId)) {
 
                     ServerInfo.StreamInfo streamInfo = new ServerInfo.StreamInfo();
 
-                    serverInfo.streamInfo.put(streamId, streamInfo);
+                    serverInfo.streamInfoMap.put(streamId, streamInfo);
 
                     RPConectionManager.updateBestServer(streamInfo, streamId, Integer.MAX_VALUE, socket);
 
