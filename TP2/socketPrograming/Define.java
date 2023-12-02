@@ -7,6 +7,8 @@ public final class Define {
 
     static int bootStraperPort             = 1000;
 
+    static int bootClientPort              = 1001;
+
     static int simpPort                    = 2000;
 
     static int shrimpPort                  = 3000;
@@ -17,7 +19,7 @@ public final class Define {
     
     static int streamingPort               = 5000;
 
-    static int bootClientPort              = 6000;
+    static int idlePort                    = 6000;
 
     static int RPPort                      = 7000;
 

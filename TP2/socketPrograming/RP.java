@@ -19,11 +19,11 @@ public class RP implements Runnable {
     @Override
     public void run() {
 
-        while (true) {
-            try (DatagramSocket socket = new DatagramSocket(Define.RPPort)) {
+
+        try (DatagramSocket socket = new DatagramSocket(Define.RPPort)) {
+                while (true) {
                 byte[] buf = new byte[Define.infoBuffer];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
                 socket.receive(packet);
 
                 Simp simp = new Simp(packet); // from client
@@ -74,10 +74,10 @@ public class RP implements Runnable {
                 System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
                         " da stream com id " + streamId +
                         " pedida por " + clientIP.getHostAddress());
-            } catch (Exception e) {
-                // TODO: handle exception
-                e.printStackTrace();
             }
+            } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
         }
 
     }

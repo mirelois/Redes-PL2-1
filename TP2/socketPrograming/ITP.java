@@ -1,0 +1,47 @@
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+
+public class ITP  extends Packet{ // Idle Tick Protocol
+
+    static int HEADER_SIZE = 3;
+
+    boolean isServer; // \
+                      // | -> 1
+    boolean isNode;   // /
+
+    int timeStamp; // 2
+
+    public ITP(boolean isServer, boolean isNode, int timeStamp, InetAddress address, int port, int payload_size, byte[] payload) {
+
+        super(HEADER_SIZE, payload, payload_size, address, port);
+
+        this.timeStamp = timeStamp;
+
+        int flags = 0x00;
+
+        if(isServer) flags |= 0x01;
+
+        if(isNode) flags |= 0x02;
+
+        this.header[0] = (byte) (flags    /* & 0xFF */);
+        this.header[1] = (byte) (this.timeStamp >> 8 /* & 0xFF */);
+        this.header[2] = (byte) (this.timeStamp      /* & 0xFF */);
+
+    }
+
+    public ITP(DatagramPacket packet) throws java.net.UnknownHostException, PacketSizeException{
+
+        super(packet, HEADER_SIZE);
+
+        // this.time_stamp = (Byte.toUnsignedInt(this.header[0]) << 8) |
+        //                    Byte.toUnsignedInt(this.header[1]);
+
+        int flags = Byte.toUnsignedInt(this.header[0]);
+
+        this.activate   = (flags & 0x02) == 0x02;
+        this.deactivate = (flags & 0x01) == 0x01;
+
+        int streamId = Byte.toUnsignedInt(this.header[1]);
+
+    }
+}
