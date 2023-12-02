@@ -26,6 +26,8 @@ public final class Define {
     static int RPServerAdderPort           = 7001;
 
     static int RPConectionManagerPort      = 7002;
+
+    static int nodeConnectionManagerPort   = 8000;
     
     static int clientPort                  = 9000;
 
