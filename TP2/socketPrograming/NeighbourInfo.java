@@ -43,13 +43,13 @@ public class NeighbourInfo {
 
         public NeighbourInfo.Node connected;
 
-        public HashSet<Node> disconnecting = new HashSet<>();
-        public HashSet<Node> deprecated = new HashSet<>();
+        public HashSet<NeighbourInfo.Node> disconnecting = new HashSet<>();
+        public HashSet<NeighbourInfo.Node> deprecated = new HashSet<>();
 
         public Thread connectorThread;
         public Thread disconnectorThread;
 
-        public HashSet<Node> getDisconnecting() {
+        public HashSet<NeighbourInfo.Node> getDisconnecting() {
             HashSet<Node> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
             return disconnecting;
@@ -75,7 +75,7 @@ public class NeighbourInfo {
     // Uma stream só existe se estiver neste mapa
     public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // nomes de ficheiros para streams
 
-    public Map<Integer, StreamInfo> streamInfo = new HashMap<>();
+    public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
 
     public PriorityQueue<Node> minNode = new PriorityQueue<>((a, b) -> a.latency - b.latency);
 
