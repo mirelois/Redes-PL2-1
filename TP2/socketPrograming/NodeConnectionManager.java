@@ -163,7 +163,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 Link link = new Link(packet);
 
-                this.streamInfo = neighbourInfo.streamInfo.get(link.getStreamId());
+                this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
                 NeighbourInfo.Node node = 
                     new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);

@@ -75,7 +75,7 @@ public class NeighbourInfo {
     // Uma stream só existe se estiver neste mapa
     public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // nomes de ficheiros para streams
 
-    public Map<Integer, StreamInfo> streamInfo = new HashMap<>();
+    public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
 
     public PriorityQueue<Node> minNode = new PriorityQueue<>((a, b) -> a.latency - b.latency);
 
