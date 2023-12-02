@@ -48,6 +48,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             }
 
                             socket.send(new Link(
+                                    false,
                                     true,
                                     false,
                                     streamId,
@@ -93,6 +94,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                                                                         // all servers in
                                 socket.send(new Link(
                                         false,
+                                        false,
                                         true,
                                         streamId,
                                         server.address,
@@ -104,6 +106,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             for (ServerInfo.StreamInfo.Server server : deprecated) {
                                 
                                 socket.send(new Link(
+                                        false,
                                         true,
                                         false,
                                         streamId,

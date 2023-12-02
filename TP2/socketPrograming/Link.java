@@ -6,12 +6,14 @@ public class Link extends Packet { //link initiation and negation kontrol (kool 
     static int HEADER_SIZE = 2;
                     
     boolean activate;   // \ 
-                        //  |-> 1
-    boolean deactivate; // /
+                        // | 
+    boolean deactivate; // |-> 1
+                        // |
+    boolean ack;        // /
 
-    int streamId; //1
+	int streamId; //1
     
-    public Link(boolean activate, boolean deactivate, int streamId, InetAddress address, int port, int payload_size, byte[] payload) {
+    public Link(boolean ack, boolean activate, boolean deactivate, int streamId, InetAddress address, int port, int payload_size, byte[] payload) {
 
         super(HEADER_SIZE, payload, payload_size, address, port);
 
@@ -19,7 +21,11 @@ public class Link extends Packet { //link initiation and negation kontrol (kool 
 
         if(deactivate) flags |= 0x01;
 
-        if(activate) flags |= 0x02; 
+        if(activate) flags   |= 0x02; 
+        
+        if(ack) flags        |= 0x04; 
+
+        this.ack = ack;
 
         this.streamId = streamId;
 
@@ -41,10 +47,11 @@ public class Link extends Packet { //link initiation and negation kontrol (kool 
 
         int flags = Byte.toUnsignedInt(this.header[0]);
 
-        this.activate   = (flags & 0x02) == 0x02;
-        this.deactivate = (flags & 0x01) == 0x01;
+        this.ack        = (flags & 0x04) > 0;
+        this.activate   = (flags & 0x02) > 0;
+        this.deactivate = (flags & 0x01) > 0;
         
-        int streamId = Byte.toUnsignedInt(this.header[1]);
+        this.streamId = Byte.toUnsignedInt(this.header[1]);
 
     }
 
@@ -55,6 +62,10 @@ public class Link extends Packet { //link initiation and negation kontrol (kool 
 	public boolean isDeactivate() {
 		return deactivate;
 	}
+
+    public boolean isAck() {
+        return ack;
+    }
 
 	public int getStreamId() {
 		return streamId;

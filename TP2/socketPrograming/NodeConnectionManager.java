@@ -23,7 +23,12 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     }
 
-    public static void updateBestServer(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo, Integer streamId, int bestServerLatency, DatagramSocket socket) throws UnknownHostException { // TODO: currently this is never called stfu
+    public static void updateBestServer( //TODO: fix args
+        NeighbourInfo neighbourInfo,
+        NeighbourInfo.StreamInfo streamInfo,
+        Integer streamId,
+        int bestServerLatency,
+        DatagramSocket socket) throws UnknownHostException { // TODO: currently this is never called stfu
 
         neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
                                                        // server
@@ -144,7 +149,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     @Override
     public void run() {
 
-        try (DatagramSocket socket = new DatagramSocket(Define.<InsertPort>)) {//TODO put port
+        try (DatagramSocket socket = new DatagramSocket(Define.nodeConnectionManagerPort)) {
 
             byte[] buf = new byte[Define.infoBuffer];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);

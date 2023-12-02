@@ -112,6 +112,7 @@ public class ServerConectionManager implements Runnable {
                     }
                 }
                 socket.send(new Link(
+                        true, // signifies that this is an acknolegment
                         true,
                         false,
                         link.getStreamId(),
@@ -129,6 +130,7 @@ public class ServerConectionManager implements Runnable {
                 }
 
                 socket.send(new Link(
+                        true,
                         false,
                         true,
                         link.getStreamId(),
