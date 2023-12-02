@@ -3,6 +3,8 @@ public final class Define {
     //Cada Port recebe apenas um tipo de Protocolo
     //Um tipo de Protocolo pode ser recebido por mais de um Port
 
+    static int ripPort                     = 100;
+
     static int bootStraperPort             = 1000;
 
     static int simpPort                    = 2000;
@@ -21,9 +23,9 @@ public final class Define {
 
     static int RPServerAdderPort           = 7001;
 
-    static int clientPort                  = 9000;
-
     static int RPConectionManagerPort      = 7002;
+    
+    static int clientPort                  = 9000;
 
     //-------timeouts---------
 
