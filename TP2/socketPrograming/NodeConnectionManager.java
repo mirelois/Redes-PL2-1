@@ -71,7 +71,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         }
 
         if (streamInfo.disconnectorThread == null) {
-            
+            //TODO Separar os Deprecated dos Disconnecting no futuro
             streamInfo.disconnectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -175,15 +175,18 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         synchronized(neighbourInfo.streamActiveLinks){
                             neighbourInfo.streamActiveLinks.get(link.streamId).add(link.getAddress());
                         }
+
+                    } else if (link.isDeactivate()) {
+
+                        //TODO lidar com pedidos de desconexão vindos de nodos dos clientes
                     }
 
-
-                }else if (link.isActivate()) { //this is a connection confirmation acknolegment
+                } else if (link.isActivate()) { //this is a connection confirmation acknolegment
                                          
                     if (node.equals(streamInfo.connecting)) { //this checks if connection has been established
 
                         // streamInfo.disconnectingDeprecatedLock.lock();
-                        try{
+                        try {
                             streamInfo.disconnecting.add(streamInfo.connecting);
                             // streamInfo.disconnectingDeprecatedEmpty.notify();
                         } finally {
@@ -194,17 +197,18 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                         streamInfo.connecting = null;
 
-                    }else if (streamInfo.deprecated.contains(node)){
+                    } else if (streamInfo.deprecated.contains(node)) {
                         // streamInfo.disconnectingDeprecatedLock.lock();
-                        try{
+                        try {
+                            streamInfo.deprecated.remove(node);
                             streamInfo.disconnecting.add(node);
                             // streamInfo.disconnectingDeprecatedEmpty.notify();
-                        }finally {
+                        } finally {
                             // streamInfo.disconnectingDeprecatedLock.unlock();
                         }
                     }
                     
-                }else if (link.isDeactivate()) { //this means a server acepted the disconnect request
+                } else if (link.isDeactivate()) { //this means a server acepted the disconnect request
                     
                     synchronized(streamInfo.disconnecting){
                         streamInfo.disconnecting.remove(node);

@@ -154,6 +154,8 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             byte[] buf = new byte[Define.infoBuffer];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
+            //Links that RP receives here:
+            //  Server Connection Acks (Connect && Disconnect)
             while (true) { // main thread only listens for Shrimp, it checks who sent the packet
 
                 socket.receive(packet);
@@ -166,11 +168,12 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     new ServerInfo.StreamInfo.Server(link.getAddress(), Integer.MAX_VALUE);
 
                 if (link.isActivate()) { //this is a connection confirmation acknolegment
-                                         
+                    
+                    //server.equals() só verifica o Address do Servidor
                     if (server.equals(streamInfo.connecting)) { //this checks if connection has been established
 
                         streamInfo.disconnectingDeprecatedLock.lock();
-                        try{
+                        try {
                             streamInfo.disconnecting.add(streamInfo.connected);
                             streamInfo.disconnectingDeprecatedEmpty.notify();
                         } finally {
@@ -181,17 +184,18 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                         streamInfo.connecting = null;
 
-                    }else if (streamInfo.deprecated.contains(server)){
+                    } else if (streamInfo.deprecated.contains(server)) { //check if the server was deprecated
+
                         streamInfo.disconnectingDeprecatedLock.lock();
-                        try{
+                        try {
                             streamInfo.disconnecting.add(server);
                             streamInfo.disconnectingDeprecatedEmpty.notify();
-                        }finally {
+                        } finally {
                             streamInfo.disconnectingDeprecatedLock.unlock();
                         }
                     }
                     
-                }else if (link.isDeactivate()) { //this means a server acepted the disconnect request
+                } else if (link.isDeactivate()) { //this means a server acepted the disconnect request
                     
                     synchronized(streamInfo.disconnecting){
                         streamInfo.disconnecting.remove(server);
