@@ -29,19 +29,17 @@ public class ITP  extends Packet{ // Idle Tick Protocol
 
     }
 
-    public ITP(DatagramPacket packet) throws java.net.UnknownHostException, PacketSizeException{
+    public ITP(DatagramPacket packet) throws PacketSizeException{
 
         super(packet, HEADER_SIZE);
 
-        // this.time_stamp = (Byte.toUnsignedInt(this.header[0]) << 8) |
-        //                    Byte.toUnsignedInt(this.header[1]);
+        this.timeStamp = (Byte.toUnsignedInt(this.header[0]) << 8) |
+                            Byte.toUnsignedInt(this.header[1]);
 
         int flags = Byte.toUnsignedInt(this.header[0]);
 
-        this.activate   = (flags & 0x02) == 0x02;
-        this.deactivate = (flags & 0x01) == 0x01;
-
-        int streamId = Byte.toUnsignedInt(this.header[1]);
+        this.isServer   = (flags & 0x02) == 0x02;
+        this.isNode = (flags & 0x01) == 0x01;
 
     }
 }
