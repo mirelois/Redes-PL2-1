@@ -8,7 +8,7 @@ public class NeighbourInfo {
     public List<InetAddress> neighbours = new ArrayList<>(); // lista de vizinhos
 
     //Uma stream só existe se estiver neste mapa
-    public Map<String, Integer> nameHash = new HashMap<>(); // nomes de ficheiros para streams
+    public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // nomes de ficheiros para streams
 
     // public Map<Integer, Set<InetAddress>> streamClients = new HashMap<>(); // clients daquela stream
 

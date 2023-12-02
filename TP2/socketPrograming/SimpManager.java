@@ -34,7 +34,7 @@ public class SimpManager implements Runnable{
 
 
                 synchronized (this.neighbourInfo) {
-                    streamId = this.neighbourInfo.nameHash.get(new String(simp.getPayload()));
+                    streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
 
                     clientAdjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
                     if(clientAdjacent == null){
@@ -47,7 +47,7 @@ public class SimpManager implements Runnable{
                     
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.connectionToRP == 0) {
-                        this.neighbourInfo.nameHash.put(new String(simp.getPayload()), 0);
+                        this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
                         socket.send(new Shrimp(clientIP, 0, Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
                         continue;
                     }
@@ -76,12 +76,12 @@ public class SimpManager implements Runnable{
                         }*/
                     }
                     //255 significa que ainda não se sabe se a stream existe
-                    this.neighbourInfo.nameHash.put(new String(simp.getPayload()), 255);
+                    this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 255);
 
                 } else {
                     //Stream existe (porque existe conexão)
                     synchronized (this.neighbourInfo) {
-                        socket.send(new Shrimp(clientIP, this.neighbourInfo.nameHash.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
+                        socket.send(new Shrimp(clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
                     }
                 }
             }
