@@ -178,6 +178,14 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                         streamInfo.connecting = null;
 
+                    }else if (streamInfo.deprecated.contains(server)){
+                        streamInfo.disconnectingDeprecatedLock.lock();
+                        try{
+                            streamInfo.disconnecting.add(server);
+                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                        }finally {
+                            streamInfo.disconnectingDeprecatedLock.unlock();
+                        }
                     }
                     
                 }else if (link.isDeactivate()) { //this means a server acepted the disconnect request
