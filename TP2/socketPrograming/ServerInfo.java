@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -54,8 +56,12 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         public ReentrantLock conLock = new ReentrantLock();
 
 		public Server connecting;
-        public HashSet<Server> disconnecting = new HashSet<Server>();
-        public HashSet<Server> deprecated    = new HashSet<Server>();
+        public HashSet<Server> disconnecting = new HashSet<>();
+
+        public Lock disconnectingDeprecatedLock = new ReentrantLock();
+
+        public Condition disconnectingDeprecatedEmpty = disconnectingDeprecatedLock.newCondition();
+        public HashSet<Server> deprecated    = new HashSet<>();
 
         public Integer streamId;
 

@@ -77,12 +77,16 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                     try {
                         while (true) {
-                            synchronized (streamInfo.disconnecting) {
+                            streamInfo.disconnectingDeprecatedLock.lock();
+                            try {
                                 while (streamInfo.disconnecting.isEmpty() && streamInfo.deprecated.isEmpty()) { // sleeps if there is nothing to remove
-                                    streamInfo.disconnecting.wait();
+                                    streamInfo.disconnectingDeprecatedEmpty.await();
                                 }
+
                                 disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
                                 deprecated = streamInfo.getDeprecated();// copy of the deprecated set
+                            } finally {
+                                streamInfo.disconnectingDeprecatedLock.unlock();
                             }
 
                             for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
@@ -162,10 +166,12 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                          
                     if (server.equals(streamInfo.connecting)) { //this checks if connection has been established
 
-                        synchronized(streamInfo.disconnecting){
+                        streamInfo.disconnectingDeprecatedLock.lock();
+                        try{
                             streamInfo.disconnecting.add(streamInfo.currentBestServer);
-
-                            streamInfo.disconnecting.notify();
+                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                        } finally {
+                            streamInfo.disconnectingDeprecatedLock.unlock();
                         }
 
                         streamInfo.currentBestServer = streamInfo.connecting;
