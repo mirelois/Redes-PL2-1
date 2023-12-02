@@ -57,11 +57,10 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
 
 		public Server connecting;
         public HashSet<Server> disconnecting = new HashSet<>();
+        public HashSet<Server> deprecated    = new HashSet<>();
 
         public Lock disconnectingDeprecatedLock = new ReentrantLock();
-
         public Condition disconnectingDeprecatedEmpty = disconnectingDeprecatedLock.newCondition();
-        public HashSet<Server> deprecated    = new HashSet<>();
 
         public Integer streamId;
 
