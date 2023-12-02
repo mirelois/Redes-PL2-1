@@ -14,7 +14,7 @@ public class RP implements Runnable {
     public RP(ServerInfo serverInfo, NeighbourInfo neighbourInfo) {
         this.serverInfo = serverInfo;
         this.neighbourInfo = neighbourInfo;
-        this.neighbourInfo.connectionToRP = 1;
+        this.neighbourInfo.isConnectedToRP = 1;
     }
 
     @Override

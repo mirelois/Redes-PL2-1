@@ -58,7 +58,7 @@ public class ShrimpManager implements Runnable{
                     
                     //Existe Stream (conseguiu caminho até ao RP)
                     if (streamId != 0 && streamId != 255) {
-                        this.neighbourInfo.connectionToRP = 1;
+                        this.neighbourInfo.isConnectedToRP = 1;
 
                         this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
                         streamClients = this.neighbourInfo.streamClients.get(streamId);
@@ -100,7 +100,7 @@ public class ShrimpManager implements Runnable{
                             if (this.neighbourInfo.rpRequest.isEmpty() && this.neighbourInfo.rpAdjacent.isEmpty()) {
                                 this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
                                 System.out.println("Não existe conexão!");
-                                this.neighbourInfo.connectionToRP = 0;
+                                this.neighbourInfo.isConnectedToRP = 0;
                                 //Avisar todos os Clientes da falta de conexão
                                 //TODO escolher o melhor link para avisar
                                 for (Set<InetAddress> linksToClient : this.neighbourInfo.clientAdjacent.values())
