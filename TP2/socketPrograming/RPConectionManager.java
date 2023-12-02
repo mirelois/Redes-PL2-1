@@ -37,8 +37,8 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                     ServerInfo.StreamInfo.Server connecting;
 
-                    while (true) {
-                        try {
+                    try {
+                        while (true) {
 
                             synchronized (streamInfo.connecting) {
                                 while (streamInfo.connecting != null) {
@@ -58,9 +58,9 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                             Thread.sleep(Define.RPTimeout);
 
-                        } catch (InterruptedException | IOException e) {
-                            e.printStackTrace();
                         }
+                    } catch (InterruptedException | IOException e) {
+                        e.printStackTrace();
                     }
                 }
             });
@@ -73,14 +73,16 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 public void run() {
 
                     HashSet<ServerInfo.StreamInfo.Server> disconnecting;
+                    HashSet<ServerInfo.StreamInfo.Server> deprecated;
 
-                    while (true) {
-                        try {
+                    try {
+                        while (true) {
                             synchronized (streamInfo.disconnecting) {
-                                while (streamInfo.disconnecting.isEmpty()) { // sleeps if there is nothing to remove
+                                while (streamInfo.disconnecting.isEmpty() && streamInfo.deprecated.isEmpty()) { // sleeps if there is nothing to remove
                                     streamInfo.disconnecting.wait();
                                 }
                                 disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
+                                deprecated = streamInfo.getDeprecated();// copy of the deprecated set
                             }
 
                             for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
@@ -95,9 +97,23 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                         null).toDatagramPacket());
                             }
 
-                        } catch (InterruptedException | IOException e) {
-                            e.printStackTrace();
+                            for (ServerInfo.StreamInfo.Server server : deprecated) {
+                                
+                                socket.send(new Link(
+                                        true,
+                                        false,
+                                        streamId,
+                                        server.address,
+                                        Define.serverPort,
+                                        0,
+                                        null).toDatagramPacket());
+                            }
+
+                            Thread.sleep(Define.RPTimeout);
+
                         }
+                    } catch (InterruptedException | IOException e) {
+                        e.printStackTrace();
                     }
                 }
             });
@@ -146,18 +162,23 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                          
                     if (server.equals(streamInfo.connecting)) { //this checks if connection has been established
 
-                        streamInfo.disconnecting.add(streamInfo.currentBestServer);
+                        synchronized(streamInfo.disconnecting){
+                            streamInfo.disconnecting.add(streamInfo.currentBestServer);
 
-                        streamInfo.disconnecting.notify();
+                            streamInfo.disconnecting.notify();
+                        }
 
                         streamInfo.currentBestServer = streamInfo.connecting;
 
                         streamInfo.connecting = null;
 
                     }
+                    
                 }else if (link.isDeactivate()) { //this means a server acepted the disconnect request
                     
-                    streamInfo.disconnecting.remove(server);
+                    synchronized(streamInfo.disconnecting){
+                        streamInfo.disconnecting.remove(server);
+                    }
                                                                         
                 }
 

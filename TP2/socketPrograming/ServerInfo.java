@@ -55,6 +55,7 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
 
 		public Server connecting;
         public HashSet<Server> disconnecting = new HashSet<Server>();
+        public HashSet<Server> deprecated    = new HashSet<Server>();
 
         public Integer streamId;
 
@@ -66,6 +67,12 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
             HashSet<Server> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
             return disconnecting;
+        }
+        
+        public HashSet<Server> getDeprecated() {
+            HashSet<Server> deprecated = new HashSet<>();
+            deprecated.addAll(this.deprecated);
+            return deprecated;
         }
 
         public Server getConnecting() {

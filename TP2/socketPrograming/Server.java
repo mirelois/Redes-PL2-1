@@ -52,7 +52,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
         sTimer = new Timer(FRAME_PERIOD, this); //init Timer para servidor
         sTimer.setInitialDelay(0);
         sTimer.setCoalesce(true);
-        sBuf = new byte[15000]; //allocate memory for the sending buffer
+        sBuf = new byte[Define.streamBuffer]; //allocate memory for the sending buffer
 
         try {
             RTPsocket = new DatagramSocket(port); //init RTP socket
@@ -101,8 +101,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
     public void actionPerformed(ActionEvent e) {
 
         //if the current image nb is less than the length of the video
-        if (imagenb < VIDEO_LENGTH)
-        {
+        if (imagenb < VIDEO_LENGTH) {
             //update current imagenb
             imagenb++;
 
@@ -199,9 +198,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
                     //update GUI
                     //label.setText("Send frame #" + imagenb);
-                }
-                catch(Exception ex)
-                {
+                }catch(Exception ex) {
                     System.out.println("Exception caught: "+ex);
                     System.exit(0);
                 }

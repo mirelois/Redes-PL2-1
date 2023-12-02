@@ -28,6 +28,7 @@ public class ServerConectionManager implements Runnable {
                     0,
                     null
                 ).toDatagramPacket());
+                
             } else if (link.isDeactivate()) {
                 //TODO: interupt server thread
                 socket.send(new Link(

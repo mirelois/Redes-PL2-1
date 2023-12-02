@@ -1,7 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Set;
 
 public class RP implements Runnable {
 
@@ -37,7 +36,6 @@ public class RP implements Runnable {
                 Integer streamId;
                 InetAddress clientIP = simp.getSourceAddress();
                 String streamName = new String(simp.getPayload());
-                Set<InetAddress> clientAdjacent, streamActiveLinks, streamClients;
 
                 synchronized (this.neighbourInfo) {
 
