@@ -1,7 +1,91 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.JFrame;
 
 public class ServerConectionManager implements Runnable {
+
+    Map<String, Integer> videoNameToStreamId = new HashMap<>();
+    Map<Integer, Thread> streamSenderThreads = new HashMap<>();
+
+    class ServerSender extends JFrame implements Runnable {
+
+        String VideoFileName; // video file to request to the server
+        Integer streamId;
+        InetAddress rpIPAddr; // RP IP address
+        int imagenb = 0; // image nb of the image currently transmitted
+        int VIDEO_LENGTH = 500; // length of the video in frames
+        VideoStream video; // VideoStream object used to access video frames
+
+        public ServerSender(String VideoFileName, Integer streamId, InetAddress rpIPAddr) {
+            this.VideoFileName = VideoFileName;
+            this.streamId = streamId;
+            this.rpIPAddr = rpIPAddr;
+            try {
+                System.out.println("Tentar abrir o ficheiro: " + VideoFileName);
+                video = new VideoStream(VideoFileName); // init the VideoStream object:
+            } catch (Exception e) {
+                System.out.println("Servidor: erro no video: " + e.getMessage());
+            }
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                // update current imagenb
+                this.imagenb = (this.imagenb + 1) % VIDEO_LENGTH;
+
+                try {
+                    // get next frame to send from the video, as well as its size
+                    int image_length = video.getnextframe(sBuf);
+
+                    // Builds an RTPpacket object containing the frame
+                    Sup rtp_packet = new Sup(this.streamId, imagenb * FRAME_PERIOD, imagenb, rpIPAddr, RTP_dest_port,
+                            image_length, sBuf);
+                    Sup sup = new Sup(
+                        0, //dizer que é responsabilidade do RP
+                        Packet.getCurrTime(),
+                        imagenb * FRAME_PERIOD,
+                        imagenb,
+                        0,// sequence number, zero porque who cares
+                        //TODO: get a streamId,
+                        //TODO get an adress,
+                        port,
+                        image_length,
+                        sbuf
+                    )
+                    // Sup rtp_packet = new RTPpacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD,
+                    // sBuf, image_length);
+
+                    // get to total length of the full rtp packet to send
+                    // int packet_length = rtp_packet.getlength();
+
+                    // retrieve the packet bitstream and store it in an array of bytes
+                    // byte[] packet_bits = new byte[packet_length];
+                    // byte[] packet_bits = rtp_packet.getPacket();
+                    // rtp_packet.getpacket(packet_bits);
+
+                    // send the packet as a DatagramPacket over the UDP socket
+                    // senddp = new DatagramPacket(packet_bits, packet_length, rpIPAddr,
+                    // RTP_dest_port);
+                    RTPsocket.send(rtp_packet.toDatagramPacket());
+
+                    System.out.println("Send frame #" + imagenb);
+                    // print the header bitstream
+                    // rtp_packet.printheader();
+
+                    // update GUI
+                    // label.setText("Send frame #" + imagenb);
+                } catch (Exception ex) {
+                    System.out.println("Exception caught: " + ex);
+                    System.exit(0);
+                }
+            }
+        }
+    }
 
     @Override
     public void run() {
@@ -16,30 +100,42 @@ public class ServerConectionManager implements Runnable {
 
             Link link = new Link(packet);
 
-            if (link.isActivate()) {//NOTE: como é que o server sabe o id da stream?
-                // if (link.getStreamId() server thread is not running
-                    //TODO: start Server Thread
+            if (link.isActivate()) {// NOTE: como é que o server sabe o id da stream?
+                if (!streamSenderThreads.containsKey(link.streamId)){
+                    
+                    streamSenderThreads.put(link.getStreamId(), new Thread(new ServerSender(VideoFileName, streamId, rpIPAddr)));
+                    
+                    if (!streamSenderThreads.get(link.streamId).isAlive()){
+
+                        streamSenderThreads.get(link.getStreamId()).start();
+                        
+                    }
+                }
                 socket.send(new Link(
-                    true,
-                    false,
-                    link.getStreamId(),
-                    link.getAddress(),
-                    link.getPort(),
-                    0,
-                    null
-                ).toDatagramPacket());
-                
+                        true,
+                        false,
+                        link.getStreamId(),
+                        link.getAddress(),
+                        link.getPort(),
+                        0,
+                        null).toDatagramPacket());
+
             } else if (link.isDeactivate()) {
-                //TODO: interupt server thread
+                
+                if (streamSenderThreads.get(link.streamId).isAlive()){
+
+                    streamSenderThreads.get(link.getStreamId()).interrupt();
+                    
+                }
+
                 socket.send(new Link(
-                    false,
-                    true,
-                    link.getStreamId(),
-                    link.getAddress(),
-                    link.getPort(),
-                    0,
-                    null
-                ).toDatagramPacket());
+                        false,
+                        true,
+                        link.getStreamId(),
+                        link.getAddress(),
+                        link.getPort(),
+                        0,
+                        null).toDatagramPacket());
             }
 
         } catch (Exception e) {
