@@ -5,7 +5,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Set;
 
-import stream;
 import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Sup;
@@ -19,12 +18,9 @@ public class RPStreaming implements Runnable{
 
     private final ServerInfo serverInfo;
 
-    private final stream stream;
-
-    public RPStreaming(ServerInfo serverInfo, NeighbourInfo neighbourInfo, stream stream){
+    public RPStreaming(ServerInfo serverInfo, NeighbourInfo neighbourInfo){
         this.serverInfo = serverInfo;
         this.neighbourInfo = neighbourInfo;
-        this.stream = stream;
     }
 
     @Override
@@ -43,7 +39,9 @@ public class RPStreaming implements Runnable{
                 int latency = Packet.getLatency(sup.getTime_stamp());
 
                 synchronized(serverInfo){
-                    serverInfo.latencyMap.put(sup.getAddress(), latency);
+                    for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
+                        streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(sup.getAddress(), latency));
+                    }
                 }
 
                 Set<InetAddress> streamActiveLinks;

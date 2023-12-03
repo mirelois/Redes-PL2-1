@@ -7,7 +7,7 @@ import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Shrimp;
 import SharedStructures.Define;
-import SharedStructures.ServerInfo;
+import SharedStructures.*;
 
 public class RPServerAdder implements Runnable{
     
@@ -34,7 +34,9 @@ public class RPServerAdder implements Runnable{
                 int latency = Packet.getLatency(shrimp.getTimeStamp());
 
                 synchronized(this.serverInfo){
-                    serverInfo.latencyMap.put(shrimp.getAddress(), latency);
+                    for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
+                        streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(shrimp.getAddress(), latency));
+                    }
                 }
                 
                 System.out.println("Adicionado servidor de endereço " + shrimp.getAddress().getHostAddress());

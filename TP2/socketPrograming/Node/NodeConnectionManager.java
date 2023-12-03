@@ -181,7 +181,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     if (link.isActivate()) {
                         
                         synchronized(neighbourInfo.streamActiveLinks){
-                            neighbourInfo.streamActiveLinks.get(link.streamId).add(link.getAddress());
+                            neighbourInfo.streamActiveLinks.get(link.getStreamId()).add(link.getAddress());
                         }
 
                     } else if (link.isDeactivate()) {
