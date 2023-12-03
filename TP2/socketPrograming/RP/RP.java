@@ -30,7 +30,7 @@ public class RP implements Runnable {
 
 
         try (DatagramSocket socket = new DatagramSocket(Define.simpPort)) {
-                while (true) {
+            while (true) {
                 byte[] buf = new byte[Define.infoBuffer];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
