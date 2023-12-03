@@ -74,7 +74,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
         try {
             for (String string : providedStreams) {
                 
-                System.out.println("Avisar RP da existência");
+                System.out.println("Avisar RP da existência da stream " + string);
                 RTPsocket.send(new Shrimp(Packet.getCurrTime(), null, 0, 
                                Define.RPServerAdderPort, rpIPAddr, string.length(), string.getBytes()).toDatagramPacket());
                 
