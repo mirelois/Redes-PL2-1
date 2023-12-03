@@ -51,16 +51,18 @@ public class RP implements Runnable {
                 }
 
                 if (!serverInfo.streamInfoMap.containsKey(streamId)) {
-
-                    ServerInfo.StreamInfo streamInfo = new ServerInfo.StreamInfo();
-
-                    serverInfo.streamInfoMap.put(streamId, streamInfo);
-
-                    RPConectionManager.updateBestServer(streamInfo, streamId, Integer.MAX_VALUE, socket);
-
+                    System.out.println("    Recebido pedido da Stream " + streamId + "que ainda não existe servidor para");
+                    //TODO não existe ainda a stream no RP
+                    
                     // System.out.println("Pedido de stream enviado ao servidor " +
                     // chooseBestServer(serverInfo) +
                     // " com payload " + new String(simp.getPayload()));
+                }
+                ServerInfo.StreamInfo streamInfo = serverInfo.streamInfoMap.get(streamId);
+
+                if (streamInfo.connected == null && streamInfo.connecting == null) {
+                    System.out.println("    Recebido pedido da Stream " + streamId + "que ainda não estava ativa");
+                    RPConectionManager.updateBestServer(streamInfo, streamId, Integer.MAX_VALUE, socket);
                 }
 
                 socket.send(new Shrimp(

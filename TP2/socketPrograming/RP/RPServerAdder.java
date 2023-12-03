@@ -42,20 +42,23 @@ public class RPServerAdder implements Runnable{
                 System.out.println("    Adicionado servidor de endereço " + shrimp.getAddress().getHostAddress());
                 String streamName = new String(shrimp.getPayload());
                 Integer streamId;
+                //Verificar se a stream já existe no RP
                 synchronized (this.neighbourInfo) {
-
                     streamId = this.neighbourInfo.fileNameToStreamId.get(streamName);
                     ServerInfo.StreamInfo streamInfo;
                     synchronized(serverInfo) {
+
                         if (streamId == null) { //Stream ainda não existe no RP
                             this.neighbourInfo.fileNameToStreamId.put(streamName, curr_streamID);
                             streamId = curr_streamID;
                             curr_streamID++;
                             streamInfo = new ServerInfo.StreamInfo(streamId);
                             this.serverInfo.streamInfoMap.put(streamId, streamInfo);
+
                         } else { //Stream já existe no RP
                             streamInfo = this.serverInfo.streamInfoMap.get(streamId);
                         }
+                        
                         streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(shrimp.getAddress(), latency));
                     }
                 }

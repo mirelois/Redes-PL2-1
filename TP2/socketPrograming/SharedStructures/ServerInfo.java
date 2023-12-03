@@ -55,10 +55,10 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         //locks for altering the connecting and connected variable
         //The order of the locks is connected->connecting->disconnecting
         public ReentrantLock connectedLock = new ReentrantLock();
-        public Server connected;
+        public Server connected = null;
         public ReentrantLock connectingLock = new ReentrantLock();
         public Condition connectingEmpty = connectingLock.newCondition();
-		public Server connecting;
+		public Server connecting = null;
         
         public Lock disconnectingDeprecatedLock = new ReentrantLock();
         public Condition disconnectingDeprecatedEmpty = disconnectingDeprecatedLock.newCondition();
@@ -74,7 +74,7 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         public StreamInfo(Integer streamId) {
             this.streamId = streamId;
         }
-        
+
         public HashSet<Server> getDisconnecting() {
             HashSet<Server> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
