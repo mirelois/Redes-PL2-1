@@ -10,14 +10,13 @@ import javax.swing.JFrame;
 import Protocols.Link;
 import Protocols.Packet;
 import Protocols.Sup;
+import Server.Server.ServerSender;
 import SharedStructures.Define;
 
 public class ServerConectionManager implements Runnable {
 
-    Map<String, Integer> videoNameToStreamId = new HashMap<>();
-    Map<Integer, Thread> streamSenderThreads = new HashMap<>();
-
-    class ServerSender extends JFrame implements Runnable {
+    
+    /*class ServerSender extends JFrame implements Runnable {
 
         String VideoFileName; // video file to request to the server
         Integer streamId;
@@ -25,7 +24,7 @@ public class ServerConectionManager implements Runnable {
         int imagenb = 0; // image nb of the image currently transmitted
         int VIDEO_LENGTH = 500; // length of the video in frames
         VideoStream video; // Server.VideoStream object used to access video frames
-
+        
         public ServerSender(String VideoFileName, Integer streamId, InetAddress rpIPAddr) {
             this.VideoFileName = VideoFileName;
             this.streamId = streamId;
@@ -37,20 +36,20 @@ public class ServerConectionManager implements Runnable {
                 System.out.println("Servidor: erro no video: " + e.getMessage());
             }
         }
-
+        
         @Override
         public void run() {
             while (true) {
                 // update current imagenb
                 this.imagenb = (this.imagenb + 1) % VIDEO_LENGTH;
-
+                
                 try {
                     // get next frame to send from the video, as well as its size
                     int image_length = video.getnextframe(sBuf);
-
+                    
                     // Builds an RTPpacket object containing the frame
                     Sup rtp_packet = new Sup(this.streamId, imagenb * FRAME_PERIOD, imagenb, rpIPAddr, RTP_dest_port,
-                            image_length, sBuf);
+                    image_length, sBuf);
                     Sup sup = new Sup(
                         0, //dizer que é responsabilidade do RP
                         Packet.getCurrTime(),
@@ -73,7 +72,7 @@ public class ServerConectionManager implements Runnable {
                     // byte[] packet_bits = new byte[packet_length];
                     // byte[] packet_bits = rtp_packet.getPacket();
                     // rtp_packet.getpacket(packet_bits);
-
+                    
                     // send the packet as a DatagramPacket over the UDP socket
                     // senddp = new DatagramPacket(packet_bits, packet_length, rpIPAddr,
                     // RTP_dest_port);
@@ -91,29 +90,49 @@ public class ServerConectionManager implements Runnable {
                 }
             }
         }
+    }*/
+    
+    InetAddress rpIPAddr;
+    HashMap<Integer, Thread> serverSenderMap;
+    HashMap<Integer, String> videoNameToStreamId;
+    DatagramSocket streamSocket;
+
+    public ServerConectionManager(InetAddress rpIPAddr,
+                                  HashMap<Integer, Thread> serverSenderMap, 
+                                  HashMap<Integer, String> streamIdToVideoName,
+                                  DatagramSocket streamSocket) {
+        this.rpIPAddr = rpIPAddr;
+        this.videoNameToStreamId = streamIdToVideoName;
+        this.serverSenderMap = serverSenderMap;
+        this.streamSocket = streamSocket;
     }
 
     @Override
     public void run() {
-
+        
         try (DatagramSocket socket = new DatagramSocket(Define.serverConnectionManagerPort)) {
-
+            
             byte[] buf = new byte[Define.infoBuffer];
-
+            
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
+            
             socket.receive(packet);
 
             Link link = new Link(packet);
 
             if (link.isActivate()) {// NOTE: como é que o server sabe o id da stream?
-                if (!streamSenderThreads.containsKey(link.streamId)){
+                if (!serverSenderMap.containsKey(link.getStreamId())){
+                    String videoName;
+                    synchronized (videoNameToStreamId) {
+                        videoName = videoNameToStreamId.get(link.getStreamId());
+                    }
+                    serverSenderMap.put(link.getStreamId(), 
+                                            new Thread(new ServerSender(videoName, 
+                                                       link.getStreamId(), this.rpIPAddr, this.streamSocket)));
                     
-                    streamSenderThreads.put(link.getStreamId(), new Thread(new ServerSender(VideoFileName, streamId, rpIPAddr)));
-                    
-                    if (!streamSenderThreads.get(link.streamId).isAlive()){
+                    if (!serverSenderMap.get(link.getStreamId()).isAlive()){
 
-                        streamSenderThreads.get(link.getStreamId()).start();
+                        serverSenderMap.get(link.getStreamId()).start();
                         
                     }
                 }
@@ -129,9 +148,9 @@ public class ServerConectionManager implements Runnable {
 
             } else if (link.isDeactivate()) {
                 
-                if (streamSenderThreads.get(link.streamId).isAlive()){
+                if (serverSenderMap.get(link.getStreamId()).isAlive()){
 
-                    streamSenderThreads.get(link.getStreamId()).interrupt();
+                    serverSenderMap.get(link.getStreamId()).interrupt();
                     
                 }
 

@@ -2,9 +2,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +22,8 @@ import Node.Streaming;
 import RP.RP;
 import RP.RPServerAdder;
 import Server.Server;
+import Server.ServerConectionManager;
+import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
 import SharedStructures.ServerInfo;
 
@@ -106,19 +111,35 @@ public class fullDuplex {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         while(keepLooping){
             String inputStr = input.readLine();
-            if(inputStr.contains("client") && !isClientAlive) {
+            if (inputStr.contains("client") && !isClientAlive) {
+
                 String[] clientStrName = inputStr.split(" ", 2);
                 new Client(clientStrName[1]);
-            }else if(inputStr.contains("server") && !isServerAlive){
+
+            } else if (inputStr.contains("server") && !isServerAlive) {
+
                 String[] file = inputStr.split(" ", 2);
                 File folder = new File(file[2]);
                 File[] listOfFiles = folder.listFiles();
                 ArrayList<String> streams = new ArrayList<>();
+                HashMap<Integer, String> streamIdToFileName = new HashMap<>();
+                HashMap<Integer, Thread> serverSenderMap = new HashMap<>();
+
                 for (int i = 0; i < Objects.requireNonNull(listOfFiles).length; i++) {
                     System.out.println("File " + listOfFiles[i].getName());
                     streams.add(file[2]+"/"+listOfFiles[i].getName());
                 }
-                new Thread(new Server(InetAddress.getByName(args[0]), 6005, 9000, 5000, streams)).start();
+                try {
+                    DatagramSocket RTPsocket = new DatagramSocket(Define.serverPort); //init RTP socket
+                    new Thread(new Server(InetAddress.getByName(args[0]), streams, 
+                                          streamIdToFileName, serverSenderMap, RTPsocket)).start();
+    
+                    new Thread(new ServerConectionManager(InetAddress.getByName(args[0]), 
+                                                          serverSenderMap, streamIdToFileName, RTPsocket));
+                    
+                } catch (SocketException e) {
+                    System.out.println("Servidor: erro no socket: " + e.getMessage());
+                }
             }else if(inputStr.contains("kill"))
                 keepLooping = false;
         }

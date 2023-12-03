@@ -12,8 +12,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
-import com.sun.tools.javac.code.Attribute.Array;
-
 import Protocols.*;
 import SharedStructures.Define;
 
@@ -28,11 +26,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
     //----------------
     DatagramPacket senddp; //UDP packet containing the video frames (to send)A
     DatagramSocket RTPsocket; //socket to be used to send and receive UDP packet
-    int rpAdderPort;
-    int RTP_dest_port; //destination port for RTP packets
     InetAddress rpIPAddr; //RP IP address
-
-    static String VideoFileName; //video file to request to the server
 
     //Video constants:
     //------------------
@@ -43,37 +37,33 @@ public class Server extends JFrame implements ActionListener, Runnable {
     static int VIDEO_LENGTH = 500; //length of the video in frames
 
     Timer sTimer; //timer used to send the images at the video frame rate
-    byte[] sBuf; //buffer used to store the images to send to the client
+    //byte[] sBuf; //buffer used to store the images to send to the client
 
-    public Map<Integer, Thread> senders = new HashMap<>(); // streams para Threads a enviá-las
+    public HashMap<Integer, Thread> serverSenderMap; // streams para Threads a enviá-las
+
+    public HashMap<Integer, String> streamIdToFileName;
 
     public ArrayList<String> providedStreams;
     
     //--------------------------
     //Constructor
     //--------------------------
-    public Server(InetAddress rpIPAddr, int port, int rpAdderPort, int streamPort, ArrayList<String> providedStreams) {
+    public Server(InetAddress rpIPAddr, ArrayList<String> providedStreams, HashMap<Integer, String> streamIdToFileName,
+                  HashMap<Integer, Thread> serverSenderMap, DatagramSocket RTPsocket) {
 
         //init Frame
         super("Servidor");
         
         this.providedStreams = providedStreams;
-
+        this.streamIdToFileName = streamIdToFileName;
+        this.serverSenderMap = serverSenderMap;
+        
         // init para a parte do servidor
         sTimer = new Timer(FRAME_PERIOD, this); //init Timer para servidor
         sTimer.setInitialDelay(0);
         sTimer.setCoalesce(true);
-        sBuf = new byte[Define.streamBuffer]; //allocate memory for the sending buffer
-
-        try {
-            RTPsocket = new DatagramSocket(port); //init RTP socket
-            this.rpIPAddr = rpIPAddr;
-            this.rpAdderPort = rpAdderPort;
-            this.RTP_dest_port = streamPort;
-            //System.out.println("Servidor: socket " + ClientIPAddr);
-        } catch (SocketException e) {
-            System.out.println("Servidor: erro no socket: " + e.getMessage());
-        }
+        this.rpIPAddr = rpIPAddr;
+        this.RTPsocket = RTPsocket;
     }
 
     //------------------------------------
@@ -85,7 +75,8 @@ public class Server extends JFrame implements ActionListener, Runnable {
             for (String string : providedStreams) {
                 
                 System.out.println("Avisar RP da existência");
-                RTPsocket.send(new Shrimp(Packet.getCurrTime(), null, 0, Define.RPServerAdderPort, rpIPAddr, string.length(), string.getBytes()).toDatagramPacket());
+                RTPsocket.send(new Shrimp(Packet.getCurrTime(), null, 0, 
+                               Define.RPServerAdderPort, rpIPAddr, string.length(), string.getBytes()).toDatagramPacket());
                 
             }
             while(true){
@@ -93,13 +84,25 @@ public class Server extends JFrame implements ActionListener, Runnable {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 RTPsocket.receive(packet);
                 Shrimp shrimp = new Shrimp(packet);
+
                 System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() + 
                                     " de id " + shrimp.getStreamId());
-                if (senders.get(shrimp.getStreamId()) == null) {
-                    System.out.println("Criada Thread que envia a stream com ficheiro de nome: " + new String(shrimp.getPayload()));
-                    Thread serverSender = new Thread(new ServerSender(new String(shrimp.getPayload()), shrimp.getStreamId(), this.rpIPAddr));
-                    senders.put(shrimp.getStreamId(), serverSender);
+
+                if (serverSenderMap.get(shrimp.getStreamId()) == null) {
+
+                    //Put FileName and StreamId into map
+                    synchronized(streamIdToFileName) {
+                        streamIdToFileName.put(shrimp.getStreamId(), new String(shrimp.getPayload()));
+                    }
+
+                    //Create thread for the sending of the stream
+                    System.out.println("Criada Thread que envia a stream com ficheiro de nome: " + 
+                                       new String(shrimp.getPayload()));
+                    Thread serverSender = new Thread(new ServerSender(new String(shrimp.getPayload()), 
+                                                     shrimp.getStreamId(), this.rpIPAddr, RTPsocket));
+                    serverSenderMap.put(shrimp.getStreamId(), serverSender);
                     serverSender.start();
+
                 }
             }
         } catch (IOException e){
@@ -113,7 +116,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
     //------------------------
     //Handler for timer
     //------------------------
-    /*
     public void actionPerformed(ActionEvent e) {
 
         //if the current image nb is less than the length of the video
@@ -123,10 +125,10 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
             try {
                 //get next frame to send from the video, as well as its size
-                int image_length = video.getnextframe(sBuf);
+                //int image_length = video.getnextframe();
 
                 //Builds an RTPpacket object containing the frame
-                Sup rtp_packet = new Sup(0, Packet.getCurrTime(),imagenb*FRAME_PERIOD, imagenb, rpIPAddr, RTP_dest_port, image_length, sBuf);
+                //Sup rtp_packet = new Sup(0, Packet.getCurrTime(),imagenb*FRAME_PERIOD, imagenb, rpIPAddr, RTP_dest_port, image_length, sBuf);
                 //Sup rtp_packet = new RTPpacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD, sBuf, image_length);
 
                 //get to total length of the full rtp packet to send
@@ -134,7 +136,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
                 //retrieve the packet bitstream and store it in an array of bytes
                 //byte[] packet_bits = new byte[packet_length];
-                byte[] packet_bits = rtp_packet.getPacket();
+                //byte[] packet_bits = rtp_packet.getPacket();
                 //rtp_packet.getpacket(packet_bits);
 
                 //send the packet as a DatagramPacket over the UDP socket
@@ -160,9 +162,9 @@ public class Server extends JFrame implements ActionListener, Runnable {
             sTimer.stop();
         }
     }
-    */
+    
 
-    class ServerSender extends JFrame implements Runnable {
+    public static class ServerSender extends JFrame implements Runnable {
 
         String VideoFileName; //video file to request to the server
         Integer streamId;
@@ -170,11 +172,15 @@ public class Server extends JFrame implements ActionListener, Runnable {
         int imagenb = 0; //image nb of the image currently transmitted
         int VIDEO_LENGTH = 500; //length of the video in frames
         VideoStream video; //Server.VideoStream object used to access video frames
+        DatagramSocket socket;
+        byte[] sBuf;
 
-        public ServerSender(String VideoFileName, Integer streamId, InetAddress rpIPAddr) {
+        public ServerSender(String VideoFileName, Integer streamId, InetAddress rpIPAddr, DatagramSocket socket) {
+            sBuf = new byte[Define.streamBuffer]; //allocate memory for the sending buffer
             this.VideoFileName = VideoFileName;
             this.streamId = streamId;
             this.rpIPAddr = rpIPAddr;
+            this.socket = socket;
             try {
                 System.out.println("Tentar abrir o ficheiro: " + VideoFileName);
                 video = new VideoStream(VideoFileName); //init the Server.VideoStream object:
@@ -194,7 +200,8 @@ public class Server extends JFrame implements ActionListener, Runnable {
                     int image_length = video.getnextframe(sBuf);
 
                     //Builds an RTPpacket object containing the frame
-                    Sup rtp_packet = new Sup(this.streamId,imagenb*FRAME_PERIOD, imagenb, rpIPAddr, RTP_dest_port, image_length, sBuf);
+                    Sup rtp_packet = new Sup(0, Packet.getCurrTime(), this.streamId,imagenb*FRAME_PERIOD,imagenb, 
+                                             streamId, rpIPAddr, Define.RPConectionManagerPort, image_length, sBuf);
                     //Sup rtp_packet = new RTPpacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD, sBuf, image_length);
 
                     //get to total length of the full rtp packet to send
@@ -207,7 +214,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
                     //send the packet as a DatagramPacket over the UDP socket
                     //senddp = new DatagramPacket(packet_bits, packet_length, rpIPAddr, RTP_dest_port);
-                    RTPsocket.send(rtp_packet.toDatagramPacket());
+                    socket.send(rtp_packet.toDatagramPacket());
 
                     System.out.println("Send frame #"+imagenb);
                     //print the header bitstream
