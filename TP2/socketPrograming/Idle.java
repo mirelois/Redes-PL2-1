@@ -57,7 +57,7 @@ public class Idle implements Runnable{
                 }
             );
             //Correr o timeout
-            timeout.run();
+            timeout.start();
 
             while (true){
                 byte[] buf = new byte[Define.infoBuffer];
