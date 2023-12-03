@@ -1,3 +1,4 @@
+package BootStrapper;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -11,6 +12,10 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import Protocols.Bop;
+import Protocols.PacketSizeException;
+import SharedStructures.Define;
 
 public class BootStrapper implements Runnable {
 

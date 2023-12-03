@@ -1,3 +1,4 @@
+package Node;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -5,6 +6,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
+
+import Protocols.PacketSizeException;
+import Protocols.Simp;
+import Protocols.Sup;
+import SharedStructures.Define;
 
 public class Client implements Runnable{
 
@@ -28,7 +34,7 @@ public class Client implements Runnable{
     Timer cTimer; //timer used to receive data from the UDP socket
     byte[] cBuf; //buffer used to store data received from the server
 
-    public Client(stream stream) {
+    public Client(String streamName) {
 
         //build GUI
         //--------------------------
@@ -67,7 +73,7 @@ public class Client implements Runnable{
 
         //init para a parte do cliente
         //--------------------------
-        cTimer = new Timer(20, new clientTimerListener(stream));
+        cTimer = new Timer(20, new clientTimerListener(streamName));
         cTimer.setInitialDelay(0);
         cTimer.setCoalesce(true);
         cBuf = new byte[Define.streamBuffer]; //allocate enough memory for the buffer used to receive data from the server
@@ -124,10 +130,10 @@ public class Client implements Runnable{
 
     class clientTimerListener implements ActionListener {
 
-        stream stream;
+        String streamName;
 
-        clientTimerListener(stream stream){
-            this.stream = stream;
+        public clientTimerListener(String streamName) {
+            this.streamName = streamName;
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -138,7 +144,8 @@ public class Client implements Runnable{
 
                 // TODO falta só configurar isto aqui, mandar o simp para o meu nodo aka o streaming de mim mesmo
                 System.out.println("Enviado pacote de pedido ao Nodo correspondente");
-                RTPsocket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), Define.simpPort, stream.file.length(), stream.file.getBytes()).toDatagramPacket());
+                RTPsocket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), 
+                                        Define.simpPort, this.streamName.length(), this.streamName.getBytes()).toDatagramPacket());
                 while(true) {
                     RTPsocket.receive(rcvdp);
                     System.out.println("Recebeu Stream");

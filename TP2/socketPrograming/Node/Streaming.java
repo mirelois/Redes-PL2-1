@@ -1,17 +1,22 @@
+package Node;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Set;
 
+import Protocols.Packet;
+import Protocols.PacketSizeException;
+import Protocols.Sup;
+import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
+import SharedStructures.NeighbourInfo.Node;
+
 public class Streaming implements Runnable{
     private final NeighbourInfo neighbourInfo;
 
-    private final stream stream;
-
-    public Streaming(NeighbourInfo neighbourInfo, stream stream){
+    public Streaming(NeighbourInfo neighbourInfo){
         this.neighbourInfo = neighbourInfo;
-        this.stream = stream;
     }
 
     @Override
@@ -25,11 +30,9 @@ public class Streaming implements Runnable{
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet);
-                
-                //int latency = stream.getTime_stamp() - Packet.getCurrTime();
-                
+                                
                 neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
-                
+
                 Integer streamId = sup.getStreamId();
                 Set<InetAddress> streamActiveLinks;
                 
@@ -38,7 +41,7 @@ public class Streaming implements Runnable{
                 }
 
                 synchronized (streamActiveLinks) {
-                    //Como fazer os frame Numbers (o que são?)
+                    //TODO Como fazer os frame Numbers (o que são?)
                     for (InetAddress activeLink : streamActiveLinks) {
                         if (!activeLink.equals(sup.getAddress())) {
                             if (activeLink.equals(InetAddress.getByName("localhost"))) {
