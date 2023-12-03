@@ -1,6 +1,8 @@
 package SharedStructures;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class NeighbourInfo {
@@ -40,12 +42,15 @@ public class NeighbourInfo {
     }
 
     public static class StreamInfo {
-        
-        public ReentrantLock conLock = new ReentrantLock();
-        public NeighbourInfo.Node connecting;
 
+        public ReentrantLock connectedLock = new ReentrantLock();
         public NeighbourInfo.Node connected;
+        public ReentrantLock connectingLock = new ReentrantLock();
+        public Condition connectingEmpty = connectingLock.newCondition();
+		public NeighbourInfo.Node connecting;
 
+        public Lock disconnectingDeprecatedLock = new ReentrantLock();
+        public Condition disconnectingDeprecatedEmpty = disconnectingDeprecatedLock.newCondition();
         public HashSet<NeighbourInfo.Node> disconnecting = new HashSet<>();
         public HashSet<NeighbourInfo.Node> deprecated = new HashSet<>();
 

@@ -45,9 +45,9 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     try {
                         while (true) {
 
-                            streamInfo.conLock.lock();
+                            streamInfo.connectedLock.lock();
                             while (streamInfo.connecting != null) {
-                                streamInfo.conLock.wait();
+                                streamInfo.connectedLock.wait();
                             }
                             connecting = streamInfo.getConnecting();// copy of the currentBestServer
                             
@@ -67,7 +67,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
                     } finally {
-                        streamInfo.conLock.unlock();
+                        streamInfo.connectedLock.unlock();
                     }
                 }
             });
@@ -140,7 +140,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
         }
 
         try {
-            streamInfo.conLock.lock();
+            streamInfo.connectedLock.lock();
             synchronized (streamInfo.disconnecting) {
                 if (streamInfo.connected != null) {
                     streamInfo.disconnecting.add(streamInfo.connected); //add unactivated packet to the remove list                    
@@ -155,11 +155,11 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 streamInfo.connecting = streamInfo.minServer.peek(); // this operation has complexity O(1)
             }
     
-            streamInfo.conLock.notify();
+            streamInfo.connectedLock.notify();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            streamInfo.conLock.unlock();
+            streamInfo.connectedLock.unlock();
         }
 
     }
