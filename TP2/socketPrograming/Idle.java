@@ -23,7 +23,7 @@ public class Idle implements Runnable{
         this.serverInfo = serverInfo;
         this.isServer = isServer;
     }
-    
+
     @Override
     public void run() {
         try(DatagramSocket socket = new DatagramSocket(Define.idlePort)) {    
@@ -35,11 +35,10 @@ public class Idle implements Runnable{
                             Thread.sleep(Define.idleTimeout);
                             synchronized(neighbourInfo.clientAdjacent) {
                                 //Colecionar num conjunto todos os adjacentes em uso 
-                                Set<InetAddress> inUse = neighbourInfo.clientAdjacent.values().stream()
-                                .flatMap(Collection::stream).collect(Collectors.toSet());
+                                Set<InetAddress> inUse = neighbourInfo.clientAdjacent.keySet();
                                 //Enviar para os adjacentes que não estão em uso
                                 //TODO diminuir vida aos ajdacentes que foram enviados mensagens
-                                for (InetAddress address : this.neighbourInfo.neighbours) {
+                                for (InetAddress address : this.neighbourInfo.overlayNeighbours) {
                                     if (!inUse.contains(address))
                                         socket.send(new ITP(isServer, 
                                                             !isServer, 

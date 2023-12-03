@@ -39,10 +39,10 @@ public class RP implements Runnable {
 
                 synchronized (this.neighbourInfo) {
 
-                    streamId = this.neighbourInfo.fileNameToStreamId.get(streamName);
+                    streamId = this.neighbourInfo.fileNameMap.get(streamName);
 
                     if (streamId == null) {
-                        this.neighbourInfo.fileNameToStreamId.put(streamName, next_stream);
+                        this.neighbourInfo.fileNameMap.put(streamName, next_stream);
                         streamId = next_stream;
                         next_stream++;
                     }

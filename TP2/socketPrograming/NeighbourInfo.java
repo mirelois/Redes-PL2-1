@@ -65,19 +65,18 @@ public class NeighbourInfo {
             return new Node(this.connecting.address, this.connecting.latency);
         }
         
-
     }
 
     int isConnectedToRP = 255; // 255 significa que ainda não sabe, 0 no, 1 yes
 
-    public List<InetAddress> neighbours = new ArrayList<>(); // lista de vizinhos
+    public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
+    public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos
 
-    // Uma stream só existe se estiver neste mapa
-    public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // nomes de ficheiros para streams
+    public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // filenames to stream id
 
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
 
-    public PriorityQueue<Node> minNode = new PriorityQueue<>((a, b) -> a.latency - b.latency);
+    public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> a.latency - b.latency);
 
     public Map<Integer, Set<InetAddress>> streamActiveLinks = new HashMap<>(); // links para enviar a stream
 
@@ -87,10 +86,10 @@ public class NeighbourInfo {
 
     Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
                              
-    public void updateLatency(Node node){//this method has O(log n) time complexity
-        synchronized(this.minNode){
-            this.minNode.remove(node);
-            this.minNode.add(node);
+    public void updateLatency(Node node) { //this method has O(log n) time complexity
+        synchronized(this.minNodeQueue){
+            this.minNodeQueue.remove(node);
+            this.minNodeQueue.add(node);
         }
     }
 }

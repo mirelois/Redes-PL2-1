@@ -73,7 +73,7 @@ public class fullDuplex {
         // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e ver a stream porque também somos clientes
         // senão tinhamos de por o nome do cliente destino no packet, do be cringe sometimes
         System.out.println("Os meus Adjacentes:");
-        for (InetAddress neighbour : neighbours.neighbours) {
+        for (InetAddress neighbour : neighbours.overlayNeighbours) {
             System.out.println(neighbour.getHostName());
         }
         stream stream = new stream();

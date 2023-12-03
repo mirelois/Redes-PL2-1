@@ -137,11 +137,11 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         }
 
         synchronized (streamInfo.connecting) {
-            synchronized (neighbourInfo.minNode) {
+            synchronized (neighbourInfo.minNodeQueue) {
                 if (streamInfo.connecting != null) {
                     streamInfo.disconnecting.add(streamInfo.connecting); //add unactivated packet to the remove list
                 }
-                streamInfo.connecting = neighbourInfo.minNode.peek(); // this operation has complexity O(1)
+                streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
             }
 
             streamInfo.connecting.notify();

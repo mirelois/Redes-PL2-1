@@ -16,7 +16,7 @@ public class Streaming implements Runnable{
 
     @Override
     public void run(){
-        try(DatagramSocket socket = new DatagramSocket(Define.streamingPort)){
+        try(DatagramSocket socket = new DatagramSocket(Define.streamingPort)) {
 
             byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough? no
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -34,16 +34,19 @@ public class Streaming implements Runnable{
                 
                 synchronized (this.neighbourInfo) {
                     streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
-
-                for (InetAddress activeLink : streamActiveLinks) {
-                    if (activeLink.equals(InetAddress.getByName("localhost"))) {
-                        socket.send(new Sup(sup.getStreamId(), sup.getVideo_time_stamp(), sup.getSequence_number(),
-                            InetAddress.getByName("localhost"), 8389, sup.getPayloadSize(), sup.getPayload())
-                            .toDatagramPacket());
-                    } else {
-                        socket.send(new Sup(sup.getStreamId(), sup.getVideo_time_stamp(), sup.getSequence_number(),
-                            activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
-                            .toDatagramPacket());
+                }
+                synchronized (streamActiveLinks) {
+                    //Como fazer os frame Numbers (o que são?)
+                    for (InetAddress activeLink : streamActiveLinks) {
+                        if (activeLink.equals(InetAddress.getByName("localhost"))) {
+                            socket.send(new Sup(0, sup.getTime_stamp(), sup.getVideo_time_stamp(), 0, sup.getSequence_number(),
+                                 sup.getStreamId(), InetAddress.getByName("localhost"), 8389, sup.getPayloadSize(), sup.getPayload())
+                                .toDatagramPacket());
+                        } else if (!activeLink.equals(sup.getAddress())) {
+                            socket.send(new Sup(0, sup.getStreamId(), sup.getVideo_time_stamp(), sup.getSequence_number(),
+                                activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
+                                .toDatagramPacket());
+                        }
                     }
                 }
             }
