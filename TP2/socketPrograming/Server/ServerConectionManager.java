@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 
-import VideoStream;
 import Protocols.Link;
 import Protocols.Packet;
 import Protocols.Sup;
@@ -25,7 +24,7 @@ public class ServerConectionManager implements Runnable {
         InetAddress rpIPAddr; // RP IP address
         int imagenb = 0; // image nb of the image currently transmitted
         int VIDEO_LENGTH = 500; // length of the video in frames
-        VideoStream video; // VideoStream object used to access video frames
+        VideoStream video; // Server.VideoStream object used to access video frames
 
         public ServerSender(String VideoFileName, Integer streamId, InetAddress rpIPAddr) {
             this.VideoFileName = VideoFileName;
@@ -33,7 +32,7 @@ public class ServerConectionManager implements Runnable {
             this.rpIPAddr = rpIPAddr;
             try {
                 System.out.println("Tentar abrir o ficheiro: " + VideoFileName);
-                video = new VideoStream(VideoFileName); // init the VideoStream object:
+                video = new VideoStream(VideoFileName); // init the Server.VideoStream object:
             } catch (Exception e) {
                 System.out.println("Servidor: erro no video: " + e.getMessage());
             }

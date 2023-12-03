@@ -7,13 +7,11 @@ package Server;
 
 import java.io.*;
 import java.net.*;
-import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
-import VideoStream;
 import Protocols.PacketSizeException;
 import Protocols.Shrimp;
 import Protocols.Simp;
@@ -40,7 +38,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
     //Video constants:
     //------------------
     int imagenb = 0; //image nb of the image currently transmitted
-    VideoStream video; //VideoStream object used to access video frames
+    VideoStream video; //Server.VideoStream object used to access video frames
     //static int MJPEG_TYPE = 26; //RTP payload type for MJPEG video
     static int FRAME_PERIOD = 100; //Frame period of the video to stream, in ms
     static int VIDEO_LENGTH = 500; //length of the video in frames
@@ -160,7 +158,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
         InetAddress rpIPAddr; //RP IP address
         int imagenb = 0; //image nb of the image currently transmitted
         int VIDEO_LENGTH = 500; //length of the video in frames
-        VideoStream video; //VideoStream object used to access video frames
+        VideoStream video; //Server.VideoStream object used to access video frames
 
         public ServerSender(String VideoFileName, Integer streamId, InetAddress rpIPAddr) {
             this.VideoFileName = VideoFileName;
@@ -168,7 +166,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
             this.rpIPAddr = rpIPAddr;
             try {
                 System.out.println("Tentar abrir o ficheiro: " + VideoFileName);
-                video = new VideoStream(VideoFileName); //init the VideoStream object:
+                video = new VideoStream(VideoFileName); //init the Server.VideoStream object:
             } catch (Exception e) {
                 System.out.println("Servidor: erro no video: " + e.getMessage());
             }
