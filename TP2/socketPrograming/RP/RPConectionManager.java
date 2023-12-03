@@ -48,7 +48,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             try {
                                 streamInfo.connectingLock.lock();
                                 while (streamInfo.connecting == null) {
-                                    streamInfo.connectingEmpty.wait();
+                                    streamInfo.connectingEmpty.await();
                                 }
                                 connecting = streamInfo.getConnecting();// copy of the currentBestServer
                             } finally {
