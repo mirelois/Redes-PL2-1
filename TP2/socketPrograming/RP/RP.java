@@ -37,7 +37,7 @@ public class RP implements Runnable {
 
                 Simp simp = new Simp(packet); // from client
 
-                socket.send(new Rip(0, simp.getAddress(), simp.getPort()).toDatagramPacket());
+                socket.send(new Rip(0, simp.getAddress(), Define.ripPort).toDatagramPacket());
 
                 System.out.println("Recebido SIMP de " + simp.getAddress().getHostAddress() +
                         " que pede Stream " + new String(simp.getPayload()));
