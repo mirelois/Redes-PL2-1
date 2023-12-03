@@ -41,6 +41,8 @@ public final class Define {
 
     static int RetransTimeout    = 1000; 
 
+    static int idleTimeout       = 1000;
+
     //-------buffersize-------
 
     static int streamBuffer = 15000;
