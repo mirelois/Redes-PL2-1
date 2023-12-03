@@ -13,6 +13,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
+import SharedStructures.Define;
+
 public class Servidor extends JFrame implements ActionListener {
 
     // GUI:

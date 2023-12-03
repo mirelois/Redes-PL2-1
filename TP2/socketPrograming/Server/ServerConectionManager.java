@@ -1,3 +1,4 @@
+package Server;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -5,6 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
+
+import VideoStream;
+import Protocols.Link;
+import Protocols.Packet;
+import Protocols.Sup;
+import SharedStructures.Define;
 
 public class ServerConectionManager implements Runnable {
 

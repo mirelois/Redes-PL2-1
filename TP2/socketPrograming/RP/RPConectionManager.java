@@ -1,9 +1,14 @@
+package RP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashSet;
+
+import Protocols.Link;
+import SharedStructures.Define;
+import SharedStructures.ServerInfo;
 
 public class RPConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
 

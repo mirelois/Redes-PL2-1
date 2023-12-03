@@ -83,9 +83,9 @@ public class NeighbourInfo {
 
     public Map<InetAddress, Set<InetAddress>> clientAdjacent = new HashMap<>(); // vizinhos que levam ao cliente
 
-    Set<InetAddress> rpRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
+    public Set<InetAddress> rpRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
 
-    Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
+    public Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
                              
     public void updateLatency(Node node) { //this method has O(log n) time complexity
         synchronized(this.minNodeQueue){

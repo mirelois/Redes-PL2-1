@@ -1,7 +1,15 @@
+package Node;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.HashSet;
+
+import Protocols.Link;
+import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
+import SharedStructures.NeighbourInfo.Node;
+import SharedStructures.NeighbourInfo.StreamInfo;
+
 import java.net.UnknownHostException;
 
 public class NodeConnectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai

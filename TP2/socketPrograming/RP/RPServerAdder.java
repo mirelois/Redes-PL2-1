@@ -1,6 +1,13 @@
+package RP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+
+import Protocols.Packet;
+import Protocols.PacketSizeException;
+import Protocols.Shrimp;
+import SharedStructures.Define;
+import SharedStructures.ServerInfo;
 
 public class RPServerAdder implements Runnable{
     

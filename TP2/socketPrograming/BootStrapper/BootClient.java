@@ -1,3 +1,4 @@
+package BootStrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,6 +7,11 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.*;
+
+import Protocols.Bop;
+import Protocols.PacketSizeException;
+import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
 
 public class BootClient implements Runnable{
 

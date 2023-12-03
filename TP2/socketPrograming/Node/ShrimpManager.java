@@ -1,3 +1,4 @@
+package Node;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -6,6 +7,12 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
+
+import Protocols.PacketSizeException;
+import Protocols.Rip;
+import Protocols.Shrimp;
+import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
 
 public class ShrimpManager implements Runnable{
 

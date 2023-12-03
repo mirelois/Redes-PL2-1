@@ -1,6 +1,15 @@
+package RP;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+
+import Protocols.Packet;
+import Protocols.Rip;
+import Protocols.Shrimp;
+import Protocols.Simp;
+import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
+import SharedStructures.ServerInfo;
 
 public class RP implements Runnable {
 
@@ -39,10 +48,10 @@ public class RP implements Runnable {
 
                 synchronized (this.neighbourInfo) {
 
-                    streamId = this.neighbourInfo.fileNameMap.get(streamName);
+                    streamId = this.neighbourInfo.fileNameToStreamId.get(streamName);
 
                     if (streamId == null) {
-                        this.neighbourInfo.fileNameMap.put(streamName, next_stream);
+                        this.neighbourInfo.fileNameToStreamId.put(streamName, next_stream);
                         streamId = next_stream;
                         next_stream++;
                     }

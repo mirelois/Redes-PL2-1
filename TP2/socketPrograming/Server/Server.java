@@ -1,3 +1,4 @@
+package Server;
 /* ------------------
    Servidor
    adaptado dos originais pela equipa docente de ESR (nenhumas garantias)
@@ -11,6 +12,13 @@ import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
+
+import VideoStream;
+import Protocols.PacketSizeException;
+import Protocols.Shrimp;
+import Protocols.Simp;
+import Protocols.Sup;
+import SharedStructures.Define;
 
 
 public class Server extends JFrame implements ActionListener, Runnable {

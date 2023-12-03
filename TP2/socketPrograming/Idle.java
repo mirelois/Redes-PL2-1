@@ -6,6 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import Protocols.ITP;
+import Protocols.Packet;
+import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
+import SharedStructures.ServerInfo;
+
 public class Idle implements Runnable{
     private final NeighbourInfo neighbourInfo;
 
@@ -57,7 +63,7 @@ public class Idle implements Runnable{
                 }
             );
             //Correr o timeout
-            timeout.start();
+            timeout.run();
 
             while (true){
                 byte[] buf = new byte[Define.infoBuffer];
