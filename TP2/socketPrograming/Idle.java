@@ -23,8 +23,8 @@ public class Idle implements Runnable{
         this.serverInfo = serverInfo;
         this.isServer = isServer;
     }
+    
     @Override
-
     public void run() {
         try(DatagramSocket socket = new DatagramSocket(Define.idlePort)) {    
             //Criar a thread que vai dar timeout e enviar os Idles para todos os adjacentes
