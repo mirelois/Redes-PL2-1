@@ -40,7 +40,7 @@ public class RP implements Runnable {
                 socket.send(new Rip(0, simp.getAddress(), simp.getPort()).toDatagramPacket());
 
                 System.out.println("Recebido SIMP de " + simp.getAddress().getHostAddress() +
-                        " Pede Stream " + new String(simp.getPayload()));
+                        " que pede Stream " + new String(simp.getPayload()));
 
                 Integer streamId;
                 InetAddress clientIP = simp.getSourceAddress();
