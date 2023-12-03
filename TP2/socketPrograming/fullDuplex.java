@@ -34,21 +34,16 @@ public class fullDuplex {
         }
 
         String filePath = null;
-        boolean isServer = false;
         boolean isRP = false;
         //cuidado, é preciso fazer -b*ESPAÇO*
-        Pattern pattern = Pattern.compile("(?:(-b|-s|-r) ?([^- \\n]*))");
+        Pattern pattern = Pattern.compile("(?:(-b|-r) ?([^- \\n]*))");
         Matcher matcher = pattern.matcher(arguments.toString());
         while(matcher.find()){
             String flag = matcher.group(1);
             if(flag.equals("-b"))
                 filePath = matcher.group(2);
-            else{
-                if(flag.equals("-s"))
-                    isServer = true;
-                else if(flag.equals("-r"))
-                    isRP = true;
-            }
+            else if(flag.equals("-r"))
+                isRP = true;
         }
 
         NeighbourInfo neighbours = new NeighbourInfo();
@@ -84,18 +79,15 @@ public class fullDuplex {
         for (InetAddress neighbour : neighbours.overlayNeighbours) {
             System.out.println(neighbour.getHostName());
         }
-        stream stream = new stream();
-        Thread streaming = new Thread(new Streaming(neighbours, stream));
+
+        Thread streaming = new Thread(new Streaming(neighbours));
         streaming.start();
 
-        if (isServer) {
-            System.out.println("Começo de Servidor!");
-            new Thread(new Server(InetAddress.getByName(args[0]), 6005, 9000, 5000)).start();
-        } else if (isRP){
+        if (isRP){
             System.out.println("Começo de RP!");
             ServerInfo serverInfo = new ServerInfo();
-            new Thread(new RP(7000, 7001, 6005, serverInfo, neighbours)).start();
-            new Thread(new RPServerAdder(9000, serverInfo)).start();
+            new Thread(new RP(serverInfo, neighbours)).start();
+            new Thread(new RPServerAdder(serverInfo)).start();
         }else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));
@@ -104,13 +96,17 @@ public class fullDuplex {
             shrimpManager.start();
         }
         boolean isClientAlive = false;
+        boolean isServerAlive = false;
         boolean keepLooping = true;
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         while(keepLooping){
             String inputStr = input.readLine();
-            if(inputStr.contains("client") && !isClientAlive)
-                new Client(stream);
-            else if(inputStr.contains("kill"))
+            if(inputStr.contains("client") && !isClientAlive) {
+                String[] clientStrName = inputStr.split(" ", 2);
+                new Client(clientStrName[1]);
+            }else if(inputStr.contains("server") && !isServerAlive){
+                new Thread(new Server(InetAddress.getByName(args[0]), 6005, 9000, 5000)).start();
+            }else if(inputStr.contains("kill"))
                 keepLooping = false;
         }
     }
