@@ -126,7 +126,7 @@ public class ServerConectionManager implements Runnable {
             if (link.isActivate()) {// NOTE: como é que o server sabe o id da stream?
                 if (!serverSenderMap.containsKey(link.getStreamId())){
                     String videoName;
-                    synchronized (videoNameToStreamId) {
+                    synchronized (this.videoNameToStreamId) {
                         videoName = videoNameToStreamId.get(link.getStreamId());
                     }
                     serverSenderMap.put(link.getStreamId(), 
