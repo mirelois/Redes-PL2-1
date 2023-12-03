@@ -44,12 +44,16 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                     try {
                         while (true) {
-
-                            streamInfo.connectedLock.lock();
-                            while (streamInfo.connecting != null) {
-                                streamInfo.connectedLock.wait();
+                            connecting = null;
+                            try {
+                                streamInfo.connectingLock.lock();
+                                while (streamInfo.connecting == null) {
+                                    streamInfo.connectingEmpty.wait();
+                                }
+                                connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                            } finally {
+                                streamInfo.connectingLock.unlock();
                             }
-                            connecting = streamInfo.getConnecting();// copy of the currentBestServer
                             
                             socket.send(new Link(
                                     false,
@@ -66,8 +70,6 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                         }
                     } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
-                    } finally {
-                        streamInfo.connectedLock.unlock();
                     }
                 }
             });
@@ -139,27 +141,28 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             streamInfo.disconnectorThread.start();
         }
 
+        streamInfo.connectingLock.lock();
         try {
-            streamInfo.connectedLock.lock();
-            /*synchronized (streamInfo.disconnecting) {
+            /*synchronized (streamInfo.disconnecting) { //not supposed to add connected to disconnecting here  
                 if (streamInfo.connected != null) {
-                    streamInfo.disconnecting.add(streamInfo.connected); //not supposed to add connected to disconnecting here                  
+                    streamInfo.disconnecting.add(streamInfo.connected);                 
                 }
             }*/
-            synchronized (streamInfo.deprecated) {
+            streamInfo.disconnectingDeprecatedLock.lock();
+            try {
                 if (streamInfo.connecting != null) {
                     streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
+                    streamInfo.disconnectingDeprecatedEmpty.signal();
                 }
+            } finally {
+                streamInfo.disconnectingDeprecatedLock.unlock();
             }
             synchronized (streamInfo.minServer) {
                 streamInfo.connecting = streamInfo.minServer.peek(); // this operation has complexity O(1)
             }
-    
-            streamInfo.connectedLock.notify();
-        } catch (Exception e) {
-            e.printStackTrace();
+            streamInfo.connectingEmpty.signal();
         } finally {
-            streamInfo.connectedLock.unlock();
+            streamInfo.connectingLock.unlock();
         }
 
     }
@@ -190,24 +193,33 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     //server.equals() só verifica o Address do Servidor
                     if (server.equals(streamInfo.connecting)) { //this checks if connection has been established
 
-                        streamInfo.disconnectingDeprecatedLock.lock();
+                        streamInfo.connectedLock.lock();
                         try {
-                            streamInfo.disconnecting.add(streamInfo.connected);
-                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                            streamInfo.connectingLock.lock();
+                            try {
+                                streamInfo.disconnectingDeprecatedLock.lock();
+                                try {
+                                    streamInfo.disconnecting.add(streamInfo.connected);
+                                    streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    streamInfo.connected = streamInfo.connecting;
+                                    streamInfo.connecting = null;
+                                } finally {
+                                    streamInfo.disconnectingDeprecatedLock.unlock();
+                                }
+                            } finally {
+                                streamInfo.connectingLock.unlock();
+                            }
                         } finally {
-                            streamInfo.disconnectingDeprecatedLock.unlock();
+                            streamInfo.connectedLock.unlock();
                         }
-
-                        streamInfo.connected = streamInfo.connecting;
-
-                        streamInfo.connecting = null;
 
                     } else if (streamInfo.deprecated.contains(server)) { //check if the server was deprecated
 
                         streamInfo.disconnectingDeprecatedLock.lock();
                         try {
+                            streamInfo.deprecated.remove(server);
                             streamInfo.disconnecting.add(server);
-                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                            streamInfo.disconnectingDeprecatedEmpty.signal();
                         } finally {
                             streamInfo.disconnectingDeprecatedLock.unlock();
                         }
@@ -215,8 +227,11 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     
                 } else if (link.isDeactivate()) { //this means a server acepted the disconnect request
                     
-                    synchronized(streamInfo.disconnecting){
+                    streamInfo.disconnectingDeprecatedLock.lock();
+                    try {
                         streamInfo.disconnecting.remove(server);
+                    } finally {
+                        streamInfo.disconnectingDeprecatedLock.unlock();
                     }
                                                                         
                 }

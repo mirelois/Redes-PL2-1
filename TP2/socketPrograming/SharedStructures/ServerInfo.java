@@ -53,9 +53,11 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         
         
         //locks for altering the connecting and connected variable
+        //The order of the locks is connected->connecting->disconnecting
         public ReentrantLock connectedLock = new ReentrantLock();
         public Server connected;
         public ReentrantLock connectingLock = new ReentrantLock();
+        public Condition connectingEmpty = connectedLock.newCondition();
 		public Server connecting;
 
         public Lock disconnectingDeprecatedLock = new ReentrantLock();

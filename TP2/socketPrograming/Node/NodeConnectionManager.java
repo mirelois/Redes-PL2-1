@@ -150,23 +150,26 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         if (!streamInfo.disconnectorThread.isAlive()) {
             streamInfo.disconnectorThread.start();
         }
+        streamInfo.connectingLock.lock();
         try {
-            streamInfo.connectingLock.lock();
             /*synchronized (streamInfo.disconnecting) {
                 if (streamInfo.connected != null) {
                     streamInfo.disconnecting.add(streamInfo.connected); //not supposed to add connected to disconnecting here
                 }
             }*/
-            synchronized (streamInfo.deprecated) {
+            streamInfo.disconnectingDeprecatedLock.lock();
+            try {
                 if (streamInfo.connecting != null) {
                     streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
+                    streamInfo.disconnectingDeprecatedEmpty.signal();
                 }
+            } finally {
+                streamInfo.disconnectingDeprecatedLock.unlock();
             }
             synchronized (neighbourInfo.minNodeQueue) {
                 streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
             }
-    
-            streamInfo.connectingEmpty.notify();
+            streamInfo.connectingEmpty.signal();
         } finally {
             streamInfo.connectingLock.unlock();
         }
@@ -221,11 +224,23 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                             //if no more active links remain, then the stream doesn't have any more clients in that direction
                             if (activeLinks.isEmpty()) {
+                                streamInfo.connectedLock.lock();
                                 try {
-                                    streamInfo.connectedLock.lock();
-                                    synchronized (streamInfo.disconnecting) {
-                                        streamInfo.disconnecting.add(streamInfo.connected);
-                                        streamInfo.connected = null;
+                                    streamInfo.connectingLock.lock();
+                                    try {
+                                        streamInfo.disconnectingDeprecatedLock.lock();
+                                        try {
+                                            streamInfo.disconnecting.add(streamInfo.connected);
+                                            if (streamInfo.connecting != null) {
+                                                streamInfo.deprecated.add(streamInfo.connecting);
+                                            }
+                                            streamInfo.connecting = null;
+                                            streamInfo.disconnectingDeprecatedEmpty.signal();
+                                        } finally {
+                                            streamInfo.disconnectingDeprecatedLock.unlock();
+                                        }
+                                    } finally {
+                                        streamInfo.connectingLock.unlock();
                                     }
                                 } finally {
                                     streamInfo.connectedLock.unlock();
@@ -249,27 +264,33 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                          
                     if (node.equals(streamInfo.connecting)) { //this checks if connection has been established
 
-                        streamInfo.disconnectingDeprecatedLock.lock();
+                        streamInfo.connectedLock.lock();
                         try {
-                            streamInfo.disconnecting.add(streamInfo.connecting);
-                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                            streamInfo.connectingLock.lock();
+                            try {
+                                streamInfo.disconnectingDeprecatedLock.lock();
+                                try {
+                                    streamInfo.disconnecting.add(streamInfo.connected);
+                                    streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    streamInfo.connected = streamInfo.connecting;
+                                    streamInfo.connecting = null;
+                                } finally {
+                                    streamInfo.disconnectingDeprecatedLock.unlock();
+                                }
+                            } finally {
+                                streamInfo.connectingLock.unlock();
+                            }
                         } finally {
-                            streamInfo.disconnectingDeprecatedLock.unlock();
-                        }
-
-                        try {
-                            streamInfo.connected = streamInfo.connecting;
-                            streamInfo.connecting = null;
-                        } finally {
-
+                            streamInfo.connectedLock.unlock();
                         }
 
                     } else if (streamInfo.deprecated.contains(node)) {
+                        
                         streamInfo.disconnectingDeprecatedLock.lock();
                         try {
                             streamInfo.deprecated.remove(node);
                             streamInfo.disconnecting.add(node);
-                            streamInfo.disconnectingDeprecatedEmpty.notify();
+                            streamInfo.disconnectingDeprecatedEmpty.signal();
                         } finally {
                             streamInfo.disconnectingDeprecatedLock.unlock();
                         }
@@ -277,8 +298,11 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     
                 } else if (link.isDeactivate()) { //this means a node acepted the disconnect request
                     
-                    synchronized(streamInfo.disconnecting){
+                    streamInfo.disconnectingDeprecatedLock.lock();
+                    try {
                         streamInfo.disconnecting.remove(node);
+                    } finally {
+                        streamInfo.disconnectingDeprecatedLock.unlock();
                     }
                                                                         
                 }

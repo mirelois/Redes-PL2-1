@@ -43,6 +43,7 @@ public class NeighbourInfo {
 
     public static class StreamInfo {
 
+        //The order of the locks is connected->connecting->disconnecting
         public ReentrantLock connectedLock = new ReentrantLock();
         public NeighbourInfo.Node connected;
         public ReentrantLock connectingLock = new ReentrantLock();
