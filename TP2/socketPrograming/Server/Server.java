@@ -101,8 +101,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
                     Thread serverSender = new Thread(new ServerSender(new String(shrimp.getPayload()), 
                                                      shrimp.getStreamId(), this.rpIPAddr, RTPsocket));
                     serverSenderMap.put(shrimp.getStreamId(), serverSender);
-                    serverSender.start();
-
                 }
             }
         } catch (IOException e){
