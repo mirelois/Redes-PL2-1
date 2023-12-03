@@ -40,7 +40,9 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         Integer streamId,
         DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
 
-        neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
+        if (streamInfo.connected != null) {
+            neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
+        }
                                                        // server
         if (streamInfo.connectorThread == null) {
             

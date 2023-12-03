@@ -104,6 +104,7 @@ public class fullDuplex {
             simpManager.start();
             Thread shrimpManager = new Thread(new ShrimpManager(neighbours));
             shrimpManager.start();
+            new Thread(new NodeConnectionManager(neighbours)).start();
         }
         boolean isClientAlive = false;
         boolean isServerAlive = false;
