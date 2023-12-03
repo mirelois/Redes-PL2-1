@@ -64,7 +64,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                     false,
                                     streamId,
                                     connecting.address,
-                                    Define.serverPort,
+                                    Define.serverConnectionManagerPort,
                                     0,
                                     null).toDatagramPacket());
 
@@ -109,7 +109,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                         true,
                                         streamId,
                                         server.address,
-                                        Define.serverPort,
+                                        Define.serverConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
@@ -122,7 +122,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                         false,
                                         streamId,
                                         server.address,
-                                        Define.serverPort,
+                                        Define.serverConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
