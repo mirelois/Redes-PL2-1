@@ -87,7 +87,7 @@ public class fullDuplex {
             System.out.println("Começo de RP!");
             ServerInfo serverInfo = new ServerInfo();
             new Thread(new RP(serverInfo, neighbours)).start();
-            new Thread(new RPServerAdder(serverInfo)).start();
+            new Thread(new RPServerAdder(serverInfo, neighbours)).start();
         }else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));

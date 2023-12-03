@@ -13,8 +13,14 @@ public class RPServerAdder implements Runnable{
     
     private final ServerInfo serverInfo;
 
-    public RPServerAdder(ServerInfo serverInfo){
+    private final NeighbourInfo neighbourInfo;
+
+    private int curr_streamID;
+
+    public RPServerAdder(ServerInfo serverInfo, NeighbourInfo neighbourInfo){
         this.serverInfo = serverInfo;
+        this.neighbourInfo = neighbourInfo;
+        this.curr_streamID = 1;
     }
 
     @Override
@@ -40,6 +46,21 @@ public class RPServerAdder implements Runnable{
                 }
                 
                 System.out.println("Adicionado servidor de endereço " + shrimp.getAddress().getHostAddress());
+                String streamName = new String(shrimp.getPayload());
+                Integer streamId;
+                synchronized (this.neighbourInfo) {
+
+                    streamId = this.neighbourInfo.fileNameToStreamId.get(streamName);
+
+                    if (streamId == null) {
+                        this.neighbourInfo.fileNameToStreamId.put(streamName, curr_streamID);
+                        streamId = curr_streamID;
+                        curr_streamID++;
+                    }
+
+                }
+
+                socket.send(new Shrimp(0, null, streamId, Define.serverPort, shrimp.getAddress(), shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
 
                 //TODO fazer check de perdas para nao dar barraco
 
