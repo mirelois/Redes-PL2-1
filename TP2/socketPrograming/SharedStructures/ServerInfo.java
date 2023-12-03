@@ -1,3 +1,4 @@
+package SharedStructures;
 import java.io.ObjectInputStream.GetField;
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -12,14 +13,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
     
-    static class StreamInfo {
+    public static class StreamInfo {
 
-        static class Server {
+        public static class Server {
             
-            final InetAddress address;
-            int latency;
+            public final InetAddress address;
+            public int latency;
             
-            Server(InetAddress address, int latency){
+            public Server(InetAddress address, int latency){
                 this.address =  address;
                 this.latency = latency;
             }

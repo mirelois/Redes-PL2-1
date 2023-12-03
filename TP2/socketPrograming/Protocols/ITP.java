@@ -1,17 +1,18 @@
+package Protocols;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
 public class ITP extends Packet { // Idle Tick Protocol
 
-    static int HEADER_SIZE = 3;
+    public static int HEADER_SIZE = 3;
 
-    boolean isNode;   // \
+    public boolean isNode;   // \
                       // |
-    boolean isServer; // |-> 1
+    public boolean isServer; // |-> 1
                       // | 
-    boolean isAck;   // /
+    public boolean isAck;   // /
 
-    int timeStamp;    // 2
+    public int timeStamp;    // 2
 
     public ITP(boolean isServer, boolean isNode, boolean isAck, int timeStamp, InetAddress address, int port, int payload_size, byte[] payload) {
 

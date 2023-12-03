@@ -1,12 +1,13 @@
+package SharedStructures;
 import java.net.InetAddress;
 import java.util.*;
 
 public class NeighbourInfo {
-    static class Node {
-        final InetAddress address;
-        int latency;
+    public static class Node {
+        public final InetAddress address;
+        public int latency;
 
-        Node(InetAddress address, int latency) {
+        public Node(InetAddress address, int latency) {
             this.address = address;
             this.latency = latency;
         }
@@ -37,7 +38,7 @@ public class NeighbourInfo {
         }
     }
 
-    static class StreamInfo {
+    public static class StreamInfo {
 
         public NeighbourInfo.Node connecting;
 
@@ -67,7 +68,7 @@ public class NeighbourInfo {
         
     }
 
-    int isConnectedToRP = 255; // 255 significa que ainda não sabe, 0 no, 1 yes
+    public int isConnectedToRP = 255; // 255 significa que ainda não sabe, 0 no, 1 yes
 
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
     public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos

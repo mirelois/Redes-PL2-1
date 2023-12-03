@@ -6,9 +6,17 @@ import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class stream{
-    String file = "movie.Mjpeg";
-}
+import BootStrapper.BootClient;
+import BootStrapper.BootStrapper;
+import Node.Client;
+import Node.ShrimpManager;
+import Node.SimpManager;
+import Node.Streaming;
+import RP.RP;
+import RP.RPServerAdder;
+import Server.Server;
+import SharedStructures.NeighbourInfo;
+import SharedStructures.ServerInfo;
 
 public class fullDuplex {
     public static void main(String[] args) throws IOException {

@@ -1,8 +1,17 @@
+package RP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Set;
+
+import stream;
+import Protocols.Packet;
+import Protocols.PacketSizeException;
+import Protocols.Sup;
+import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
+import SharedStructures.ServerInfo;
 
 public class RPStreaming implements Runnable{
     
@@ -31,7 +40,7 @@ public class RPStreaming implements Runnable{
                 Sup sup = new Sup(packet); //this came from a server
                 
                 //calculatet and update server latencies
-                int latency = Packet.getLatency(sup.time_stamp);
+                int latency = Packet.getLatency(sup.getTime_stamp());
 
                 synchronized(serverInfo){
                     serverInfo.latencyMap.put(sup.getAddress(), latency);
