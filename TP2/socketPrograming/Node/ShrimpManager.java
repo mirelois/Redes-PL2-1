@@ -39,7 +39,7 @@ public class ShrimpManager implements Runnable{
                                     " vindo de " + shrimp.getAddress().getHostAddress() +
                                     " com streamId " + shrimp.getStreamId());
 
-                socket.send(new Rip(0, packet.getAddress(), packet.getPort()).toDatagramPacket());
+                socket.send(new Rip(0, packet.getAddress(), Define.ripPort).toDatagramPacket());
 
                 synchronized(this.neighbourInfo) {
                     //Remover pedido feito por Simp
