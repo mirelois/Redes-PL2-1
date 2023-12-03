@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import BootStrapper.BootClient;
 import BootStrapper.BootStrapper;
 import Node.Client;
+import Node.NodeConnectionManager;
 import Node.ShrimpManager;
 import Node.SimpManager;
 import Node.Streaming;
@@ -91,6 +92,7 @@ public class fullDuplex {
             ServerInfo serverInfo = new ServerInfo();
             new Thread(new RP(serverInfo, neighbours)).start();
             new Thread(new RPServerAdder(serverInfo, neighbours)).start();
+            new Thread(new NodeConnectionManager(neighbours)).start();
         }else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));

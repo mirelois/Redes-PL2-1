@@ -141,11 +141,11 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
         try {
             streamInfo.connectedLock.lock();
-            synchronized (streamInfo.disconnecting) {
+            /*synchronized (streamInfo.disconnecting) {
                 if (streamInfo.connected != null) {
-                    streamInfo.disconnecting.add(streamInfo.connected); //add unactivated packet to the remove list                    
+                    streamInfo.disconnecting.add(streamInfo.connected); //not supposed to add connected to disconnecting here                  
                 }
-            }
+            }*/
             synchronized (streamInfo.deprecated) {
                 if (streamInfo.connecting != null) {
                     streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list

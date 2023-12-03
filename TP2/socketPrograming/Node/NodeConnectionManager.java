@@ -59,8 +59,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 while (streamInfo.connecting == null) {
                                     streamInfo.connectingEmpty.wait();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
                             } finally {
                                 connecting = streamInfo.getConnecting();// copy of the currentBestServer
                                 streamInfo.connectingLock.unlock();
@@ -154,12 +152,11 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         }
         try {
             streamInfo.connectingLock.lock();
-            synchronized (streamInfo.disconnecting) {
+            /*synchronized (streamInfo.disconnecting) {
                 if (streamInfo.connected != null) {
-                    streamInfo.disconnecting.add(streamInfo.connected); //add unactivated packet to the remove list
-                    streamInfo.connected = null;
+                    streamInfo.disconnecting.add(streamInfo.connected); //not supposed to add connected to disconnecting here
                 }
-            }
+            }*/
             synchronized (streamInfo.deprecated) {
                 if (streamInfo.connecting != null) {
                     streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
@@ -170,8 +167,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
             }
     
             streamInfo.connectingEmpty.notify();
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             streamInfo.connectingLock.unlock();
         }
@@ -232,8 +227,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         streamInfo.disconnecting.add(streamInfo.connected);
                                         streamInfo.connected = null;
                                     }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
                                 } finally {
                                     streamInfo.connectedLock.unlock();
                                 }
@@ -261,21 +254,24 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             streamInfo.disconnecting.add(streamInfo.connecting);
                             streamInfo.disconnectingDeprecatedEmpty.notify();
                         } finally {
-                            // streamInfo.disconnectingDeprecatedLock.unlock();
+                            streamInfo.disconnectingDeprecatedLock.unlock();
                         }
 
-                        streamInfo.connected = streamInfo.connecting;
+                        try {
+                            streamInfo.connected = streamInfo.connecting;
+                            streamInfo.connecting = null;
+                        } finally {
 
-                        streamInfo.connecting = null;
+                        }
 
                     } else if (streamInfo.deprecated.contains(node)) {
-                        // streamInfo.disconnectingDeprecatedLock.lock();
+                        streamInfo.disconnectingDeprecatedLock.lock();
                         try {
                             streamInfo.deprecated.remove(node);
                             streamInfo.disconnecting.add(node);
-                            // streamInfo.disconnectingDeprecatedEmpty.notify();
+                            streamInfo.disconnectingDeprecatedEmpty.notify();
                         } finally {
-                            // streamInfo.disconnectingDeprecatedLock.unlock();
+                            streamInfo.disconnectingDeprecatedLock.unlock();
                         }
                     }
                     
