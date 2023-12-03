@@ -47,7 +47,7 @@ public class Packet {
         if(packet.getLength() < header_size) {
             throw new PacketSizeException("Packet size to smol" + "\nIt came from " + this.getAddress() + 
                                           "\nConsidered as " + this.getClass().getName() + 
-                                          ": Header size: " + this.getHeaderSize() + "\nPayload size: " + this.getPayloadSize() + 
+                                          ": Header size: " + header_size + 
                                           "\nPacket size: " + packet.getLength() + 
                                           "\nString: " + new String(packet.getData()));
         }
