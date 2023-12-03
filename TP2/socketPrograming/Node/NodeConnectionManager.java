@@ -34,12 +34,11 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     }
 
     //Called once at the start and everytime the Connected Node should change
-    public static void updateBestNode( //TODO: fix args
+    public static void updateBestNode( //TODO: fix args -> done?
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
         Integer streamId,
-        int bestServerLatency,
-        DatagramSocket socket) throws UnknownHostException { // TODO: currently this is never called stfu
+        DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
 
         neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
                                                        // server
@@ -166,6 +165,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
             } finally {
                 streamInfo.disconnectingDeprecatedLock.unlock();
             }
+
             synchronized (neighbourInfo.minNodeQueue) {
                 streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
             }
@@ -197,12 +197,25 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 //RP never receives acks as their logic exists in RP
                 if (!link.isAck()) {
+                    Set<InetAddress> activeLinks;
 
                     if (link.isActivate()) {
-                        synchronized(neighbourInfo.streamActiveLinks){
-                            neighbourInfo.streamActiveLinks.get(link.getStreamId()).add(link.getAddress());
-                        }
 
+                        boolean isActiveEmpty = false;
+                        //TODO better locking mechanism to not stall the entire streamActiveLinks structure
+                        synchronized(neighbourInfo.streamActiveLinks){
+
+                            //Get the Set of active links (activated by clients)
+                            activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
+                            isActiveEmpty = activeLinks.isEmpty();
+                            activeLinks.add(link.getAddress());
+                        }
+                        
+                        if (isActiveEmpty) {
+                            //TODO Probably errors here! Don't know how this works fully
+                            updateBestNode(neighbourInfo, streamInfo, streamId, socket);
+                        }
+                        
                         socket.send(new Link(
                                         true,
                                         true,
@@ -214,11 +227,12 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         null).toDatagramPacket());
 
                     } else if (link.isDeactivate()) {
-                        //Get the Set of active links (activated by clients)
-                        Set<InetAddress> activeLinks;
+
                         synchronized(neighbourInfo.streamActiveLinks){
 
+                            //Get the Set of active links (activated by clients)
                             activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
+
                             //remove from the active links the one asked to be deactivated
                             activeLinks.remove(link.getAddress());
 
@@ -230,11 +244,14 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                     try {
                                         streamInfo.disconnectingDeprecatedLock.lock();
                                         try {
-                                            streamInfo.disconnecting.add(streamInfo.connected);
+                                            if (streamInfo.connected != null) {
+                                                streamInfo.disconnecting.add(streamInfo.connected);
+                                            }
                                             if (streamInfo.connecting != null) {
                                                 streamInfo.deprecated.add(streamInfo.connecting);
                                             }
                                             streamInfo.connecting = null;
+                                            streamInfo.connected = null;
                                             streamInfo.disconnectingDeprecatedEmpty.signal();
                                         } finally {
                                             streamInfo.disconnectingDeprecatedLock.unlock();
