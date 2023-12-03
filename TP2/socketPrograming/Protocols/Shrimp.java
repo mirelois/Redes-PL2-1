@@ -21,7 +21,8 @@ public class Shrimp extends Packet{ //Stream Hard Response Initiation Management
         this.streamId = streamId;
 
         this.sourceAddress = sourceAddress;
-        
+
+        System.out.println("what the hell is this? -> " + sourceAddress);
         String[] ip_values = sourceAddress.getHostAddress().split("\\.", 4);
 
         this.header[0] = (byte) (this.streamId /* & 0xFF */);
