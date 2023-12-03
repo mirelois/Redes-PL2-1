@@ -4,11 +4,11 @@ public final class Define {
     //Cada Port recebe apenas um tipo de Protocolo
     //Um tipo de Protocolo pode ser recebido por mais de um Port
 
-    public static int ripPort                       = 100;
+    public static int ripPort                       = 4500;
 
-    public static int bootStraperPort               = 1000;
+    public static int bootStraperPort               = 2100;
 
-    public static int bootClientPort                = 1001;
+    public static int bootClientPort                = 2200;
 
     public static int simpPort                      = 2000;
 
