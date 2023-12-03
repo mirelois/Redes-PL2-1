@@ -109,7 +109,7 @@ public class ServerConectionManager implements Runnable {
 
     @Override
     public void run() {
-        
+        System.out.println("ServerConectionManager is alive!");
         try (DatagramSocket socket = new DatagramSocket(Define.serverConnectionManagerPort)) {
             
             byte[] buf = new byte[Define.infoBuffer];
