@@ -46,10 +46,10 @@ public class RipSender implements Runnable {
                     case -2:
                         //Shrimp
                         //TODO Como tirar o streamId (do payload?)
-                        Integer streamId = rip.getPayload();
+                        //Integer streamId = rip.getPayload();
                         try {
-                            retransInfo.lsimp.lock();
-                            retransInfo.shrimpPackets.remove(new Tuple<InetAddress, Integer>(address, streamId));
+                            //retransInfo.lsimp.lock();
+                            //retransInfo.shrimpPackets.remove(new Tuple<InetAddress, Integer>(address, streamId));
                         } finally {
                             retransInfo.lsimp.unlock();
                         }
@@ -59,7 +59,7 @@ public class RipSender implements Runnable {
                         Boolean bool1, bool2;
                         try {
                             retransInfo.lsimp.lock();
-                            retransInfo.linkPackets.remove(new Triple<InetAddress, Boolean, Boolean>(address, bool1, bool2));
+                            //retransInfo.linkPackets.remove(new Triple<InetAddress, Boolean, Boolean>(address, bool1, bool2));
                         } finally {
                             retransInfo.lsimp.unlock();
                         }
