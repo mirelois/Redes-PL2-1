@@ -20,7 +20,6 @@ public class RPServerAdder implements Runnable{
     public RPServerAdder(ServerInfo serverInfo, NeighbourInfo neighbourInfo){
         this.serverInfo = serverInfo;
         this.neighbourInfo = neighbourInfo;
-        this.curr_streamID = 1;
     }
 
     @Override

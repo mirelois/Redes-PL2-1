@@ -13,7 +13,7 @@ import SharedStructures.ServerInfo;
 
 public class RP implements Runnable {
 
-    int port, serverPort, next_stream = 1;
+    int port, serverPort;
 
     ServerInfo serverInfo;
 
@@ -47,15 +47,7 @@ public class RP implements Runnable {
                 String streamName = new String(simp.getPayload());
 
                 synchronized (this.neighbourInfo) {
-
-                    streamId = this.neighbourInfo.fileNameToStreamId.get(streamName);
-
-                    if (streamId == null) {
-                        this.neighbourInfo.fileNameToStreamId.put(streamName, next_stream);
-                        streamId = next_stream;
-                        next_stream++;
-                    }
-
+                    streamId = this.neighbourInfo.fileNameToStreamId.get(streamName); // senão existir cliente -> dumb
                 }
 
                 if (!serverInfo.streamInfoMap.containsKey(streamId)) {
