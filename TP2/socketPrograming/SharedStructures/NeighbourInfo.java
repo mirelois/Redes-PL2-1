@@ -1,6 +1,7 @@
 package SharedStructures;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class NeighbourInfo {
     public static class Node {
@@ -39,7 +40,8 @@ public class NeighbourInfo {
     }
 
     public static class StreamInfo {
-
+        
+        public ReentrantLock conLock = new ReentrantLock();
         public NeighbourInfo.Node connecting;
 
         public NeighbourInfo.Node connected;

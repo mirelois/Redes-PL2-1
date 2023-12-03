@@ -63,8 +63,8 @@ public class SimpManager implements Runnable{
                 if (streamId == null) {
                     //Stream nunca foi testada
 
-                    synchronized(neighbourInfo) {
-                        //if (this.neighbourInfo.streamAdjacent.values().isEmpty()) {
+                    synchronized(this.neighbourInfo) {
+                        if (this.neighbourInfo.isConnectedToRP == 1) {
                             //Enviar para todos os vizinhos se não conhecer caminhos para o RP
                             for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) 
                                 if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(simp.getSourceAddress())) {
@@ -73,14 +73,14 @@ public class SimpManager implements Runnable{
                                     //Adicionar pedido feito por Simp
                                     this.neighbourInfo.rpRequest.add(neighbour);
                                 }
-                        /*} else {
+                        } else {
                             //Enviar apenas para os caminhos conhecidos do RP
-                            for (Set<InetAddress> neighbourSet : this.neighbourInfo.streamAdjacent.values().) 
-                                for (InetAddress neighbour : neighbourSet) {
-                                    if (!neighbour.equals(simp.getAddress())) 
-                                       socket.send(new Simp(clientIP, simp.getAddress(), this.port, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());    
-                                }
-                        }*/
+                            for (InetAddress neighbour : this.neighbourInfo.rpAdjacent) {
+                                if (!neighbour.equals(simp.getAddress())) 
+                                    socket.send(new Simp(clientIP, simp.getAddress(), Define.simpPort, simp.getPayloadSize(), 
+                                                         simp.getPayload()).toDatagramPacket());
+                            }
+                        }
                     }
                     //255 significa que ainda não se sabe se a stream existe
                     this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 255);

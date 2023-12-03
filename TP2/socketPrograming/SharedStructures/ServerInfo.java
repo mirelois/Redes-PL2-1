@@ -55,8 +55,8 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         
         //locks for altering the connecting variable
         public ReentrantLock conLock = new ReentrantLock();
-
 		public Server connecting;
+        
         public HashSet<Server> disconnecting = new HashSet<>();
         public HashSet<Server> deprecated    = new HashSet<>();
 

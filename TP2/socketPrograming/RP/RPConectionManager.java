@@ -45,13 +45,12 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     try {
                         while (true) {
 
-                            synchronized (streamInfo.connecting) {
-                                while (streamInfo.connecting != null) {
-                                    streamInfo.connecting.wait();
-                                }
-                                connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                            streamInfo.conLock.lock();
+                            while (streamInfo.connecting != null) {
+                                streamInfo.conLock.wait();
                             }
-
+                            connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                            
                             socket.send(new Link(
                                     false,
                                     true,
@@ -67,6 +66,8 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                         }
                     } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
+                    } finally {
+                        streamInfo.conLock.unlock();
                     }
                 }
             });
@@ -131,22 +132,34 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             });
         }
 
-        if (streamInfo.connectorThread.isAlive()) {
+        if (!streamInfo.connectorThread.isAlive()) {
             streamInfo.connectorThread.start();
         }
-        if (streamInfo.disconnectorThread.isAlive()) {
+        if (!streamInfo.disconnectorThread.isAlive()) {
             streamInfo.disconnectorThread.start();
         }
 
-        synchronized (streamInfo.connecting) {
-            synchronized (streamInfo.minServer) {
-                if (streamInfo.connecting != null) {
-                    streamInfo.disconnecting.add(streamInfo.connecting); //add unactivated packet to the remove list
+        try {
+            streamInfo.conLock.lock();
+            synchronized (streamInfo.disconnecting) {
+                if (streamInfo.connected != null) {
+                    streamInfo.disconnecting.add(streamInfo.connected); //add unactivated packet to the remove list                    
                 }
+            }
+            synchronized (streamInfo.deprecated) {
+                if (streamInfo.connecting != null) {
+                    streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
+                }
+            }
+            synchronized (streamInfo.minServer) {
                 streamInfo.connecting = streamInfo.minServer.peek(); // this operation has complexity O(1)
             }
-
-            streamInfo.connecting.notify();
+    
+            streamInfo.conLock.notify();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            streamInfo.conLock.unlock();
         }
 
     }

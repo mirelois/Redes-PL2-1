@@ -2,7 +2,9 @@ package Node;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.HashSet;
+import java.util.Set;
 
 import Protocols.Link;
 import SharedStructures.Define;
@@ -31,7 +33,8 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     }
 
-    public static void updateBestServer( //TODO: fix args
+    //Called once at the start and everytime the Connected Node should change
+    public static void updateBestNode( //TODO: fix args
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
         Integer streamId,
@@ -64,7 +67,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                     false,
                                     streamId,
                                     connecting.address,
-                                    Define.serverPort,
+                                    Define.linkPort,
                                     0,
                                     null).toDatagramPacket());
 
@@ -109,7 +112,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         true,
                                         streamId,
                                         node.address,
-                                        Define.serverPort,
+                                        Define.linkPort,
                                         0,
                                         null).toDatagramPacket());
                             }
@@ -122,7 +125,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         false,
                                         streamId,
                                         node.address,
-                                        Define.serverPort,
+                                        Define.linkPort,
                                         0,
                                         null).toDatagramPacket());
                             }
@@ -137,22 +140,33 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
             });
         }
 
-        if (streamInfo.connectorThread.isAlive()) {
+        if (!streamInfo.connectorThread.isAlive()) {
             streamInfo.connectorThread.start();
         }
-        if (streamInfo.disconnectorThread.isAlive()) {
+        if (!streamInfo.disconnectorThread.isAlive()) {
             streamInfo.disconnectorThread.start();
         }
-
-        synchronized (streamInfo.connecting) {
-            synchronized (neighbourInfo.minNodeQueue) {
-                if (streamInfo.connecting != null) {
-                    streamInfo.disconnecting.add(streamInfo.connecting); //add unactivated packet to the remove list
+        try {
+            streamInfo.conLock.lock();
+            synchronized (streamInfo.disconnecting) {
+                if (streamInfo.connected != null) {
+                    streamInfo.disconnecting.add(streamInfo.connected); //add unactivated packet to the remove list                    
                 }
+            }
+            synchronized (streamInfo.deprecated) {
+                if (streamInfo.connecting != null) {
+                    streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
+                }
+            }
+            synchronized (neighbourInfo.minNodeQueue) {
                 streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
             }
-
-            streamInfo.connecting.notify();
+    
+            streamInfo.conLock.notify();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            streamInfo.conLock.unlock();
         }
 
     }
@@ -176,18 +190,45 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 NeighbourInfo.Node node = 
                     new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
 
+                //RP never receives acks as their logic exists in RP
                 if (!link.isAck()) {
 
                     if (link.isActivate()) {
-                        
                         synchronized(neighbourInfo.streamActiveLinks){
                             neighbourInfo.streamActiveLinks.get(link.getStreamId()).add(link.getAddress());
                         }
 
-                    } else if (link.isDeactivate()) {
+                        socket.send(new Link(
+                                        true,
+                                        true,
+                                        false,
+                                        link.getStreamId(),
+                                        link.getAddress(),
+                                        Define.linkPort,
+                                        0,
+                                        null).toDatagramPacket());
 
+                    } else if (link.isDeactivate()) {
+                        Set<InetAddress> activeLinks;
+                        synchronized(neighbourInfo.streamActiveLinks){
+                            activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
+                            activeLinks.remove(link.getAddress());
+                            if (activeLinks.isEmpty()) {
+
+                            }
+                        }
+
+                        socket.send(new Link(
+                                        true,
+                                        false,
+                                        true,
+                                        link.getStreamId(),
+                                        link.getAddress(),
+                                        Define.linkPort,
+                                        0,
+                                        null).toDatagramPacket());
                         //TODO lidar com pedidos de desconexão vindos de nodos dos clientes
-                    }
+                    }  
 
                 } else if (link.isActivate()) { //this is a connection confirmation acknolegment
                                          
@@ -216,7 +257,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         }
                     }
                     
-                } else if (link.isDeactivate()) { //this means a server acepted the disconnect request
+                } else if (link.isDeactivate()) { //this means a node acepted the disconnect request
                     
                     synchronized(streamInfo.disconnecting){
                         streamInfo.disconnecting.remove(node);

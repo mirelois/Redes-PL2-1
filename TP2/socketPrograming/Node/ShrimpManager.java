@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
 
+import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Rip;
 import Protocols.Shrimp;
@@ -56,7 +57,7 @@ public class ShrimpManager implements Runnable{
 
                 }
 
-                Set<InetAddress> clientAdjacent, streamActiveLinks, streamClients, rpAdjacent;
+                Set<InetAddress> clientAdjacent, rpAdjacent;
                 Integer streamId = shrimp.getStreamId();
                 synchronized(this.neighbourInfo) {
 
@@ -68,30 +69,14 @@ public class ShrimpManager implements Runnable{
                         this.neighbourInfo.isConnectedToRP = 1;
 
                         this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
-                        streamClients = this.neighbourInfo.streamClients.get(streamId);
-                        streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
                         rpAdjacent = this.neighbourInfo.rpAdjacent;
-                        
-                        //Criar novas estruturas
-                        if(streamActiveLinks == null) {
-                            streamActiveLinks = new HashSet<>();
-                            this.neighbourInfo.streamActiveLinks.put(streamId, streamActiveLinks);
-                        }
-                        if(streamClients == null){
-                            streamClients = new HashSet<>();
-                            this.neighbourInfo.streamClients.put(streamId, streamClients);
-                        }
 
-                        //TODO decidir qual dos links está ativo é dinâmico
-                        //Se o cliente é novo, colocar o primeiro link para CLiente como o primeiro link
-                        if (!streamClients.contains(clientIP)) 
-                            streamActiveLinks.add(clientAdjacent.iterator().next());
-                        
-                        //Adicionar Cliente à Stream (Porque existe!)
-                        streamClients.add(clientIP);
+                        this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
+                                                            Packet.getLatency(shrimp.getTimeStamp())));
 
                         //Adicionar Novo Caminho para a Stream (Porque existe!)
                         rpAdjacent.add(shrimp.getAddress());
+
                         //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
                         for (InetAddress linkToClient : clientAdjacent) {
                             if (!linkToClient.equals(InetAddress.getByName("localhost"))) {

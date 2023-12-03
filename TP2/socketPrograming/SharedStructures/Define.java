@@ -12,7 +12,9 @@ public final class Define {
 
     public static int simpPort                      = 2000;
 
-    public static int shrimpPort                    = 3000;
+    public static int shrimpPort                    = 2001;
+
+    public static int linkPort                      = 3000;
 
     public static int serverPort                    = 4000;
     
