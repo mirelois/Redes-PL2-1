@@ -12,6 +12,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
+import com.sun.tools.javac.code.Attribute.Array;
+
 import Protocols.*;
 import SharedStructures.Define;
 
@@ -44,12 +46,18 @@ public class Server extends JFrame implements ActionListener, Runnable {
     byte[] sBuf; //buffer used to store the images to send to the client
 
     public Map<Integer, Thread> senders = new HashMap<>(); // streams para Threads a enviá-las
+
+    public ArrayList<String> providedStreams;
+    
     //--------------------------
     //Constructor
     //--------------------------
-    public Server(InetAddress rpIPAddr, int port, int rpAdderPort, int streamPort) {
+    public Server(InetAddress rpIPAddr, int port, int rpAdderPort, int streamPort, ArrayList<String> providedStreams) {
+
         //init Frame
         super("Servidor");
+        
+        this.providedStreams = providedStreams;
 
         // init para a parte do servidor
         sTimer = new Timer(FRAME_PERIOD, this); //init Timer para servidor
@@ -74,8 +82,12 @@ public class Server extends JFrame implements ActionListener, Runnable {
     @Override
     public void run() {
         try {
-            System.out.println("Avisar RP da existência");
-            RTPsocket.send(new Simp(InetAddress.getByName("localhost"), rpIPAddr, this.rpAdderPort, 0, null).toDatagramPacket());
+            for (String string : providedStreams) {
+                
+                System.out.println("Avisar RP da existência");
+                RTPsocket.send(new Shrimp(Packet.getCurrTime(), null, 0, Define.RPServerAdderPort, rpIPAddr, string.length(), string.getBytes()).toDatagramPacket());
+                
+            }
             while(true){
                 byte[] buf = new byte[Define.infoBuffer];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
