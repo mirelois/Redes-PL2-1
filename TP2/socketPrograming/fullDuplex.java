@@ -136,7 +136,7 @@ public class fullDuplex {
                                           streamIdToFileName, serverSenderMap, RTPsocket)).start();
     
                     new Thread(new ServerConectionManager(InetAddress.getByName(args[0]), 
-                                                          serverSenderMap, streamIdToFileName, RTPsocket));
+                                                          serverSenderMap, streamIdToFileName, RTPsocket)).start();
                     
                 } catch (SocketException e) {
                     System.out.println("Servidor: erro no socket: " + e.getMessage());
