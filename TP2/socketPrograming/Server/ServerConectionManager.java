@@ -169,6 +169,7 @@ public class ServerConectionManager implements Runnable {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             // TODO: handle exception
         }
 
