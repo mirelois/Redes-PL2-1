@@ -113,6 +113,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
     //------------------------
     //Handler for timer
     //------------------------
+    /*
     public void actionPerformed(ActionEvent e) {
 
         //if the current image nb is less than the length of the video
@@ -159,6 +160,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
             sTimer.stop();
         }
     }
+    */
 
     class ServerSender extends JFrame implements Runnable {
 
