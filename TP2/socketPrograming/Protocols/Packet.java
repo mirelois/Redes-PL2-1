@@ -49,7 +49,7 @@ public class Packet {
                                           "\nConsidered as " + this.getClass().getName() + 
                                           ": Header size: " + header_size + 
                                           "\nPacket size: " + packet.getLength() + 
-                                          "\nString: " + new String(packet.getData()));
+                                          "\nPayload as String: " + new String(packet.getData()));
         }
 
         this.header_size = header_size;
