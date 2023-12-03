@@ -64,7 +64,7 @@ public class SimpManager implements Runnable{
                     //Stream nunca foi testada
 
                     synchronized(this.neighbourInfo) {
-                        if (this.neighbourInfo.isConnectedToRP == 1) {
+                        if (this.neighbourInfo.isConnectedToRP != 1) {
                             //Enviar para todos os vizinhos se não conhecer caminhos para o RP
                             for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) 
                                 if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(simp.getSourceAddress())) {
