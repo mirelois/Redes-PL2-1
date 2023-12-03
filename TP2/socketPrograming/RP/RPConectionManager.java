@@ -37,7 +37,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
         }
                                                                // server
         if (streamInfo.connectorThread == null) {
-            
+            System.out.println("Started connector thread.");
             streamInfo.connectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -78,7 +78,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
         }
 
         if (streamInfo.disconnectorThread == null) {
-            
+            System.out.println("Started disconnector thread.");
             streamInfo.disconnectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -184,7 +184,8 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 socket.receive(packet);
 
                 Link link = new Link(packet);
-
+                System.out.println("Recebido Link de " + link.getAddress() + " do tipo activate: " + link.isActivate());
+                
                 this.streamInfo = serverInfo.streamInfoMap.get(link.getStreamId());
 
                 ServerInfo.StreamInfo.Server server = 

@@ -120,6 +120,9 @@ public class ServerConectionManager implements Runnable {
 
             Link link = new Link(packet);
 
+            System.out.println("Recebido Link de " + link.getAddress() + " da stream " + link.getStreamId() + 
+                               " do tipo activate: " + link.isActivate());
+
             if (link.isActivate()) {// NOTE: como é que o server sabe o id da stream?
                 if (!serverSenderMap.containsKey(link.getStreamId())){
                     String videoName;
