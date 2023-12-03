@@ -145,7 +145,7 @@ public class ServerConectionManager implements Runnable {
                         false,
                         link.getStreamId(),
                         link.getAddress(),
-                        link.getPort(),
+                        Define.RPConectionManagerPort,
                         0,
                         null).toDatagramPacket());
 
@@ -163,7 +163,7 @@ public class ServerConectionManager implements Runnable {
                         true,
                         link.getStreamId(),
                         link.getAddress(),
-                        link.getPort(),
+                        Define.RPConectionManagerPort,
                         0,
                         null).toDatagramPacket());
             }
