@@ -1,8 +1,11 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,7 +108,15 @@ public class fullDuplex {
                 String[] clientStrName = inputStr.split(" ", 2);
                 new Client(clientStrName[1]);
             }else if(inputStr.contains("server") && !isServerAlive){
-                new Thread(new Server(InetAddress.getByName(args[0]), 6005, 9000, 5000)).start();
+                String[] file = inputStr.split(" ", 2);
+                File folder = new File(file[2]);
+                File[] listOfFiles = folder.listFiles();
+                ArrayList<String> streams = new ArrayList<>();
+                for (int i = 0; i < Objects.requireNonNull(listOfFiles).length; i++) {
+                    System.out.println("File " + listOfFiles[i].getName());
+                    streams.add(file[2]+"/"+listOfFiles[i].getName());
+                }
+                new Thread(new Server(InetAddress.getByName(args[0]), 6005, 9000, 5000, streams)).start();
             }else if(inputStr.contains("kill"))
                 keepLooping = false;
         }
