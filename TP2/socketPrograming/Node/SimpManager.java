@@ -53,7 +53,8 @@ public class SimpManager implements Runnable{
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.isConnectedToRP == 0) {
                         this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
-                        socket.send(new Shrimp(clientIP, 0, Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
+                        socket.send(new Shrimp(clientIP, 0, Define.shrimpPort, simp.getAddress(), 
+                                               streamName.length, streamName).toDatagramPacket());
                         continue;
                     }
                 }
