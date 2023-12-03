@@ -7,6 +7,7 @@ import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
 
+import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Shrimp;
 import Protocols.Simp;
@@ -53,7 +54,7 @@ public class SimpManager implements Runnable{
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.isConnectedToRP == 0) {
                         this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
-                        socket.send(new Shrimp(clientIP, 0, Define.shrimpPort, simp.getAddress(), 
+                        socket.send(new Shrimp(Packet.getCurrTime(), clientIP, 0, Define.shrimpPort, simp.getAddress(),
                                                streamName.length, streamName).toDatagramPacket());
                         continue;
                     }
@@ -87,7 +88,7 @@ public class SimpManager implements Runnable{
                 } else {
                     //Stream existe (porque existe conexão)
                     synchronized (this.neighbourInfo) {
-                        socket.send(new Shrimp(clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
+                        socket.send(new Shrimp((Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency)%60000, clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
                     }
                 }
             }

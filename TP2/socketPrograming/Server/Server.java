@@ -12,10 +12,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
-import Protocols.PacketSizeException;
-import Protocols.Shrimp;
-import Protocols.Simp;
-import Protocols.Sup;
+import Protocols.*;
 import SharedStructures.Define;
 
 
@@ -116,7 +113,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
                 int image_length = video.getnextframe(sBuf);
 
                 //Builds an RTPpacket object containing the frame
-                Sup rtp_packet = new Sup(0,imagenb*FRAME_PERIOD, imagenb, rpIPAddr, RTP_dest_port, image_length, sBuf);
+                Sup rtp_packet = new Sup(0, Packet.getCurrTime(),imagenb*FRAME_PERIOD, imagenb, rpIPAddr, RTP_dest_port, image_length, sBuf);
                 //Sup rtp_packet = new RTPpacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD, sBuf, image_length);
 
                 //get to total length of the full rtp packet to send
