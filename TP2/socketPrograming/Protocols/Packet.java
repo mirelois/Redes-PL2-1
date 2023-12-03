@@ -44,8 +44,8 @@ public class Packet {
         
         this.payload_size = packet.getLength() - header_size;
 
-        if(packet.getLength() < header_size){
-            throw new PacketSizeException("Packet size to smol");
+        if(packet.getLength() < header_size) {
+            throw new PacketSizeException("Packet size to smol de packet " + this.getClass().getName());
         }
 
         this.header_size = header_size;
