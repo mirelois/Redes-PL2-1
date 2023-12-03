@@ -49,8 +49,8 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
             }
         }
 
-        public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         
+        public PriorityQueue<Server> minServerQueue = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         
         //locks for altering the connecting and connected variable
         //The order of the locks is connected->connecting->disconnecting
@@ -59,18 +59,22 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         public ReentrantLock connectingLock = new ReentrantLock();
         public Condition connectingEmpty = connectingLock.newCondition();
 		public Server connecting;
-
+        
         public Lock disconnectingDeprecatedLock = new ReentrantLock();
         public Condition disconnectingDeprecatedEmpty = disconnectingDeprecatedLock.newCondition();
         public HashSet<Server> disconnecting = new HashSet<>();
         public HashSet<Server> deprecated    = new HashSet<>();
-
+        
         public Integer streamId;
-
+        
         public Thread connectorThread;
         
         public Thread disconnectorThread;
 
+        public StreamInfo(Integer streamId) {
+            this.streamId = streamId;
+        }
+        
         public HashSet<Server> getDisconnecting() {
             HashSet<Server> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
@@ -88,9 +92,9 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         }
 
         public void updateLatency(Server server){//this method has O(log n) time complexity
-            synchronized(this.minServer){
-                this.minServer.remove(server);
-                this.minServer.add(server);
+            synchronized(this.minServerQueue){
+                this.minServerQueue.remove(server);
+                this.minServerQueue.add(server);
             }
         }
     }

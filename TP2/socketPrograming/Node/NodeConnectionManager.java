@@ -64,7 +64,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 connecting = streamInfo.getConnecting();// copy of the currentBestServer
                                 streamInfo.connectingLock.unlock();
                             }
-
+                            System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
                             socket.send(new Link(
                                     false,
                                     true,
@@ -110,7 +110,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             }
 
                             for (NeighbourInfo.Node node : disconnecting) { // sends disconect link to
-                                                                                        // all servers in
+                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         false,
@@ -123,7 +123,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             }
 
                             for (NeighbourInfo.Node node : deprecated) {
-                                
+                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         true,
@@ -170,6 +170,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
             synchronized (neighbourInfo.minNodeQueue) {
                 streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
+                System.out.println("Alterado connecting para " + streamInfo.connecting);
             }
             streamInfo.connectingEmpty.signal();
         } finally {

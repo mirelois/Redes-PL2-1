@@ -36,34 +36,33 @@ public class RPServerAdder implements Runnable{
                 socket.receive(packet);
 
                 Shrimp shrimp = new Shrimp(packet); // servidor manda shrimps
-
+                System.out.println("Recebido Shrimp de conexão do servidor " + shrimp.getAddress());
                 int latency = Packet.getLatency(shrimp.getTimeStamp());
-
-                synchronized(this.serverInfo){
-                    for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
-                        streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(shrimp.getAddress(), latency));
-                    }
-                }
                 
-                System.out.println("Adicionado servidor de endereço " + shrimp.getAddress().getHostAddress());
+                System.out.println("    Adicionado servidor de endereço " + shrimp.getAddress().getHostAddress());
                 String streamName = new String(shrimp.getPayload());
                 Integer streamId;
                 synchronized (this.neighbourInfo) {
 
                     streamId = this.neighbourInfo.fileNameToStreamId.get(streamName);
-
-                    if (streamId == null) {
-                        this.neighbourInfo.fileNameToStreamId.put(streamName, curr_streamID);
-                        streamId = curr_streamID;
-                        curr_streamID++;
+                    ServerInfo.StreamInfo streamInfo;
+                    synchronized(serverInfo) {
+                        if (streamId == null) { //Stream ainda não existe no RP
+                            this.neighbourInfo.fileNameToStreamId.put(streamName, curr_streamID);
+                            streamId = curr_streamID;
+                            curr_streamID++;
+                            streamInfo = new ServerInfo.StreamInfo(streamId);
+                            this.serverInfo.streamInfoMap.put(streamId, streamInfo);
+                        } else { //Stream já existe no RP
+                            streamInfo = this.serverInfo.streamInfoMap.get(streamId);
+                        }
+                        streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(shrimp.getAddress(), latency));
                     }
-
                 }
 
                 socket.send(new Shrimp(0, InetAddress.getByName("localhost"), streamId, Define.serverPort, shrimp.getAddress(), shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
 
                 //TODO fazer check de perdas para nao dar barraco
-
 
             } catch (IOException | PacketSizeException e) {
                 //TODO: handle exception
