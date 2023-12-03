@@ -81,7 +81,7 @@ public class SimpManager implements Runnable{
                             System.out.println("    Enviar pedido para os vizinhos que vão para o RP");
                             for (InetAddress neighbour : this.neighbourInfo.rpAdjacent) {
                                 if (!neighbour.equals(simp.getAddress())) 
-                                    socket.send(new Simp(clientIP, simp.getAddress(), Define.simpPort, simp.getPayloadSize(), 
+                                    socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), 
                                                          simp.getPayload()).toDatagramPacket());
                             }
                         }
