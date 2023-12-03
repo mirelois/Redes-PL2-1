@@ -119,7 +119,7 @@ public class fullDuplex {
             } else if (inputStr.contains("server") && !isServerAlive) {
 
                 String[] file = inputStr.split(" ", 2);
-                File folder = new File(file[2]);
+                File folder = new File(file[1]);
                 File[] listOfFiles = folder.listFiles();
                 ArrayList<String> streams = new ArrayList<>();
                 HashMap<Integer, String> streamIdToFileName = new HashMap<>();
@@ -127,7 +127,7 @@ public class fullDuplex {
 
                 for (int i = 0; i < Objects.requireNonNull(listOfFiles).length; i++) {
                     System.out.println("File " + listOfFiles[i].getName());
-                    streams.add(file[2]+"/"+listOfFiles[i].getName());
+                    streams.add(file[1]+"/"+listOfFiles[i].getName());
                 }
                 try {
                     DatagramSocket RTPsocket = new DatagramSocket(Define.serverPort); //init RTP socket
