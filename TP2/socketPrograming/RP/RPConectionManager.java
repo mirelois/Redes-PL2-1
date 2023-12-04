@@ -25,7 +25,8 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
     }
 
-    public static void updateBestServer(final ServerInfo.StreamInfo streamInfo, final Integer streamId, int bestServerLatency, DatagramSocket socket)
+    public static void updateBestServer(final ServerInfo.StreamInfo streamInfo, final Integer streamId, 
+                                        int bestServerLatency, DatagramSocket socket)
             throws UnknownHostException { // TODO: currently this is never called stfu
 
         if (streamInfo.connected != null) {
