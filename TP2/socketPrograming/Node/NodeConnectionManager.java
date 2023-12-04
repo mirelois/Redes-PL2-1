@@ -190,7 +190,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 Link link = new Link(packet);
                 System.out.println("Recebido Link de " + link.getAddress() + " do tipo activate: " + link.isActivate());
 
-                this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
+                //TODO this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
                 NeighbourInfo.Node node = 
                     new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
