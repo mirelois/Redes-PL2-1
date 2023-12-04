@@ -25,7 +25,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
     }
 
-    public static void updateBestServer(ServerInfo.StreamInfo streamInfo, Integer streamIdToClone, 
+    public static void updateBestServer(final ServerInfo.StreamInfo streamInfo, final Integer streamId, 
                                         int bestServerLatency, DatagramSocket socket)
             throws UnknownHostException { // TODO: currently this is never called stfu
 
@@ -38,7 +38,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             streamInfo.connectorThread = new Thread(new Runnable() {
 
                 public void run() {
-                    int streamId = streamIdToClone;
+
                     ServerInfo.StreamInfo.Server connecting;
 
                     try {
@@ -80,7 +80,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             streamInfo.disconnectorThread = new Thread(new Runnable() {
 
                 public void run() {
-                    int streamId = streamIdToClone;
+
                     HashSet<ServerInfo.StreamInfo.Server> disconnecting;
                     HashSet<ServerInfo.StreamInfo.Server> deprecated;
 
@@ -99,7 +99,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             }
 
                             for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
-
+                                
                                 if (server != null) {
                                     System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
                                 }
