@@ -53,10 +53,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             try {
                                 streamInfo.connectingLock.lock();
                                 while (streamInfo.connecting == null) {
-                                    streamInfo.connectingEmpty.wait();
+                                    streamInfo.connectingEmpty.await();
                                 }
-                            } finally {
                                 connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                            } finally {
                                 streamInfo.connectingLock.unlock();
                             }
                             System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
