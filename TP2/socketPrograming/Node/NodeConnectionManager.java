@@ -218,7 +218,8 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         
                         if (isActiveEmpty) {
                             //TODO Probably errors here! Don't know how this works fully
-                            System.out.println("    Novo active link, update ao melhor nodo");
+                            System.out.println("    Novo active link, update ao melhor nodo, com streamInfo null? " + 
+                                               (this.streamInfo==null));
                             updateBestNode(this.neighbourInfo, this.streamInfo, link.getStreamId(), socket);
                         }
                         
