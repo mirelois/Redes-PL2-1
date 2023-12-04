@@ -25,7 +25,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     }
 
     //Called once at the start and everytime the Connected Node should change
-    public static void updateBestNode( //TODO: fix args -> done?
+    public static void updateBestNode( //TODO: fix args -> done? nao era isso lmao
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
         Integer streamId,
@@ -34,7 +34,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
-    
         
         if (streamInfo.connectorThread == null) {
             System.out.println("Started connector thread.");

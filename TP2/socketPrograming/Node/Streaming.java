@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -15,6 +16,13 @@ import SharedStructures.NeighbourInfo.Node;
 
 public class Streaming implements Runnable{
 
+    class lossInfo {
+        
+        Integer latestReceivedPacket;
+        Integer lossRate;
+        
+    }
+    HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
     
     private final NeighbourInfo neighbourInfo;
     NeighbourInfo.StreamInfo streamInfo;
@@ -34,16 +42,27 @@ public class Streaming implements Runnable{
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
             while (true){
+                
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet);
+
+                lossInfo lossInfo = this.lossInfo.get(sup.getStreamId());
+
+                if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
+                    continue;//Manda cu caralho
+                }
+
+                lossInfo.lossRate = 100*(sup.getFrameNumber() - lossInfo.latestReceivedPacket)/sup.getFrameNumber();
                                 
                 //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
                 this.streamInfo.connectedLock.lock();
                 try {
-                    if (streamInfo.connected != null)
+                    if (streamInfo.connected != null) {
                         this.streamInfo.connected.latency = currLatency;
+                        this.streamInfo.connected.lossRate = lossInfo.lossRate;
+                    }
                 } finally {
                     this.streamInfo.connectedLock.unlock();
                 }
