@@ -212,6 +212,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
                     //update GUI
                     //label.setText("Send frame #" + imagenb);
+                    Thread.sleep(FRAME_PERIOD);
                 }catch(Exception ex) {
                     System.out.println("Exception caught: "+ex);
                     System.exit(0);
