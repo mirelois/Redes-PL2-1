@@ -31,9 +31,11 @@ public class VideoStream {
 
         int readB;
         //read current frame length
-        readB = fis.read(frame_length,0,5);
-        if(readB==0)//loop
+        readB = fis.read(frame_length, 0, 5);
+        if (readB == 0){
             fis = new FileInputStream(filename);
+            readB = fis.read(frame_length,0,5);
+        }
 
         //transform frame_length to integer
         length_string = new String(frame_length);
