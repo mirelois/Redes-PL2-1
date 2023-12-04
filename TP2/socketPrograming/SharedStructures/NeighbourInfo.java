@@ -9,6 +9,7 @@ public class NeighbourInfo {
     public static class Node {
         public final InetAddress address;
         public int latency;
+        public int lossRate = -1;
 
         public Node(InetAddress address, int latency) {
             this.address = address;
@@ -85,7 +86,15 @@ public class NeighbourInfo {
 
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
 
-    public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> a.latency - b.latency);
+    public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> {
+        
+        if (a.lossRate == -1 || b.lossRate == -1){
+            return a.latency - b.latency;
+        }else{
+            return (0.45 * a.latency + 0.55 * a.lossRate*600) - (0.45 * b.latency + 0.55 * b.lossRate * 600);
+        }
+    
+    });
 
     public Map<Integer, Set<InetAddress>> streamActiveLinks = new HashMap<>(); // links para enviar a stream
 
