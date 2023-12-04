@@ -52,16 +52,16 @@ public class ShrimpManager implements Runnable{
                         clientIP.isLoopbackAddress() || 
                         NetworkInterface.getByInetAddress(clientIP) != null) {
                         //TODO Avisar o Cliente anexo ao nodo de que a Stream chegou (ou não)!
-                        System.out.println("    Shrimp veio para Cliente local");
+                        System.out.println("    Shrimp veio para Cliente local - Enviado Link para local");
                         socket.send(new Link(false, 
                                              true,
                                              false,
                                              shrimp.getStreamId(),
                                              InetAddress.getByName("localhost"),
-                                             Define.linkPort,
+                                             Define.nodeConnectionManagerPort,
                                              0,
                                              null).toDatagramPacket());     
-                        //continue;
+                        continue;
                     }
                 } catch (SocketException e) {
 
