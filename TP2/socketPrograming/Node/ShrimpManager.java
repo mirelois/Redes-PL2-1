@@ -76,6 +76,7 @@ public class ShrimpManager implements Runnable{
                     
                     //Existe Stream (conseguiu caminho até ao RP)
                     if (streamId != 0 && streamId != 255) {
+                        System.out.println("Adicionado novo caminho para o RP");
                         this.neighbourInfo.isConnectedToRP = 1;
 
                         this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
@@ -86,7 +87,6 @@ public class ShrimpManager implements Runnable{
 
                         //Adicionar Novo Caminho para a Stream (Porque existe!)
                         rpAdjacent.add(shrimp.getAddress());
-                        this.neighbourInfo.updateLatency(new NeighbourInfo.Node(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp())));
 
                         //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
                         for (InetAddress linkToClient : clientAdjacent) {
