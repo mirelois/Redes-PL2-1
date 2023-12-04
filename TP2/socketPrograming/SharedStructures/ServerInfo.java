@@ -57,7 +57,7 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         public ReentrantLock connectedLock = new ReentrantLock();
         public Server connected;
         public ReentrantLock connectingLock = new ReentrantLock();
-        public Condition connectingEmpty = connectedLock.newCondition();
+        public Condition connectingEmpty = connectingLock.newCondition();
 		public Server connecting;
 
         public Lock disconnectingDeprecatedLock = new ReentrantLock();
