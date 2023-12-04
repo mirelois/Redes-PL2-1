@@ -215,11 +215,13 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             //Get the Set of active links (activated by clients)
                             activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
                             isActiveEmpty = activeLinks.isEmpty();
+                            System.out.println("    Active Links vazios? " + isActiveEmpty);
                             activeLinks.add(link.getAddress());
                         }
                         
                         if (isActiveEmpty) {
                             //TODO Probably errors here! Don't know how this works fully
+                            System.out.println("    Novo active link, update ao melhor nodo");
                             updateBestNode(neighbourInfo, streamInfo, streamId, socket);
                         }
                         
