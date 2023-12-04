@@ -16,9 +16,9 @@ public class Streaming implements Runnable{
 
     class lossInfo {
         
-        int latestReceivedPacket;
+        int latestReceivedPacket = 0;
         int totalReceivedPacket = 0;
-        double lossRate;
+        double lossRate = -1;
         
     }
     HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
