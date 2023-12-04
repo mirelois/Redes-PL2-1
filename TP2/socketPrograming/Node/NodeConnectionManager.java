@@ -211,8 +211,8 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         boolean isActiveEmpty = false;
                         //TODO better locking mechanism to not stall the entire streamActiveLinks structure
                         System.out.println("Provavelmente entrou em Deadlock:");
-                        synchronized(neighbourInfo.streamActiveLinks){
-
+                        synchronized(neighbourInfo.streamActiveLinks) {
+                            System.out.println("Nope, não entrou em Deadlock:");
                             //Get the Set of active links (activated by clients)
                             activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
                             isActiveEmpty = activeLinks.isEmpty();
@@ -337,6 +337,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             // TODO: handle exception
         }
     }
