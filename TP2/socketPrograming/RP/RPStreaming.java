@@ -53,7 +53,8 @@ public class RPStreaming implements Runnable{
                 }
 
                 for (InetAddress activeLink : streamActiveLinks) {
-                    System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink);
+                    System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
+                                       " com seq#: " + sup.getSequence_number());
                     socket.send(new Sup(
                             -1,
                             Packet.getCurrTime(),
