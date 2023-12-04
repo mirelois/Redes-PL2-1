@@ -26,10 +26,9 @@ public class Streaming implements Runnable{
     private final NeighbourInfo neighbourInfo;
     NeighbourInfo.StreamInfo streamInfo;
 
-    public Streaming(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo){
+    public Streaming(NeighbourInfo neighbourInfo){
         
         this.neighbourInfo = neighbourInfo;
-        this.streamInfo = streamInfo;
         
     }
 

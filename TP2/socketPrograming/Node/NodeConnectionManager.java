@@ -18,10 +18,9 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     NeighbourInfo.StreamInfo streamInfo;
 
-    public NodeConnectionManager(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo) {
+    public NodeConnectionManager(NeighbourInfo neighbourInfo) {
 
         this.neighbourInfo = neighbourInfo;
-        this.streamInfo = streamInfo;
     }
 
     //Called once at the start and everytime the Connected Node should change
