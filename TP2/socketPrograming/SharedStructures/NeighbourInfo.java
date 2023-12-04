@@ -16,6 +16,12 @@ public class NeighbourInfo {
             this.latency = latency;
         }
 
+        public Node(InetAddress address, int latency, int lossRate) {
+            this.address = address;
+            this.latency = latency;
+            this.lossRate = lossRate;
+        }
+
         @Override
         public boolean equals(Object o) {
 
