@@ -49,55 +49,60 @@ public class Streaming implements Runnable{
                 }
             });
 
-            while (true){
-                // socket.receive(packet);
+            try {
+                while (true){
+                    // socket.receive(packet);
 
-                packet = packetQueue.poll();
+                    packet = packetQueue.take();
 
-                Sup sup = new Sup(packet);
-                                
-                //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
-                Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
-                this.streamInfo.connectedLock.lock();
-                try {
-                    this.streamInfo.connected.latency = currLatency;
-                } finally {
-                    this.streamInfo.connectedLock.unlock();
-                }
-                
-                synchronized(this.neighbourInfo.minNodeQueue) {
-                    bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
-                }
+                    Sup sup = new Sup(packet);
+                                    
+                    //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
+                    Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
+                    this.streamInfo.connectedLock.lock();
+                    try {
+                        this.streamInfo.connected.latency = currLatency;
+                    } finally {
+                        this.streamInfo.connectedLock.unlock();
+                    }
+                    
+                    synchronized(this.neighbourInfo.minNodeQueue) {
+                        bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
+                    }
 
-                if (bestLatency < 0.95 * currLatency) {
-                    NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
-                }
+                    if (bestLatency < 0.95 * currLatency) {
+                        NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
+                    }
 
-                Integer streamId = sup.getStreamId();
-                Set<InetAddress> streamActiveLinks;
-                
-                synchronized (this.neighbourInfo) {
-                    streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
-                }
+                    Integer streamId = sup.getStreamId();
+                    Set<InetAddress> streamActiveLinks;
+                    
+                    synchronized (this.neighbourInfo) {
+                        streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(streamId);
+                    }
 
-                synchronized (streamActiveLinks) {
-                    //TODO Como fazer os frame Numbers (o que são?)
-                    for (InetAddress activeLink : streamActiveLinks) {
-                        System.out.println("Enviando SUP da stream " + sup.getStreamId() + " para " + activeLink);
-                        if (!activeLink.equals(sup.getAddress())) {
-                            if (activeLink.equals(InetAddress.getByName("localhost"))) {
-                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
-                                     sup.getStreamId(), InetAddress.getByName("localhost"), Define.clientPort, sup.getPayloadSize(), sup.getPayload())
-                                    .toDatagramPacket());
-                            } else {
-                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
-                                     sup.getStreamId(), activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
-                                    .toDatagramPacket());
+                    synchronized (streamActiveLinks) {
+                        //TODO Como fazer os frame Numbers (o que são?)
+                        for (InetAddress activeLink : streamActiveLinks) {
+                            System.out.println("Enviando SUP da stream " + sup.getStreamId() + " para " + activeLink);
+                            if (!activeLink.equals(sup.getAddress())) {
+                                if (activeLink.equals(InetAddress.getByName("localhost"))) {
+                                    socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
+                                        sup.getStreamId(), InetAddress.getByName("localhost"), Define.clientPort, sup.getPayloadSize(), sup.getPayload())
+                                        .toDatagramPacket());
+                                } else {
+                                    socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
+                                        sup.getStreamId(), activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
+                                        .toDatagramPacket());
+                                }
                             }
                         }
                     }
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            
         } catch (IOException | PacketSizeException e) {
             throw new RuntimeException(e);
         }
