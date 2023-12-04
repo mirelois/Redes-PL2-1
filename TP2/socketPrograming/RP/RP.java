@@ -51,27 +51,39 @@ public class RP implements Runnable {
                 }
 
                 if (!serverInfo.streamInfoMap.containsKey(streamId)) {
-                    System.out.println("    Recebido pedido da Stream " + streamId + "que ainda não existe servidor para");
+                    System.out.println("    Recebido pedido da Stream " + streamId + "que ainda não existe servidor com o ficheiro");
                     //TODO não existe ainda a stream no RP
                     
                     // System.out.println("Pedido de stream enviado ao servidor " +
                     // chooseBestServer(serverInfo) +
                     // " com payload " + new String(simp.getPayload()));
-                }
-                ServerInfo.StreamInfo streamInfo = serverInfo.streamInfoMap.get(streamId);
-
-                socket.send(new Shrimp(
+                    socket.send(new Shrimp(
                         Packet.getCurrTime(),
                         simp.getSourceAddress(),
-                        streamId,
+                        0,
                         Define.shrimpPort,
                         simp.getAddress(),
                         simp.getPayloadSize(),
                         simp.getPayload()).toDatagramPacket());
 
-                System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
-                        " da stream com id " + streamId +
-                        " pedida por " + clientIP.getHostAddress());
+                        System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
+                            " da stream com id " + 0 +
+                            " pedida por " + clientIP.getHostAddress());
+                } else {
+                    socket.send(new Shrimp(
+                            Packet.getCurrTime(),
+                            simp.getSourceAddress(),
+                            streamId,
+                            Define.shrimpPort,
+                            simp.getAddress(),
+                            simp.getPayloadSize(),
+                            simp.getPayload()).toDatagramPacket());
+    
+                    System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
+                            " da stream com id " + streamId +
+                            " pedida por " + clientIP.getHostAddress());
+                }
+
             }
             } catch (Exception e) {
             // TODO: handle exception
