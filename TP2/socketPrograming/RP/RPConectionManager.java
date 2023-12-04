@@ -162,7 +162,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             }
             synchronized (streamInfo.minServerQueue) {
                 streamInfo.connecting = streamInfo.minServerQueue.peek(); // this operation has complexity O(1)
-                System.out.println("Alterado connecting para " + streamInfo.connecting);
+                System.out.println("Alterado connecting para " + streamInfo.connecting.address);
             }
             streamInfo.connectingEmpty.signal();
         } finally {

@@ -192,7 +192,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
                     //Builds an RTPpacket object containing the frame
                     Sup rtp_packet = new Sup(0, Packet.getCurrTime(), this.streamId,imagenb*FRAME_PERIOD,imagenb, 
-                                             streamId, rpIPAddr, Define.RPConectionManagerPort, image_length, sBuf);
+                                             streamId, rpIPAddr, Define.streamingPort, image_length, sBuf);
                     //Sup rtp_packet = new RTPpacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD, sBuf, image_length);
 
                     //get to total length of the full rtp packet to send
