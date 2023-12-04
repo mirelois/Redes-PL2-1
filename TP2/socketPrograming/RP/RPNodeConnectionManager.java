@@ -63,7 +63,12 @@ public class RPNodeConnectionManager implements Runnable { // TODO: ver concorre
                     }
                     
                     synchronized(streamInfo.clientAdjacent) {
-                        streamInfo.clientAdjacent.put(link.getAddress(), streamInfo.clientAdjacent.get(link.getAddress()) + 1);
+                        Integer n = streamInfo.clientAdjacent.get(link.getAddress());
+                        if (n == null) {
+                            streamInfo.clientAdjacent.put(link.getAddress(), 1);
+                        } else {
+                            streamInfo.clientAdjacent.put(link.getAddress(), n + 1);
+                        }
                     }
 
                     socket.send(new Link(
