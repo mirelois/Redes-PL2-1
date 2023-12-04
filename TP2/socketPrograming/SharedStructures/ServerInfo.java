@@ -87,6 +87,8 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         
         public Thread disconnectorThread;
 
+        public HashMap<InetAddress, Integer> clientAdjacent = new HashMap<>(); // vizinhos que levam ao cliente
+
         public StreamInfo(Integer streamId) {
             this.streamId = streamId;
         }

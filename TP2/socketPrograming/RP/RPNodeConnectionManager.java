@@ -62,6 +62,10 @@ public class RPNodeConnectionManager implements Runnable { // TODO: ver concorre
                         RPServerConectionManager.updateBestServer(streamInfo, link.getStreamId(), socket);
                     }
                     
+                    synchronized(streamInfo.clientAdjacent) {
+                        streamInfo.clientAdjacent.put(link.getAddress(), streamInfo.clientAdjacent.get(link.getAddress()) + 1);
+                    }
+
                     socket.send(new Link(
                                     true,
                                     true,
@@ -109,6 +113,10 @@ public class RPNodeConnectionManager implements Runnable { // TODO: ver concorre
                                 streamInfo.connectedLock.unlock();
                             }
                         }
+                    }
+
+                    synchronized(streamInfo.clientAdjacent) {
+                        streamInfo.clientAdjacent.put(link.getAddress(), streamInfo.clientAdjacent.get(link.getAddress()) - 1);
                     }
 
                     socket.send(new Link(

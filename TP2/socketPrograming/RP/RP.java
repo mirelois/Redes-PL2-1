@@ -53,10 +53,6 @@ public class RP implements Runnable {
                 if (!serverInfo.streamInfoMap.containsKey(streamId)) {
                     System.out.println("    Recebido pedido da Stream " + streamId + "que ainda não existe servidor com o ficheiro");
                     //TODO não existe ainda a stream no RP
-                    
-                    // System.out.println("Pedido de stream enviado ao servidor " +
-                    // chooseBestServer(serverInfo) +
-                    // " com payload " + new String(simp.getPayload()));
                     socket.send(new Shrimp(
                         Packet.getCurrTime(),
                         simp.getSourceAddress(),
@@ -70,6 +66,18 @@ public class RP implements Runnable {
                             " da stream com id " + 0 +
                             " pedida por " + clientIP.getHostAddress());
                 } else {
+
+                    ServerInfo.StreamInfo streamInfo = this.serverInfo.streamInfoMap.get(streamId);
+
+                    synchronized(streamInfo.clientAdjacent) {
+                        //Check if neighbour didn't ask for specific stream
+                        if(!streamInfo.clientAdjacent.containsKey(simp.getAddress())) {
+                            //Add asking neighbour
+                            streamInfo.clientAdjacent.put(simp.getAddress(), 0);
+                        }
+
+                    }
+
                     socket.send(new Shrimp(
                             Packet.getCurrTime(),
                             simp.getSourceAddress(),
