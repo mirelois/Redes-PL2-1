@@ -16,16 +16,6 @@ import SharedStructures.ServerInfo;
 
 public class RPStreaming implements Runnable{
     
-    class lossInfo {
-        
-        int latestReceivedPacket = 0;
-        int totalReceivedPacket = 0;
-        double lossRate = -1;
-        
-    }
-    
-    HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
-    
     private final NeighbourInfo neighbourInfo;
 
     private final ServerInfo serverInfo;
@@ -46,8 +36,14 @@ public class RPStreaming implements Runnable{
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet); //this came from a server
-                                           
-                lossInfo lossInfo = this.lossInfo.get(sup.getStreamId());
+                   
+                ServerInfo.StreamInfo streamInfo;
+
+                synchronized(serverInfo.streamInfoMap) {
+                    streamInfo = serverInfo.streamInfoMap.get(sup.getStreamId());
+                }
+
+                NeighbourInfo.LossInfo lossInfo = this.serverInfo.streamInfoMap.get(sup.getStreamId()).lossInfo;
 
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
@@ -67,12 +63,6 @@ public class RPStreaming implements Runnable{
                 
                 System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
                 //calculatet and update server latencies
-
-                ServerInfo.StreamInfo streamInfo;
-
-                synchronized(serverInfo.streamInfoMap) {
-                    streamInfo = serverInfo.streamInfoMap.get(sup.getStreamId());
-                }
 
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp());
                 double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;

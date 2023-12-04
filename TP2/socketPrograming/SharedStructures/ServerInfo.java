@@ -65,6 +65,8 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
          
         }
                 
+        public NeighbourInfo.LossInfo lossInfo = new NeighbourInfo.LossInfo();
+
         public PriorityQueue<Server> minServerQueue = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         public Integer activeServerLatency = Integer.MAX_VALUE;
         

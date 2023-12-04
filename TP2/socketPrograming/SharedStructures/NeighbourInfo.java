@@ -6,10 +6,20 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class NeighbourInfo {
+    
+    public static class LossInfo {
+        
+        public int latestReceivedPacket = 0;
+        public int totalReceivedPacket = 0;
+        public double lossRate = -1;
+        
+    }
+
     public static class Node {
         public final InetAddress address;
         public int latency;
         public double lossRate = -1.;
+
 
         public Node(InetAddress address, int latency) {
             this.address = address;
@@ -79,7 +89,8 @@ public class NeighbourInfo {
 
         public Thread connectorThread;
         public Thread disconnectorThread;
-
+    
+        public NeighbourInfo.LossInfo lossInfo = new NeighbourInfo.LossInfo();
         
         public HashSet<NeighbourInfo.Node> getDisconnecting() {
             HashSet<Node> disconnecting = new HashSet<>();
