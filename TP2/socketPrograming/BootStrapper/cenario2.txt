@@ -1,13 +1,13 @@
 n1:10.0.0.20, n2:10.0.1.20, n3a:10.0.0.1, n3b:10.0.2.1, n3c:10.0.3.1, n4a:10.0.1.1, n4b:10.0.2.2, n4c:10.0.4.1, n5a:10.0.3.2, n5b:10.0.4.2, n5c:10.0.5.1, n6:10.0.5.10
 n1: n3a
 n2: n4a
-n3a: n1, n3b, n3c,
-n3b: n3a, n3c, n4b
-n3c: n3a, n3b, n5a
-n4a: n2, n4b, n4c
-n4b: n3b, n4a, n4c
-n4c: n4b, n4c, n5b
-n5a: n3c, n5b, n5c
-n5b: n4c, n5a, n5c
-n5c: n5a, n5b, n6
+n3a: n1, n4b, n5a
+n3b: n1, n4b, n5a
+n3c: n1, n4b, n5a
+n4a: n2, n4b, n5b
+n4b: n2, n4b, n5b
+n4c: n2, n4b, n5b
+n5a: n3c, n4c, n6
+n5b: n3c, n4c, n6
+n5c: n3c, n4c, n6
 n6: n5c
