@@ -2,6 +2,7 @@ package RP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 
@@ -14,11 +15,11 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
     static class Connector extends Thread {
 
         ServerInfo.StreamInfo streamInfo; 
-        int streamId; 
+        Integer streamId; 
         int bestServerLatency; 
         DatagramSocket socket;
 
-        public Connector(ServerInfo.StreamInfo streamInfo, int streamId, int bestServerLatency, DatagramSocket socket) {
+        public Connector(ServerInfo.StreamInfo streamInfo, Integer streamId, int bestServerLatency, DatagramSocket socket) {
             this.streamInfo = streamInfo;
             this.streamId = streamId;
             this.bestServerLatency = bestServerLatency;
@@ -65,11 +66,11 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
     static class Disconnector extends Thread {
 
         ServerInfo.StreamInfo streamInfo; 
-        int streamId; 
+        Integer streamId; 
         int bestServerLatency; 
         DatagramSocket socket;
 
-        public Disconnector(ServerInfo.StreamInfo streamInfo, int streamId, int bestServerLatency, DatagramSocket socket) {
+        public Disconnector(ServerInfo.StreamInfo streamInfo, Integer streamId, int bestServerLatency, DatagramSocket socket) {
             this.streamInfo = streamInfo;
             this.streamId = streamId;
             this.bestServerLatency = bestServerLatency;
