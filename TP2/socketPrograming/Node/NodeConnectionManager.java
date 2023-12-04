@@ -53,7 +53,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             try {
                                 streamInfo.connectingLock.lock();
                                 while (streamInfo.connecting == null) {
-                                    streamInfo.connectingEmpty.wait();
+                                    streamInfo.connectingEmpty.await();
                                 }
                                 connecting = streamInfo.getConnecting();// copy of the currentBestServer
                             } finally {
