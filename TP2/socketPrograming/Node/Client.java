@@ -58,7 +58,7 @@ public class Client implements Runnable{
         tearButton.addActionListener(new tearButtonListener());
 
         //Image display label
-        iconLabel.setIcon(null);
+        iconLabel.setIcon(icon);
 
         //frame layout
         mainPanel.setLayout(null);
@@ -168,8 +168,14 @@ public class Client implements Runnable{
                     Image image = toolkit.createImage(payload, 0, payload.length);
 
                     //display the image as an ImageIcon object
+
                     icon = new ImageIcon(image);
-                    iconLabel.setIcon(icon);
+                    SwingUtilities.invokeLater(() -> {
+                        // Update the image in the GUI
+                        iconLabel.setIcon(icon);
+                        f.repaint(); // Ensure the frame is repainted
+                    });
+                    //f.getContentPane().imageUpdate(image, 0, 0,0,380,280);
                 }
             } catch (IOException eio){
                 eio.printStackTrace();
