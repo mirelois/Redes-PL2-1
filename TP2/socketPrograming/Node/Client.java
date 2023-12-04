@@ -148,9 +148,11 @@ public class Client implements Runnable{
                                         Define.simpPort, this.streamName.length(), this.streamName.getBytes()).toDatagramPacket());
                 while(true) {
                     RTPsocket.receive(rcvdp);
-                    System.out.println("Recebeu Stream");
                     //create an RTPpacket object from the DP
                     Sup rtp_packet = new Sup(rcvdp);
+                    System.out.println("Recebeu Stream " + rtp_packet.getStreamId());
+                    System.out.println("    Seq# = " + rtp_packet.getSequence_number() +
+                                       "    Payload Size = " + rtp_packet.getPayloadSize());
 
                     //print important header fields of the RTP packet received:
                     //System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getSequenceNumber() +" TimeStamp "+rtp_packet.getTimeStamp());//+" ms, of type "+rtp_packet.getpayloadtype());

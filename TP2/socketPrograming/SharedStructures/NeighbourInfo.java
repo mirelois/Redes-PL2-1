@@ -45,10 +45,10 @@ public class NeighbourInfo {
 
         //The order of the locks is connected->connecting->disconnecting
         public ReentrantLock connectedLock = new ReentrantLock();
-        public NeighbourInfo.Node connected;
+        public NeighbourInfo.Node connected = null;
         public ReentrantLock connectingLock = new ReentrantLock();
         public Condition connectingEmpty = connectingLock.newCondition();
-		public NeighbourInfo.Node connecting;
+		public NeighbourInfo.Node connecting = null;
 
         public Lock disconnectingDeprecatedLock = new ReentrantLock();
         public Condition disconnectingDeprecatedEmpty = disconnectingDeprecatedLock.newCondition();

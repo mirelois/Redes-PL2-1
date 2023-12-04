@@ -41,7 +41,7 @@ public class SimpManager implements Runnable{
 
                 synchronized (this.neighbourInfo) {
                     streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
-
+                    System.out.println("StreamId do ficheiro pedido é: " + streamId);
                     clientAdjacent = this.neighbourInfo.clientAdjacent.get(clientIP);
                     if(clientAdjacent == null){
                         clientAdjacent = new HashSet<>();
@@ -53,6 +53,7 @@ public class SimpManager implements Runnable{
                     
                     //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
                     if (this.neighbourInfo.isConnectedToRP == 0) {
+                        System.out.println("Nodo já sabe que não tem conexão para o RP");
                         this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
                         socket.send(new Shrimp(Packet.getCurrTime(), clientIP, 0, Define.shrimpPort, simp.getAddress(),
                                                streamName.length, streamName).toDatagramPacket());
@@ -62,22 +63,25 @@ public class SimpManager implements Runnable{
 
                 if (streamId == null) {
                     //Stream nunca foi testada
-
+                    System.out.println("    Não conheço o stream...");
                     synchronized(this.neighbourInfo) {
-                        if (this.neighbourInfo.isConnectedToRP == 1) {
+                        if (this.neighbourInfo.isConnectedToRP != 1) {
+                            System.out.println("    Enviar pedido para todos os seus vizinhos, não conheço o RP");
                             //Enviar para todos os vizinhos se não conhecer caminhos para o RP
-                            for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) 
+                            for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) {
                                 if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(simp.getSourceAddress())) {
-                                    System.out.println("Enviado SIMP para " + neighbour.getHostName());
+                                    System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
                                     socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
                                     //Adicionar pedido feito por Simp
                                     this.neighbourInfo.rpRequest.add(neighbour);
                                 }
+                            }
                         } else {
                             //Enviar apenas para os caminhos conhecidos do RP
+                            System.out.println("    Enviar pedido para os vizinhos que vão para o RP");
                             for (InetAddress neighbour : this.neighbourInfo.rpAdjacent) {
                                 if (!neighbour.equals(simp.getAddress())) 
-                                    socket.send(new Simp(clientIP, simp.getAddress(), Define.simpPort, simp.getPayloadSize(), 
+                                    socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), 
                                                          simp.getPayload()).toDatagramPacket());
                             }
                         }

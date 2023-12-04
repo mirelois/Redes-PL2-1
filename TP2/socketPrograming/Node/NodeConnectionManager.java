@@ -18,19 +18,12 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     NeighbourInfo neighbourInfo;
 
-    int streamId;
-
-    String streamName;
-
     NeighbourInfo.StreamInfo streamInfo;
 
     public NodeConnectionManager(NeighbourInfo neighbourInfo) {
 
-        // this.serverInfo = serverInfo;
-        // this.streamId = streamId;
-        // this.streamName = streamName;
         this.neighbourInfo = neighbourInfo;
-
+        this.streamInfo = new StreamInfo();
     }
 
     //Called once at the start and everytime the Connected Node should change
@@ -40,10 +33,13 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         Integer streamId,
         DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
 
-        neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
-                                                       // server
+        if (streamInfo.connected != null) {
+            neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
+        }
+    
+        
         if (streamInfo.connectorThread == null) {
-            
+            System.out.println("Started connector thread.");
             streamInfo.connectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -56,20 +52,20 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             try {
                                 streamInfo.connectingLock.lock();
                                 while (streamInfo.connecting == null) {
-                                    streamInfo.connectingEmpty.wait();
+                                    streamInfo.connectingEmpty.await();
                                 }
-                            } finally {
                                 connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                            } finally {
                                 streamInfo.connectingLock.unlock();
                             }
-
+                            System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
                             socket.send(new Link(
                                     false,
                                     true,
                                     false,
                                     streamId,
                                     connecting.address,
-                                    Define.linkPort,
+                                    Define.nodeConnectionManagerPort,
                                     0,
                                     null).toDatagramPacket());
 
@@ -85,6 +81,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
         if (streamInfo.disconnectorThread == null) {
             //TODO Separar os Deprecated dos Disconnecting no futuro
+            System.out.println("Started disconnector thread.");
             streamInfo.disconnectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -108,27 +105,27 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             }
 
                             for (NeighbourInfo.Node node : disconnecting) { // sends disconect link to
-                                                                                        // all servers in
+                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         false,
                                         true,
                                         streamId,
                                         node.address,
-                                        Define.linkPort,
+                                        Define.nodeConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
 
                             for (NeighbourInfo.Node node : deprecated) {
-                                
+                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         true,
                                         false,
                                         streamId,
                                         node.address,
-                                        Define.linkPort,
+                                        Define.nodeConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
@@ -168,6 +165,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
             synchronized (neighbourInfo.minNodeQueue) {
                 streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
+                System.out.println("Alterado connecting para " + streamInfo.connecting);
             }
             streamInfo.connectingEmpty.signal();
         } finally {
@@ -189,31 +187,38 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 socket.receive(packet);
 
                 Link link = new Link(packet);
+                System.out.println("Recebido Link de " + link.getAddress() + " do tipo activate: " + link.isActivate());
 
-                this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
+                //TODO this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
                 NeighbourInfo.Node node = 
                     new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
 
                 //RP never receives acks as their logic exists in RP
                 if (!link.isAck()) {
+                    System.out.println("    Link não é Ack");
                     Set<InetAddress> activeLinks;
 
                     if (link.isActivate()) {
 
                         boolean isActiveEmpty = false;
                         //TODO better locking mechanism to not stall the entire streamActiveLinks structure
-                        synchronized(neighbourInfo.streamActiveLinks){
-
+                        synchronized(neighbourInfo.streamActiveLinks) {
                             //Get the Set of active links (activated by clients)
                             activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
+                            if (activeLinks == null) {
+                                activeLinks = new HashSet<InetAddress>();
+                                neighbourInfo.streamActiveLinks.put(link.getStreamId(), activeLinks);
+                            }
                             isActiveEmpty = activeLinks.isEmpty();
+                            System.out.println("    Active Links vazios? " + isActiveEmpty);
                             activeLinks.add(link.getAddress());
                         }
                         
                         if (isActiveEmpty) {
                             //TODO Probably errors here! Don't know how this works fully
-                            updateBestNode(neighbourInfo, streamInfo, streamId, socket);
+                            System.out.println("    Novo active link, update ao melhor nodo");
+                            updateBestNode(this.neighbourInfo, this.streamInfo, link.getStreamId(), socket);
                         }
                         
                         socket.send(new Link(
@@ -222,7 +227,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         false,
                                         link.getStreamId(),
                                         link.getAddress(),
-                                        Define.linkPort,
+                                        Define.nodeConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
 
@@ -272,7 +277,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         true,
                                         link.getStreamId(),
                                         link.getAddress(),
-                                        Define.linkPort,
+                                        Define.nodeConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                     }  
@@ -287,8 +292,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             try {
                                 streamInfo.disconnectingDeprecatedLock.lock();
                                 try {
-                                    streamInfo.disconnecting.add(streamInfo.connected);
-                                    streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    if (streamInfo.connected != null) {
+                                        streamInfo.disconnecting.add(streamInfo.connected);
+                                        streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    }
                                     streamInfo.connected = streamInfo.connecting;
                                     streamInfo.connecting = null;
                                 } finally {
@@ -327,6 +334,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             // TODO: handle exception
         }
     }
