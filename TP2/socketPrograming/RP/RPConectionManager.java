@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 
 import Protocols.Link;
+import Server.Server;
 import SharedStructures.Define;
 import SharedStructures.ServerInfo;
 
@@ -26,7 +27,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
     }
 
     public static void updateBestServer(ServerInfo.StreamInfo streamInfo, Integer streamIdToClone, 
-                                        int bestServerLatency, DatagramSocket socket)
+                                        int bestServerLatency, DatagramSocket socketToClone)
             throws UnknownHostException { // TODO: currently this is never called stfu
 
         if (streamInfo.connected != null) {
@@ -38,20 +39,22 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             streamInfo.connectorThread = new Thread(new Runnable() {
 
                 public void run() {
-                    int streamId = streamIdToClone;
+                    Integer streamId = streamIdToClone;
+                    DatagramSocket socket = socketToClone;
+                    ServerInfo.StreamInfo streamInfoRef = streamInfo;
                     ServerInfo.StreamInfo.Server connecting;
 
                     try {
                         while (true) {
                             connecting = null;
                             try {
-                                streamInfo.connectingLock.lock();
-                                while (streamInfo.connecting == null) {
-                                    streamInfo.connectingEmpty.await();
+                                streamInfoRef.connectingLock.lock();
+                                while (streamInfoRef.connecting == null) {
+                                    streamInfoRef.connectingEmpty.await();
                                 }
-                                connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                                connecting = streamInfoRef.getConnecting();// copy of the currentBestServer
                             } finally {
-                                streamInfo.connectingLock.unlock();
+                                streamInfoRef.connectingLock.unlock();
                             }
                             
                             System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
@@ -81,21 +84,23 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
                 public void run() {
                     int streamId = streamIdToClone;
+                    DatagramSocket socket = socketToClone;
+                    ServerInfo.StreamInfo streamInfoRef = streamInfo;
                     HashSet<ServerInfo.StreamInfo.Server> disconnecting;
                     HashSet<ServerInfo.StreamInfo.Server> deprecated;
 
                     try {
                         while (true) {
-                            streamInfo.disconnectingDeprecatedLock.lock();
+                            streamInfoRef.disconnectingDeprecatedLock.lock();
                             try {
-                                while (streamInfo.disconnecting.isEmpty() && streamInfo.deprecated.isEmpty()) { // sleeps if there is nothing to remove
-                                    streamInfo.disconnectingDeprecatedEmpty.await();
+                                while (streamInfoRef.disconnecting.isEmpty() && streamInfoRef.deprecated.isEmpty()) { // sleeps if there is nothing to remove
+                                    streamInfoRef.disconnectingDeprecatedEmpty.await();
                                 }
 
-                                disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
-                                deprecated = streamInfo.getDeprecated();// copy of the deprecated set
+                                disconnecting = streamInfoRef.getDisconnecting();// copy of the disconnecting set
+                                deprecated = streamInfoRef.getDeprecated();// copy of the deprecated set
                             } finally {
-                                streamInfo.disconnectingDeprecatedLock.unlock();
+                                streamInfoRef.disconnectingDeprecatedLock.unlock();
                             }
 
                             for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
