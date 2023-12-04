@@ -22,6 +22,7 @@ import Node.Streaming;
 import RP.RP;
 import RP.RPConectionManager;
 import RP.RPServerAdder;
+import RP.RPStreaming;
 import Server.Server;
 import Server.ServerConectionManager;
 import SharedStructures.Define;
@@ -100,6 +101,7 @@ public class fullDuplex {
             new Thread(new RPServerAdder(serverInfo, neighbours)).start();
             new Thread(new NodeConnectionManager(neighbours)).start();
             new Thread(new RPConectionManager(serverInfo)).start();
+            new Thread(new RPStreaming(serverInfo, neighbours)).start();
         }else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));
