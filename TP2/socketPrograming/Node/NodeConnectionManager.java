@@ -292,8 +292,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             try {
                                 streamInfo.disconnectingDeprecatedLock.lock();
                                 try {
-                                    streamInfo.disconnecting.add(streamInfo.connected);
-                                    streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    if (streamInfo.connected != null) {
+                                        streamInfo.disconnecting.add(streamInfo.connected);
+                                        streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    }
                                     streamInfo.connected = streamInfo.connecting;
                                     streamInfo.connecting = null;
                                 } finally {
