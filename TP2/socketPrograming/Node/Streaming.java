@@ -19,6 +19,8 @@ public class Streaming implements Runnable{
         int latestReceivedPacket = 0;
         int totalReceivedPacket = 0;
         double lossRate = -1;
+        int prevDiff = 0;
+        double jitter = -1;
         
     }
     HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
@@ -50,28 +52,37 @@ public class Streaming implements Runnable{
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
                 }
+                
+                int currentLatency = Packet.getLatency(sup.getTime_stamp());
+
+                int arrival = Packet.getCurrTime();
+                
+                int timestap = Packet.getCurrTime();
+
+                //see section 6.4.1 of rfc3550
+                lossInfo.jitter = lossInfo.jitter + (Math.abs(lossInfo.prevDiff - (arrival - timestap)) - lossInfo.jitter)/16;
 
                 lossInfo.totalReceivedPacket++;
 
                 lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket/(double)sup.getFrameNumber();
                 
                 if (sup.getFrameNumber() < lossInfo.totalReceivedPacket) {
-                    lossInfo.totalReceivedPacket = 0;
                     lossInfo.latestReceivedPacket = 0;
-                    lossInfo.lossRate = -1.;
+                    lossInfo.totalReceivedPacket = 0;
+                    lossInfo.lossRate = -1;
+                    lossInfo.jitter = -1;
                 }
                                 
                 lossInfo.latestReceivedPacket = sup.getFrameNumber();
 
                 //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
-                Integer currLatency = Packet.getLatency(sup.getTime_stamp());
                 double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
                 
                 this.streamInfo.connectedLock.lock();
                 
                 try {
                     if (streamInfo.connected != null) {
-                        this.streamInfo.connected.latency = currLatency;
+                        this.streamInfo.connected.latency = currentLatency;
                         this.streamInfo.connected.lossRate = lossInfo.lossRate;
                         currentMetrics = this.streamInfo.connected.getMetrics();
                     }

@@ -61,7 +61,11 @@ public class NeighbourInfo {
         
         //The order of the locks is connected->connecting->disconnecting
         public HashMap<InetAddress, Integer> clientAdjacent = new HashMap<>(); // vizinhos que levam ao cliente
+        public PriorityQueue<Node> minStreamNodeQ = new PriorityQueue<>((a, b) -> {
+            if(clientAdjacent.get(a) > clientAdjacent.get(b)) return -1;
 
+            return (a.getMetrics() - b.getMetrics()) > 0 ? 1 : -1;
+        });
         public ReentrantLock connectedLock = new ReentrantLock();
         public NeighbourInfo.Node connected = null;
         public ReentrantLock connectingLock = new ReentrantLock();
