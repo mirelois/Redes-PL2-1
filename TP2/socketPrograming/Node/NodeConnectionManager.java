@@ -18,17 +18,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     NeighbourInfo neighbourInfo;
 
-    int streamId;
-
-    String streamName;
-
-    NeighbourInfo.StreamInfo streamInfo;
+    NeighbourInfo.StreamInfo streamInfo = new StreamInfo();
 
     public NodeConnectionManager(NeighbourInfo neighbourInfo) {
 
-        // this.serverInfo = serverInfo;
-        // this.streamId = streamId;
-        // this.streamName = streamName;
         this.neighbourInfo = neighbourInfo;
 
     }
@@ -225,7 +218,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         if (isActiveEmpty) {
                             //TODO Probably errors here! Don't know how this works fully
                             System.out.println("    Novo active link, update ao melhor nodo");
-                            updateBestNode(neighbourInfo, streamInfo, streamId, socket);
+                            updateBestNode(neighbourInfo, streamInfo, link.getStreamId(), socket);
                         }
                         
                         socket.send(new Link(
