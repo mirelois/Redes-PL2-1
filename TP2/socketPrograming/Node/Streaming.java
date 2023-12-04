@@ -14,9 +14,11 @@ import SharedStructures.NeighbourInfo.Node;
 
 public class Streaming implements Runnable{
     private final NeighbourInfo neighbourInfo;
+    NeighbourInfo.StreamInfo streamInfo;
 
-    public Streaming(NeighbourInfo neighbourInfo){
+    public Streaming(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo){
         this.neighbourInfo = neighbourInfo;
+        this.streamInfo = streamInfo;
     }
 
     @Override
@@ -30,9 +32,23 @@ public class Streaming implements Runnable{
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet);
-                System.out.println("Recebid SUP de " + sup.getAddress() + " da stream " + sup.getStreamId());
+                                
+                //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
+                Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
+                this.streamInfo.connectedLock.lock();
+                try {
+                    this.streamInfo.connected.latency = currLatency;
+                } finally {
+                    this.streamInfo.connectedLock.unlock();
+                }
+                
+                synchronized(this.neighbourInfo.minNodeQueue) {
+                    bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
+                }
 
-                neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
+                if (bestLatency < 0.95 * currLatency) {
+                    NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
+                }
 
                 Integer streamId = sup.getStreamId();
                 Set<InetAddress> streamActiveLinks;

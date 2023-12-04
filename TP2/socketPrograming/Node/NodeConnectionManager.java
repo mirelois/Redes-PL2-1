@@ -9,8 +9,6 @@ import java.util.Set;
 import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
-import SharedStructures.NeighbourInfo.Node;
-import SharedStructures.NeighbourInfo.StreamInfo;
 
 import java.net.UnknownHostException;
 
@@ -20,10 +18,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     NeighbourInfo.StreamInfo streamInfo;
 
-    public NodeConnectionManager(NeighbourInfo neighbourInfo) {
+    public NodeConnectionManager(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo) {
 
         this.neighbourInfo = neighbourInfo;
-        this.streamInfo = new StreamInfo();
+        this.streamInfo = streamInfo;
     }
 
     //Called once at the start and everytime the Connected Node should change

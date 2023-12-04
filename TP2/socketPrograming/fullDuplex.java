@@ -92,10 +92,10 @@ public class fullDuplex {
             System.out.println(neighbour.getHostName());
         }
         Thread streaming;
-        
+
         if (isRP){
+            ServerInfo serverInfo = new ServerInfo();        
             System.out.println("Começo de RP!");
-            ServerInfo serverInfo = new ServerInfo();
             new Thread(new RP(serverInfo, neighbours)).start();
             new Thread(new RPServerAdder(serverInfo, neighbours)).start();
             new Thread(new RPNodeConnectionManager(serverInfo, neighbours)).start();
@@ -103,10 +103,11 @@ public class fullDuplex {
             streaming = new Thread(new RPStreaming(serverInfo, neighbours));
         }else {
             System.out.println("Começo de Nodo!");
+            NeighbourInfo.StreamInfo streamInfo = new NeighbourInfo.StreamInfo();
             Thread simpManager = new Thread(new SimpManager(neighbours));
             Thread shrimpManager = new Thread(new ShrimpManager(neighbours));
-            new Thread(new NodeConnectionManager(neighbours)).start();
-            streaming = new Thread(new Streaming(neighbours));
+            new Thread(new NodeConnectionManager(neighbours, streamInfo)).start();
+            streaming = new Thread(new Streaming(neighbours, streamInfo));
             simpManager.start();
             shrimpManager.start();
         }
