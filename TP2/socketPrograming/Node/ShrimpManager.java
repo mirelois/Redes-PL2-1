@@ -43,7 +43,6 @@ public class ShrimpManager implements Runnable{
                 socket.send(new Rip(0, packet.getAddress(), Define.ripPort).toDatagramPacket());
                 
                 Set<InetAddress> rpAdjacent;
-                NeighbourInfo.StreamInfo streamInfo;
 
                 //Retirar streamId do pacote
                 Integer streamId = shrimp.getStreamId();
@@ -53,7 +52,7 @@ public class ShrimpManager implements Runnable{
                     this.neighbourInfo.rpRequest.remove(shrimp.getAddress());
                     
                     //Colocar o nome da Stream associado ao seu Id
-                    streamInfo = this.neighbourInfo.streamIdToStreamInfo.get(streamId);
+                    this.neighbourInfo.streamIdToStreamInfo.get(streamId);
                     
                     //Existe Stream (conseguiu caminho até ao RP)
                     if (streamId != 0 && streamId != 255) {
@@ -89,7 +88,7 @@ public class ShrimpManager implements Runnable{
                         }
 
                         //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
-                        for (InetAddress linkToClient : streamInfo.clientAdjacent.keySet()) {
+                        for (InetAddress linkToClient : this.neighbourInfo.clientRequest) {
                             if (!linkToClient.equals(InetAddress.getByName("localhost"))) {
                                 System.out.println("Enviado SHRIMP para " + linkToClient.getHostAddress() +
                                                    " da stream com id " + streamId +
@@ -104,16 +103,17 @@ public class ShrimpManager implements Runnable{
                         synchronized (neighbourInfo) {
 
                             if (this.neighbourInfo.rpRequest.isEmpty() && this.neighbourInfo.rpAdjacent.isEmpty()) {
-                                
+
                                 this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
                                 System.out.println("Não existe conexão!");
                     
                                 this.neighbourInfo.isConnectedToRP = 0; 
                                 //Avisar todos os Clientes da falta de conexão
-                                for (InetAddress linkToClient : streamInfo.clientAdjacent.keySet()) {
+                                for (InetAddress linkToClient : this.neighbourInfo.clientRequest) {
                                     socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, shrimp.getPort(), linkToClient, 
                                                 shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
-                                    streamInfo.clientAdjacent.remove(linkToClient);
+
+                                    this.neighbourInfo.clientRequest.remove(linkToClient);
                                 }
 
                             }

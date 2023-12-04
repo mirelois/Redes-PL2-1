@@ -37,7 +37,6 @@ public class SimpManager implements Runnable{
 
                 InetAddress clientIP = simp.getSourceAddress();
                 Integer streamId;
-                StreamInfo streamInfo;
                 byte[] streamName = simp.getPayload();
 
                 synchronized (this.neighbourInfo) {
@@ -54,16 +53,7 @@ public class SimpManager implements Runnable{
                     streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
                     System.out.println("    StreamId do ficheiro pedido é: " + streamId);
 
-                    streamInfo = this.neighbourInfo.streamIdToStreamInfo.get(streamId);
-                    
-                    synchronized(streamInfo.clientAdjacent) {
-                        //Check if neighbour didn't ask for specific stream
-                        if(!streamInfo.clientAdjacent.containsKey(simp.getAddress())) {
-                            //Add asking neighbour
-                            streamInfo.clientAdjacent.put(simp.getAddress(), 0);
-                        }
-
-                    }
+                    this.neighbourInfo.clientRequest.add(clientIP);
 
                 }
 

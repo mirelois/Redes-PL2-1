@@ -110,6 +110,8 @@ public class NeighbourInfo {
     
     public Set<InetAddress> rpRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
 
+    public Set<InetAddress> clientRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
+
     public Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
     
     public void updateLatency(Node node) { //this method has O(log n) time complexity
