@@ -94,13 +94,31 @@ public class Streaming implements Runnable{
                         System.out.println("Enviando SUP da stream " + sup.getStreamId() + " para " + activeLink);
                         if (!activeLink.equals(sup.getAddress())) {
                             if (activeLink.equals(InetAddress.getByName("localhost"))) {
-                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
-                                    sup.getStreamId(), InetAddress.getByName("localhost"), Define.clientPort, sup.getPayloadSize(), sup.getPayload())
-                                    .toDatagramPacket());
+                                socket.send(new Sup(
+                                    sup.getLossRate(),
+                                    sup.getTime_stamp(),
+                                    sup.getVideo_time_stamp(),
+                                    sup.getFrameNumber(),
+                                    sup.getSequence_number(),
+                                    sup.getStreamId(),
+                                    InetAddress.getByName("localhost"),//podia ser active link
+                                    Define.clientPort,
+                                    sup.getPayloadSize(),
+                                    sup.getPayload()
+                                ).toDatagramPacket());
                             } else {
-                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
-                                    sup.getStreamId(), activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
-                                    .toDatagramPacket());
+                                socket.send(new Sup(
+                                    sup.getLossRate(),
+                                    sup.getTime_stamp(),
+                                    sup.getVideo_time_stamp(),
+                                    sup.getFrameNumber(),
+                                    sup.getSequence_number(),
+                                    sup.getStreamId(),
+                                    activeLink,
+                                    Define.streamingPort,
+                                    sup.getPayloadSize(),
+                                    sup.getPayload()
+                                ).toDatagramPacket());
                             }
                         }
                     }
