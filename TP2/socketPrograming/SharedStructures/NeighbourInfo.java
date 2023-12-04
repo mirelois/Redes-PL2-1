@@ -21,6 +21,7 @@ public class NeighbourInfo {
         public final InetAddress address;
         public int latency;
         public double lossRate = -1.;
+        public int jitter;
 
 
         public Node(InetAddress address, int latency) {
@@ -28,7 +29,13 @@ public class NeighbourInfo {
             this.latency = latency;
         }
 
-        public Node(InetAddress address, int latency, Double lossRate) {
+        public Node(InetAddress address, int latency, double lossRate) {
+            this.address = address;
+            this.latency = latency;
+            this.lossRate = lossRate;
+        }
+        
+        public Node(InetAddress address, int latency, double lossRate, int jitter) {
             this.address = address;
             this.latency = latency;
             this.lossRate = lossRate;
@@ -36,10 +43,14 @@ public class NeighbourInfo {
 
         public double getMetrics(){//NOTE: isto é de total responsabilidade do Lucena
             
-            if (this.lossRate < 0){
+            if (this.lossRate < 0 && this.jitter < 0){
                 return this.latency;
-            }else{
-                return (0.45 * this.latency + 0.55 * this.lossRate*600);
+            }else if (this.jitter < 0){
+                return 0.45 * this.latency + 0.55 * this.lossRate;
+            }else if (this.lossRate < 0){
+                return 0.45 * this.latency + 0.55 * this.jitter;
+            }else {
+                return 0.33 * this.latency + 0.33 * this.jitter + 0.34 * this.lossRate;
             }
         }
 

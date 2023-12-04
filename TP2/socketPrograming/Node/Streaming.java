@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Set;
 
 import Protocols.Packet;
@@ -11,7 +10,6 @@ import Protocols.PacketSizeException;
 import Protocols.Sup;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
-import SharedStructures.ServerInfo;
 
 public class Streaming implements Runnable{
     
@@ -50,6 +48,8 @@ public class Streaming implements Runnable{
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
                 }
+
+                int expected_prior = lossInfo.latestReceivedPacket+1;
                 
                 int currentLatency = Packet.getLatency(sup.getTime_stamp());
 
@@ -59,6 +59,8 @@ public class Streaming implements Runnable{
 
                 //see section 6.4.1 of rfc3550
                 lossInfo.jitter = lossInfo.jitter + (Math.abs(lossInfo.prevDiff - (arrival - timestap)) - lossInfo.jitter)/16;
+
+                lossInfo.prevDiff = (arrival - timestap);
 
                 lossInfo.totalReceivedPacket++;
 
