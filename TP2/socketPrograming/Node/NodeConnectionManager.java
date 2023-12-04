@@ -35,10 +35,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     //Called once at the start and everytime the Connected Node should change
     public static void updateBestNode( //TODO: fix args -> done?
-        final NeighbourInfo neighbourInfo,
-        final NeighbourInfo.StreamInfo streamInfo,
-        final Integer streamId,
-        final DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
+        NeighbourInfo neighbourInfo,
+        NeighbourInfo.StreamInfo streamInfo,
+        Integer streamId,
+        DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
 
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
