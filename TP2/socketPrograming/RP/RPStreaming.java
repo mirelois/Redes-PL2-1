@@ -70,10 +70,11 @@ public class RPStreaming implements Runnable{
                 streamInfo.connectedLock.lock();
                 
                 try {
-                    if (streamInfo.connected != null)
+                    if (streamInfo.connected != null) {
                         streamInfo.connected.latency = currLatency;
                         streamInfo.connected.lossRate = lossInfo.lossRate;
                         currentMetrics = streamInfo.connected.getMetrics();
+                    }
                 } finally {
                     streamInfo.connectedLock.unlock();
                 }
