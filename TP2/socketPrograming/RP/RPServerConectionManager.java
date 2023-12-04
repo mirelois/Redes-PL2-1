@@ -10,7 +10,7 @@ import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.ServerInfo;
 
-public class RPConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
+public class RPServerConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
 
     ServerInfo serverInfo;
 
@@ -20,7 +20,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
     ServerInfo.StreamInfo streamInfo;
 
-    public RPConectionManager(ServerInfo serverInfo) {
+    public RPServerConectionManager(ServerInfo serverInfo) {
 
         // this.serverInfo = serverInfo;
         // this.streamId = streamId;

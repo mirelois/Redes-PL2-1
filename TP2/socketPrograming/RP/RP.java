@@ -60,11 +60,6 @@ public class RP implements Runnable {
                 }
                 ServerInfo.StreamInfo streamInfo = serverInfo.streamInfoMap.get(streamId);
 
-                if (streamInfo.connected == null && streamInfo.connecting == null) {
-                    System.out.println("    Recebido pedido da Stream " + streamId + "que ainda não estava ativa");
-                    RPConectionManager.updateBestServer(streamInfo, streamId, Integer.MAX_VALUE, socket);
-                }
-
                 socket.send(new Shrimp(
                         Packet.getCurrTime(),
                         simp.getSourceAddress(),
