@@ -39,22 +39,18 @@ public class Idle implements Runnable{
                     try {
                         while(true) {
                             Thread.sleep(Define.idleTimeout);
-                            synchronized(neighbourInfo.clientAdjacent) {
-                                //Colecionar num conjunto todos os adjacentes em uso 
-                                Set<InetAddress> inUse = neighbourInfo.clientAdjacent.keySet();
-                                //Enviar para os adjacentes que não estão em uso
-                                //TODO diminuir vida aos ajdacentes que foram enviados mensagens
-                                for (InetAddress address : this.neighbourInfo.overlayNeighbours) {
-                                    if (!inUse.contains(address))
-                                        socket.send(new ITP(isServer, 
-                                                            !isServer, 
-                                                            false, 
-                                                            this.port,
-                                                            address, 
-                                                            Packet.getCurrTime(), 
-                                                            0, 
-                                                            null).toDatagramPacket());
-                                }
+                            //Colecionar num conjunto todos os adjacentes em uso 
+                            //Enviar para os adjacentes que não estão em uso
+                            //TODO diminuir vida aos ajdacentes que foram enviados mensagens
+                            for (InetAddress address : this.neighbourInfo.overlayNeighbours) {
+                                socket.send(new ITP(isServer, 
+                                                    !isServer, 
+                                                    false, 
+                                                    this.port,
+                                                    address, 
+                                                    Packet.getCurrTime(), 
+                                                    0, 
+                                                    null).toDatagramPacket());
                             }
                         }
                     } catch (Exception E) {

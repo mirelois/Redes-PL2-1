@@ -56,10 +56,12 @@ public class NeighbourInfo {
             return this.address.hashCode();
         }
     }
-
+    
     public static class StreamInfo {
-
+        
         //The order of the locks is connected->connecting->disconnecting
+        public HashMap<InetAddress, Integer> clientAdjacent = new HashMap<>(); // vizinhos que levam ao cliente
+
         public ReentrantLock connectedLock = new ReentrantLock();
         public NeighbourInfo.Node connected = null;
         public ReentrantLock connectingLock = new ReentrantLock();
@@ -74,6 +76,7 @@ public class NeighbourInfo {
         public Thread connectorThread;
         public Thread disconnectorThread;
 
+        
         public HashSet<NeighbourInfo.Node> getDisconnecting() {
             HashSet<Node> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
@@ -91,26 +94,24 @@ public class NeighbourInfo {
         }
         
     }
-
+    
     public int isConnectedToRP = 255; // 255 significa que ainda não sabe, 0 no, 1 yes
-
+    
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
     public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos
-
+    
     public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // filenames to stream id
-
+    
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
-
+    
     public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> (a.getMetrics() - b.getMetrics()) > 0 ? 1 : -1);
-
+    
     public Map<Integer, Set<InetAddress>> streamActiveLinks = new HashMap<>(); // links para enviar a stream
-
-    public Map<InetAddress, Set<InetAddress>> clientAdjacent = new HashMap<>(); // vizinhos que levam ao cliente
-
+    
     public Set<InetAddress> rpRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
 
     public Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
-                             
+    
     public void updateLatency(Node node) { //this method has O(log n) time complexity
         synchronized(this.minNodeQueue){
             this.minNodeQueue.remove(node);
