@@ -86,6 +86,7 @@ public class ShrimpManager implements Runnable{
 
                         //Adicionar Novo Caminho para a Stream (Porque existe!)
                         rpAdjacent.add(shrimp.getAddress());
+                        this.neighbourInfo.updateLatency(new NeighbourInfo.Node(shrimp.getAddress(), Packet.getLatency(shrimp.getTimeStamp())));
 
                         //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
                         for (InetAddress linkToClient : clientAdjacent) {
