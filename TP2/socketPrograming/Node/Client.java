@@ -170,11 +170,8 @@ public class Client implements Runnable{
                     //display the image as an ImageIcon object
 
                     icon = new ImageIcon(image);
-                    SwingUtilities.invokeLater(() -> {
-                        // Update the image in the GUI
-                        iconLabel.setIcon(icon);
-                        f.repaint(); // Ensure the frame is repainted
-                    });
+                    iconLabel.setIcon(icon);
+                    iconLabel.update(f.getGraphics());
                     //f.getContentPane().imageUpdate(image, 0, 0,0,380,280);
                 }
             } catch (IOException eio){
