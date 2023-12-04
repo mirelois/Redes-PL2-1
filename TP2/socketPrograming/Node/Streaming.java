@@ -48,7 +48,10 @@ public class Streaming implements Runnable{
                 }
                 
                 synchronized(this.neighbourInfo.minNodeQueue) {
-                    bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
+                    if (this.neighbourInfo.minNodeQueue.peek() != null)
+                        bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
+                    else
+                        bestLatency = Integer.MAX_VALUE;
                 }
 
                 if (bestLatency < 0.95 * currLatency) {

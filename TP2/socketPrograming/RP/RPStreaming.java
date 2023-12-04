@@ -37,7 +37,6 @@ public class RPStreaming implements Runnable{
                 Sup sup = new Sup(packet); //this came from a server
                 System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
                 //calculatet and update server latencies
-                int latency = Packet.getLatency(sup.getTime_stamp());
 
                 ServerInfo.StreamInfo streamInfo;
 
@@ -46,7 +45,7 @@ public class RPStreaming implements Runnable{
                 }
 
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
-                
+
                 streamInfo.connectedLock.lock();
                 try {
                     streamInfo.connected.latency = currLatency;
@@ -55,7 +54,10 @@ public class RPStreaming implements Runnable{
                 }
                 
                 synchronized(this.neighbourInfo.minNodeQueue) {
-                    bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
+                    if (this.neighbourInfo.minNodeQueue.peek() != null)
+                        bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;
+                    else
+                        bestLatency = Integer.MAX_VALUE;
                 }
 
                 if (bestLatency < 0.95 * currLatency) {
