@@ -20,6 +20,7 @@ import Node.ShrimpManager;
 import Node.SimpManager;
 import Node.Streaming;
 import RP.RP;
+import RP.RPConectionManager;
 import RP.RPServerAdder;
 import Server.Server;
 import Server.ServerConectionManager;
@@ -98,6 +99,7 @@ public class fullDuplex {
             new Thread(new RP(serverInfo, neighbours)).start();
             new Thread(new RPServerAdder(serverInfo, neighbours)).start();
             new Thread(new NodeConnectionManager(neighbours)).start();
+            new Thread(new RPConectionManager(serverInfo)).start();
         }else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));

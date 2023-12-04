@@ -139,8 +139,8 @@ public class ServerConectionManager implements Runnable {
                             
                         }
                     }
-                    
-                    System.out.println("Enviado Link de " + link.getAddress() + " da stream " + link.getStreamId() + 
+
+                    System.out.println("Enviado Link para " + link.getAddress() + " da stream " + link.getStreamId() + 
                                    " do tipo activate: " + true);
 
                     socket.send(new Link(
@@ -160,7 +160,8 @@ public class ServerConectionManager implements Runnable {
                         serverSenderMap.get(link.getStreamId()).interrupt();
                         
                     }
-    
+                    System.out.println("Enviado Link de " + link.getAddress() + " da stream " + link.getStreamId() + 
+                                   " do tipo activate: " + false);
                     socket.send(new Link(
                             true,
                             false,
