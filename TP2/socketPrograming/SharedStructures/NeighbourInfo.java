@@ -97,7 +97,7 @@ public class NeighbourInfo {
         if (a.lossRate == -1 || b.lossRate == -1){
             return a.latency - b.latency;
         }else{
-            return (0.45 * a.latency + 0.55 * a.lossRate*600) - (0.45 * b.latency + 0.55 * b.lossRate * 600);
+            return (0.45 * a.latency + 0.55 * a.lossRate*600) - (0.45 * b.latency + 0.55 * b.lossRate * 600) > 0 ? 1 : -1;
         }
     
     });
