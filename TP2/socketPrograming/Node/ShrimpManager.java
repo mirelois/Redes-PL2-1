@@ -61,7 +61,6 @@ public class ShrimpManager implements Runnable{
                                              Define.nodeConnectionManagerPort,
                                              0,
                                              null).toDatagramPacket());     
-                        continue;
                     }
                 } catch (SocketException e) {
 
