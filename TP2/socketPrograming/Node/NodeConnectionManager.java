@@ -11,7 +11,6 @@ import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
 import SharedStructures.NeighbourInfo.Node;
 import SharedStructures.NeighbourInfo.StreamInfo;
-import SharedStructures.ServerInfo;
 
 import java.net.UnknownHostException;
 
@@ -38,8 +37,8 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     public static void updateBestNode( //TODO: fix args -> done?
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
-        Integer streamIdToClone,
-        DatagramSocket socketToClone) throws UnknownHostException { // TODO: called once, only in the first time it is needed
+        Integer streamId,
+        DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
 
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
@@ -51,22 +50,19 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 public void run() {
 
-                    Integer streamId = streamIdToClone;
-                    DatagramSocket socket = socketToClone;
-                    NeighbourInfo.StreamInfo streamInfoRef = streamInfo;
                     NeighbourInfo.Node connecting;
 
                     try {
                         while (true) {
 
                             try {
-                                streamInfoRef.connectingLock.lock();
-                                while (streamInfoRef.connecting == null) {
-                                    streamInfoRef.connectingEmpty.wait();
+                                streamInfo.connectingLock.lock();
+                                while (streamInfo.connecting == null) {
+                                    streamInfo.connectingEmpty.wait();
                                 }
                             } finally {
-                                connecting = streamInfoRef.getConnecting();// copy of the currentBestServer
-                                streamInfoRef.connectingLock.unlock();
+                                connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                                streamInfo.connectingLock.unlock();
                             }
                             System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
                             socket.send(new Link(
@@ -95,9 +91,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 public void run() {
 
-                    Integer streamId = streamIdToClone;
-                    DatagramSocket socket = socketToClone;
-                    NeighbourInfo.StreamInfo streamInfoRef = streamInfo;
                     HashSet<NeighbourInfo.Node> disconnecting;
                     HashSet<NeighbourInfo.Node> deprecated;
 
@@ -107,13 +100,13 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             deprecated = null;
                             streamInfo.disconnectingDeprecatedLock.lock();
                             try {
-                                while (streamInfoRef.disconnecting.isEmpty() && streamInfoRef.deprecated.isEmpty()) { // sleeps if there is nothing to remove
+                                while (streamInfo.disconnecting.isEmpty() && streamInfo.deprecated.isEmpty()) { // sleeps if there is nothing to remove
                                     streamInfo.disconnectingDeprecatedEmpty.await();
                                 }
-                                disconnecting = streamInfoRef.getDisconnecting();// copy of the disconnecting set
-                                deprecated = streamInfoRef.getDeprecated();// copy of the deprecated set
+                                disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
+                                deprecated = streamInfo.getDeprecated();// copy of the deprecated set
                             } finally {
-                                streamInfoRef.disconnectingDeprecatedLock.unlock();
+                                streamInfo.disconnectingDeprecatedLock.unlock();
                             }
 
                             for (NeighbourInfo.Node node : disconnecting) { // sends disconect link to
