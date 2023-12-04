@@ -16,7 +16,6 @@ import SharedStructures.ServerInfo;
 public class Streaming implements Runnable{
     
     private final NeighbourInfo neighbourInfo;
-    NeighbourInfo.StreamInfo streamInfo;
 
     public Streaming(NeighbourInfo neighbourInfo){
         
@@ -43,10 +42,10 @@ public class Streaming implements Runnable{
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
                 
-                System.out.println("Recebido SUP de " + sup.getAddress() +
-                                   " Com a streamInfo: " + streamInfo);
+                System.out.println("Recebido SUP de " + sup.getAddress() + 
+                                   "\n  Seq#: " + sup.getSequence_number());
 
-                NeighbourInfo.LossInfo lossInfo = this.streamInfo.lossInfo;
+                NeighbourInfo.LossInfo lossInfo = streamInfo.lossInfo;
 
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
@@ -77,16 +76,16 @@ public class Streaming implements Runnable{
                 //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
                 double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
                 
-                this.streamInfo.connectedLock.lock();
+                streamInfo.connectedLock.lock();
                 
                 try {
                     if (streamInfo.connected != null) {
-                        this.streamInfo.connected.latency = currentLatency;
-                        this.streamInfo.connected.lossRate = lossInfo.lossRate;
-                        currentMetrics = this.streamInfo.connected.getMetrics();
+                        streamInfo.connected.latency = currentLatency;
+                        streamInfo.connected.lossRate = lossInfo.lossRate;
+                        currentMetrics = streamInfo.connected.getMetrics();
                     }
                 } finally {
-                    this.streamInfo.connectedLock.unlock();
+                    streamInfo.connectedLock.unlock();
                 }
                 
                 synchronized(this.neighbourInfo.minNodeQueue) {
@@ -98,11 +97,11 @@ public class Streaming implements Runnable{
 
                 if (bestMetrics < 0.95 * currentMetrics) { //Mandar latencia melhor se isto fizer
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
-                    this.streamInfo.connectingLock.lock();
+                    streamInfo.connectingLock.lock();
                     try{
-                        timeStampToSend = (Packet.getCurrTime() - this.streamInfo.connecting.latency)%60000;
+                        timeStampToSend = (Packet.getCurrTime() - streamInfo.connecting.latency)%60000;
                     }finally{
-                        this.streamInfo.connectingLock.unlock();
+                        streamInfo.connectingLock.unlock();
                     }
                 }
 
