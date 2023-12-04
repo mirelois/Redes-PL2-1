@@ -65,7 +65,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                     false,
                                     streamId,
                                     connecting.address,
-                                    Define.linkPort,
+                                    Define.nodeConnectionManagerPort,
                                     0,
                                     null).toDatagramPacket());
 
@@ -112,7 +112,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         true,
                                         streamId,
                                         node.address,
-                                        Define.linkPort,
+                                        Define.nodeConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
@@ -125,7 +125,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         false,
                                         streamId,
                                         node.address,
-                                        Define.linkPort,
+                                        Define.nodeConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
