@@ -99,9 +99,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             }
 
                             for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
-                                if (server != null) {
-                                    System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
-                                }
+                                System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         false,
@@ -114,9 +112,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             }
 
                             for (ServerInfo.StreamInfo.Server server : deprecated) {
-                                if (server != null) {
-                                    System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
-                                }
+                                System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         true,
