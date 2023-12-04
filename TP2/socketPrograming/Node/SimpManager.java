@@ -53,7 +53,7 @@ public class SimpManager implements Runnable{
                     streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
                     System.out.println("    StreamId do ficheiro pedido é: " + streamId);
 
-                    this.neighbourInfo.clientRequest.add(clientIP);
+                    this.neighbourInfo.clientRequest.add(simp.getAddress());
 
                 }
 
@@ -70,7 +70,7 @@ public class SimpManager implements Runnable{
                             for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) {
 
                                 //Não envio para quem me enviou
-                                if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(simp.getSourceAddress())) {
+                                if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(clientIP)) {
 
                                     System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
 
