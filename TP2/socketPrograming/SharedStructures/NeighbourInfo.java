@@ -12,6 +12,8 @@ public class NeighbourInfo {
         public int latestReceivedPacket = 0;
         public int totalReceivedPacket = 0;
         public double lossRate = -1;
+        public int prevDiff = 0;
+        public double jitter = -1;
         
     }
 

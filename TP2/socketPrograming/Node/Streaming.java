@@ -11,19 +11,9 @@ import Protocols.PacketSizeException;
 import Protocols.Sup;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
+import SharedStructures.ServerInfo;
 
 public class Streaming implements Runnable{
-
-    class lossInfo {
-        
-        int latestReceivedPacket = 0;
-        int totalReceivedPacket = 0;
-        double lossRate = -1;
-        int prevDiff = 0;
-        double jitter = -1;
-        
-    }
-    HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
     
     private final NeighbourInfo neighbourInfo;
     NeighbourInfo.StreamInfo streamInfo;
@@ -47,7 +37,13 @@ public class Streaming implements Runnable{
 
                 Sup sup = new Sup(packet);
 
-                lossInfo lossInfo = this.lossInfo.get(sup.getStreamId());
+                NeighbourInfo.StreamInfo streamInfo;
+
+                synchronized(neighbourInfo.streamIdToStreamInfo) {
+                    streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
+                }
+
+                NeighbourInfo.LossInfo lossInfo = this.streamInfo.lossInfo;
 
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
