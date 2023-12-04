@@ -16,8 +16,9 @@ public class Streaming implements Runnable{
 
     class lossInfo {
         
-        int latestReceivedPacket;
-        double lossRate;
+        int latestReceivedPacket = 0;
+        int totalReceivedPacket = 0;
+        double lossRate = -1;
         
     }
     HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
@@ -46,15 +47,23 @@ public class Streaming implements Runnable{
                 Sup sup = new Sup(packet);
 
                 lossInfo lossInfo = this.lossInfo.get(sup.getStreamId());
-                
-                lossInfo.latestReceivedPacket = sup.getFrameNumber();
 
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
                 }
 
-                lossInfo.lossRate = (sup.getFrameNumber() - lossInfo.latestReceivedPacket)/(double)sup.getFrameNumber();
+                lossInfo.totalReceivedPacket++;
+
+                lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket/(double)sup.getFrameNumber();
+                
+                if (sup.getFrameNumber() < lossInfo.totalReceivedPacket) {
+                    lossInfo.totalReceivedPacket = 0;
+                    lossInfo.latestReceivedPacket = 0;
+                    lossInfo.lossRate = -1.;
+                }
                                 
+                lossInfo.latestReceivedPacket = sup.getFrameNumber();
+
                 //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp());
                 double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
@@ -76,8 +85,16 @@ public class Streaming implements Runnable{
                         bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();    
                 }
 
-                if (bestMetrics < 0.95 * currentMetrics) {
+                int timeStampToSend = sup.getTime_stamp();
+
+                if (bestMetrics < 0.95 * currentMetrics) { //Mandar latencia melhor se isto fizer
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
+                    this.streamInfo.connectingLock.lock();
+                    try{
+                        timeStampToSend = (Packet.getCurrTime() - this.streamInfo.connecting.latency)%60000;
+                    }finally{
+                        this.streamInfo.connectingLock.unlock();
+                    }
                 }
 
                 Integer streamId = sup.getStreamId();
@@ -95,7 +112,7 @@ public class Streaming implements Runnable{
                             if (activeLink.equals(InetAddress.getByName("localhost"))) {
                                 socket.send(new Sup(
                                     sup.getLossRate(),
-                                    sup.getTime_stamp(),
+                                    timeStampToSend,
                                     sup.getVideo_time_stamp(),
                                     sup.getFrameNumber(),
                                     sup.getSequence_number(),
@@ -108,7 +125,7 @@ public class Streaming implements Runnable{
                             } else {
                                 socket.send(new Sup(
                                     sup.getLossRate(),
-                                    sup.getTime_stamp(),
+                                    timeStampToSend,
                                     sup.getVideo_time_stamp(),
                                     sup.getFrameNumber(),
                                     sup.getSequence_number(),

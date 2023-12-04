@@ -18,8 +18,9 @@ public class RPStreaming implements Runnable{
     
     class lossInfo {
         
-        int latestReceivedPacket;
-        double lossRate;
+        int latestReceivedPacket = 0;
+        int totalReceivedPacket = 0;
+        double lossRate = -1;
         
     }
     
@@ -52,8 +53,16 @@ public class RPStreaming implements Runnable{
                     continue;//Manda cu caralho
                 }
 
-                lossInfo.lossRate = (sup.getFrameNumber() - lossInfo.latestReceivedPacket)/(double)sup.getFrameNumber();
+                lossInfo.totalReceivedPacket++;
 
+                lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket/(double)sup.getFrameNumber();
+                
+                if (sup.getFrameNumber() < lossInfo.totalReceivedPacket) {
+                    lossInfo.totalReceivedPacket = 0;
+                    lossInfo.latestReceivedPacket = 0;
+                    lossInfo.lossRate = -1.;
+                }
+                                
                 lossInfo.latestReceivedPacket = sup.getFrameNumber();
                 
                 System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
@@ -65,7 +74,7 @@ public class RPStreaming implements Runnable{
                     streamInfo = serverInfo.streamInfoMap.get(sup.getStreamId());
                 }
 
-                Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
+                Integer currLatency = Packet.getLatency(sup.getTime_stamp());
                 double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
                  
                 streamInfo.connectedLock.lock();
@@ -81,7 +90,7 @@ public class RPStreaming implements Runnable{
                 
                 synchronized(this.neighbourInfo.minNodeQueue) {
                     if (this.neighbourInfo.minNodeQueue.peek() != null)
-                        bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;
+                        bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();
                 }
 
                 if (bestMetrics < 0.95 * currentMetrics) {
