@@ -9,28 +9,133 @@ import java.util.Set;
 import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
-import SharedStructures.NeighbourInfo.Node;
-import SharedStructures.NeighbourInfo.StreamInfo;
 
 import java.net.UnknownHostException;
 
 public class NodeConnectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
 
+    static class Connector extends Thread {
+
+        NeighbourInfo.StreamInfo streamInfo; 
+        Integer streamId; 
+        DatagramSocket socket;
+
+        public Connector(NeighbourInfo.StreamInfo streamInfo, Integer streamId, DatagramSocket socket) {
+            this.streamInfo = streamInfo;
+            this.streamId = streamId;
+            this.socket = socket;    
+        }
+
+        public void run() {
+
+            NeighbourInfo.Node connecting;
+
+            try {
+                while (true) {
+
+                    try {
+                        streamInfo.connectingLock.lock();
+                        while (streamInfo.connecting == null) {
+                            streamInfo.connectingEmpty.wait();
+                        }
+                    } finally {
+                        connecting = streamInfo.getConnecting();// copy of the currentBestServer
+                        streamInfo.connectingLock.unlock();
+                    }
+                    System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
+                    socket.send(new Link(
+                            false,
+                            true,
+                            false,
+                            streamId,
+                            connecting.address,
+                            Define.linkPort,
+                            0,
+                            null).toDatagramPacket());
+
+                    Thread.sleep(Define.RPTimeout);
+
+                }
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static class Disconnector extends Thread {
+
+        NeighbourInfo.StreamInfo streamInfo; 
+        Integer streamId; 
+        DatagramSocket socket;
+
+        public Disconnector(NeighbourInfo.StreamInfo streamInfo, Integer streamId, DatagramSocket socket) {
+            this.streamInfo = streamInfo;
+            this.streamId = streamId;
+            this.socket = socket;    
+        }
+
+        //TODO Separar os Deprecated dos Disconnecting no futuro
+        public void run() {
+
+            HashSet<NeighbourInfo.Node> disconnecting;
+            HashSet<NeighbourInfo.Node> deprecated;
+
+            try {
+                while (true) {
+                    disconnecting = null;
+                    deprecated = null;
+                    streamInfo.disconnectingDeprecatedLock.lock();
+                    try {
+                        while (streamInfo.disconnecting.isEmpty() && streamInfo.deprecated.isEmpty()) { // sleeps if there is nothing to remove
+                            streamInfo.disconnectingDeprecatedEmpty.await();
+                        }
+                        disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
+                        deprecated = streamInfo.getDeprecated();// copy of the deprecated set
+                    } finally {
+                        streamInfo.disconnectingDeprecatedLock.unlock();
+                    }
+
+                    for (NeighbourInfo.Node node : disconnecting) { // sends disconect link to
+                        System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
+                        socket.send(new Link(
+                                false,
+                                false,
+                                true,
+                                streamId,
+                                node.address,
+                                Define.linkPort,
+                                0,
+                                null).toDatagramPacket());
+                    }
+
+                    for (NeighbourInfo.Node node : deprecated) {
+                        System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
+                        socket.send(new Link(
+                                false,
+                                true,
+                                false,
+                                streamId,
+                                node.address,
+                                Define.linkPort,
+                                0,
+                                null).toDatagramPacket());
+                    }
+
+                    Thread.sleep(Define.RPTimeout);
+
+                }
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     NeighbourInfo neighbourInfo;
-
-    int streamId;
-
-    String streamName;
 
     NeighbourInfo.StreamInfo streamInfo;
 
     public NodeConnectionManager(NeighbourInfo neighbourInfo) {
-
-        // this.serverInfo = serverInfo;
-        // this.streamId = streamId;
-        // this.streamName = streamName;
         this.neighbourInfo = neighbourInfo;
-
     }
 
     //Called once at the start and everytime the Connected Node should change
@@ -46,103 +151,11 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                                        // server
         if (streamInfo.connectorThread == null) {
             
-            streamInfo.connectorThread = new Thread(new Runnable() {
-
-                public void run() {
-
-                    NeighbourInfo.Node connecting;
-
-                    try {
-                        while (true) {
-
-                            try {
-                                streamInfo.connectingLock.lock();
-                                while (streamInfo.connecting == null) {
-                                    streamInfo.connectingEmpty.wait();
-                                }
-                            } finally {
-                                connecting = streamInfo.getConnecting();// copy of the currentBestServer
-                                streamInfo.connectingLock.unlock();
-                            }
-                            System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
-                            socket.send(new Link(
-                                    false,
-                                    true,
-                                    false,
-                                    streamId,
-                                    connecting.address,
-                                    Define.linkPort,
-                                    0,
-                                    null).toDatagramPacket());
-
-                            Thread.sleep(Define.RPTimeout);
-
-                        }
-                    } catch (InterruptedException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            streamInfo.connectorThread = new Connector(streamInfo, streamId, socket);
         }
 
         if (streamInfo.disconnectorThread == null) {
-            //TODO Separar os Deprecated dos Disconnecting no futuro
-            streamInfo.disconnectorThread = new Thread(new Runnable() {
-
-                public void run() {
-
-                    HashSet<NeighbourInfo.Node> disconnecting;
-                    HashSet<NeighbourInfo.Node> deprecated;
-
-                    try {
-                        while (true) {
-                            disconnecting = null;
-                            deprecated = null;
-                            streamInfo.disconnectingDeprecatedLock.lock();
-                            try {
-                                while (streamInfo.disconnecting.isEmpty() && streamInfo.deprecated.isEmpty()) { // sleeps if there is nothing to remove
-                                    streamInfo.disconnectingDeprecatedEmpty.await();
-                                }
-                                disconnecting = streamInfo.getDisconnecting();// copy of the disconnecting set
-                                deprecated = streamInfo.getDeprecated();// copy of the deprecated set
-                            } finally {
-                                streamInfo.disconnectingDeprecatedLock.unlock();
-                            }
-
-                            for (NeighbourInfo.Node node : disconnecting) { // sends disconect link to
-                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
-                                socket.send(new Link(
-                                        false,
-                                        false,
-                                        true,
-                                        streamId,
-                                        node.address,
-                                        Define.linkPort,
-                                        0,
-                                        null).toDatagramPacket());
-                            }
-
-                            for (NeighbourInfo.Node node : deprecated) {
-                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
-                                socket.send(new Link(
-                                        false,
-                                        true,
-                                        false,
-                                        streamId,
-                                        node.address,
-                                        Define.linkPort,
-                                        0,
-                                        null).toDatagramPacket());
-                            }
-
-                            Thread.sleep(Define.RPTimeout);
-
-                        }
-                    } catch (InterruptedException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            streamInfo.disconnectorThread = new Disconnector(streamInfo, streamId, socket);
         }
 
         if (!streamInfo.connectorThread.isAlive()) {
@@ -216,7 +229,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         
                         if (isActiveEmpty) {
                             //TODO Probably errors here! Don't know how this works fully
-                            updateBestNode(neighbourInfo, streamInfo, streamId, socket);
+                            updateBestNode(neighbourInfo, streamInfo, link.getStreamId(), socket);
                         }
                         
                         socket.send(new Link(
