@@ -204,8 +204,10 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             try {
                                 streamInfo.disconnectingDeprecatedLock.lock();
                                 try {
-                                    streamInfo.disconnecting.add(streamInfo.connected);
-                                    streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    if (streamInfo.connected != null) {
+                                        streamInfo.disconnecting.add(streamInfo.connected);
+                                        streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    }
                                     streamInfo.connected = streamInfo.connecting;
                                     streamInfo.connecting = null;
                                 } finally {
