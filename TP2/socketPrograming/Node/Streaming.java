@@ -38,10 +38,13 @@ public class Streaming implements Runnable{
                 Sup sup = new Sup(packet);
 
                 NeighbourInfo.StreamInfo streamInfo;
-
+                
                 synchronized(neighbourInfo.streamIdToStreamInfo) {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
+                
+                System.out.println("Recebido SUP de " + sup.getAddress() +
+                                   " Com a streamInfo: " + streamInfo);
 
                 NeighbourInfo.LossInfo lossInfo = this.streamInfo.lossInfo;
 

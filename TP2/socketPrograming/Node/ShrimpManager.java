@@ -52,10 +52,11 @@ public class ShrimpManager implements Runnable{
                     this.neighbourInfo.rpRequest.remove(shrimp.getAddress());
                     
                     //Colocar o nome da Stream associado ao seu Id
-                    this.neighbourInfo.streamIdToStreamInfo.put(streamId, new NeighbourInfo.StreamInfo());
                     
                     //Existe Stream (conseguiu caminho até ao RP)
                     if (streamId != 0 && streamId != 255) {
+                        this.neighbourInfo.streamIdToStreamInfo.put(streamId, new NeighbourInfo.StreamInfo());
+                        
                         System.out.println("Adicionado novo caminho para o RP: " + shrimp.getAddress());
                         this.neighbourInfo.isConnectedToRP = 1;
 
