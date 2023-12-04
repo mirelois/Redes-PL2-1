@@ -46,9 +46,11 @@ public class RPStreaming implements Runnable{
 
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
 
+                 
                 streamInfo.connectedLock.lock();
                 try {
-                    streamInfo.connected.latency = currLatency;
+                    if (streamInfo.connected != null)
+                        streamInfo.connected.latency = currLatency;
                 } finally {
                     streamInfo.connectedLock.unlock();
                 }

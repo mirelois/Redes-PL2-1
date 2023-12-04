@@ -42,7 +42,8 @@ public class Streaming implements Runnable{
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
                 this.streamInfo.connectedLock.lock();
                 try {
-                    this.streamInfo.connected.latency = currLatency;
+                    if (streamInfo.connected != null)
+                        this.streamInfo.connected.latency = currLatency;
                 } finally {
                     this.streamInfo.connectedLock.unlock();
                 }
