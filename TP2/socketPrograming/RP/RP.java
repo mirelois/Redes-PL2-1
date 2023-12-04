@@ -57,6 +57,7 @@ public class RP implements Runnable {
                     // System.out.println("Pedido de stream enviado ao servidor " +
                     // chooseBestServer(serverInfo) +
                     // " com payload " + new String(simp.getPayload()));
+                    continue;
                 }
                 ServerInfo.StreamInfo streamInfo = serverInfo.streamInfoMap.get(streamId);
 
