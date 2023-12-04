@@ -60,13 +60,13 @@ public class Streaming implements Runnable{
                 //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp());
                 this.streamInfo.connectedLock.lock();
-                Double metrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
+                Double currentmetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
                 
                 try {
                     if (streamInfo.connected != null) {
                         this.streamInfo.connected.latency = currLatency;
                         this.streamInfo.connected.lossRate = lossInfo.lossRate;
-                        metrics = this.streamInfo.connected.getMetrics();
+                        currentmetrics = this.streamInfo.connected.getMetrics();
                     }
                 } finally {
                     this.streamInfo.connectedLock.unlock();
@@ -77,7 +77,7 @@ public class Streaming implements Runnable{
                         bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();    
                 }
 
-                if (bestMetrics < 0.95 * metrics) {
+                if (bestMetrics < 0.95 * currentmetrics) {
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
                 }
 
