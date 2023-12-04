@@ -109,72 +109,63 @@ public class ServerConectionManager implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("ServerConectionManager is alive!");
+        
         try (DatagramSocket socket = new DatagramSocket(Define.serverConnectionManagerPort)) {
-            while (true) {
-                byte[] buf = new byte[Define.infoBuffer];
-                
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                
-                socket.receive(packet);
-    
-                Link link = new Link(packet);
-    
-                System.out.println("Recebido Link de " + link.getAddress() + " da stream " + link.getStreamId() + 
-                                   " do tipo activate: " + link.isActivate());
-    
-                if (link.isActivate()) {// NOTE: como é que o server sabe o id da stream?
-                    if (!serverSenderMap.containsKey(link.getStreamId())){
-                        String videoName;
-                        synchronized (this.videoNameToStreamId) {
-                            videoName = videoNameToStreamId.get(link.getStreamId());
-                        }
-                        serverSenderMap.put(link.getStreamId(), 
-                                                new Thread(new ServerSender(videoName, 
-                                                           link.getStreamId(), this.rpIPAddr, this.streamSocket)));
-                        
-                        if (!serverSenderMap.get(link.getStreamId()).isAlive()){
-                            System.out.println("Vou começar a stream: " + link.getStreamId());
-                            serverSenderMap.get(link.getStreamId()).start();
-                        }
+            
+            byte[] buf = new byte[Define.infoBuffer];
+            
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            
+            socket.receive(packet);
+
+            Link link = new Link(packet);
+
+            if (link.isActivate()) {// NOTE: como é que o server sabe o id da stream?
+                if (!serverSenderMap.containsKey(link.getStreamId())){
+                    String videoName;
+                    synchronized (videoNameToStreamId) {
+                        videoName = videoNameToStreamId.get(link.getStreamId());
                     }
-
-                    System.out.println("Enviado Link para " + link.getAddress() + " da stream " + link.getStreamId() + 
-                                   " do tipo activate: " + true);
-
-                    socket.send(new Link(
-                            true, // signifies that this is an acknolegment
-                            true,
-                            false,
-                            link.getStreamId(),
-                            link.getAddress(),
-                            Define.RPConectionManagerPort,
-                            0,
-                            null).toDatagramPacket());
-    
-                } else if (link.isDeactivate()) {
+                    serverSenderMap.put(link.getStreamId(), 
+                                            new Thread(new ServerSender(videoName, 
+                                                       link.getStreamId(), this.rpIPAddr, this.streamSocket)));
                     
-                    if (serverSenderMap.get(link.getStreamId()).isAlive()){
-    
-                        serverSenderMap.get(link.getStreamId()).interrupt();
+                    if (!serverSenderMap.get(link.getStreamId()).isAlive()){
+
+                        serverSenderMap.get(link.getStreamId()).start();
                         
                     }
-                    System.out.println("Enviado Link de " + link.getAddress() + " da stream " + link.getStreamId() + 
-                                   " do tipo activate: " + false);
-                    socket.send(new Link(
-                            true,
-                            false,
-                            true,
-                            link.getStreamId(),
-                            link.getAddress(),
-                            Define.RPConectionManagerPort,
-                            0,
-                            null).toDatagramPacket());
                 }
+                socket.send(new Link(
+                        true, // signifies that this is an acknolegment
+                        true,
+                        false,
+                        link.getStreamId(),
+                        link.getAddress(),
+                        link.getPort(),
+                        0,
+                        null).toDatagramPacket());
+
+            } else if (link.isDeactivate()) {
+                
+                if (serverSenderMap.get(link.getStreamId()).isAlive()){
+
+                    serverSenderMap.get(link.getStreamId()).interrupt();
+                    
+                }
+
+                socket.send(new Link(
+                        true,
+                        false,
+                        true,
+                        link.getStreamId(),
+                        link.getAddress(),
+                        link.getPort(),
+                        0,
+                        null).toDatagramPacket());
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             // TODO: handle exception
         }
 

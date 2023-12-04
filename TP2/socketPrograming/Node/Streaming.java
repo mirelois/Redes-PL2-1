@@ -30,8 +30,7 @@ public class Streaming implements Runnable{
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet);
-                System.out.println("Recebid SUP de " + sup.getAddress() + " da stream " + sup.getStreamId());
-
+                                
                 neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
 
                 Integer streamId = sup.getStreamId();
@@ -44,14 +43,13 @@ public class Streaming implements Runnable{
                 synchronized (streamActiveLinks) {
                     //TODO Como fazer os frame Numbers (o que são?)
                     for (InetAddress activeLink : streamActiveLinks) {
-                        System.out.println("Enviando SUP da stream " + sup.getStreamId() + " para " + activeLink);
                         if (!activeLink.equals(sup.getAddress())) {
                             if (activeLink.equals(InetAddress.getByName("localhost"))) {
-                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
-                                     sup.getStreamId(), InetAddress.getByName("localhost"), Define.clientPort, sup.getPayloadSize(), sup.getPayload())
+                                socket.send(new Sup(0, sup.getTime_stamp(), sup.getVideo_time_stamp(), 0, sup.getSequence_number(),
+                                     sup.getStreamId(), InetAddress.getByName("localhost"), 8389, sup.getPayloadSize(), sup.getPayload())
                                     .toDatagramPacket());
                             } else {
-                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
+                                socket.send(new Sup(0, sup.getTime_stamp(), sup.getVideo_time_stamp(), 0, sup.getSequence_number(),
                                      sup.getStreamId(), activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
                                     .toDatagramPacket());
                             }
