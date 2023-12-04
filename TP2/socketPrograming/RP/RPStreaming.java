@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Set;
 
+import Node.NodeConnectionManager;
 import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Sup;
@@ -38,10 +39,27 @@ public class RPStreaming implements Runnable{
                 //calculatet and update server latencies
                 int latency = Packet.getLatency(sup.getTime_stamp());
 
-                synchronized(serverInfo){
-                    for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
-                        streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(sup.getAddress(), latency));
-                    }
+                ServerInfo.StreamInfo streamInfo;
+
+                synchronized(serverInfo.streamInfoMap) {
+                    streamInfo = serverInfo.streamInfoMap.get(sup.getStreamId());
+                }
+
+                Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
+                
+                streamInfo.connectedLock.lock();
+                try {
+                    streamInfo.connected.latency = currLatency;
+                } finally {
+                    streamInfo.connectedLock.unlock();
+                }
+                
+                synchronized(this.neighbourInfo.minNodeQueue) {
+                    bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
+                }
+
+                if (bestLatency < 0.95 * currLatency) {
+                    RPServerConectionManager.updateBestServer(streamInfo, sup.getStreamId(), socket);
                 }
 
                 Set<InetAddress> streamActiveLinks;
