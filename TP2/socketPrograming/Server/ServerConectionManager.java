@@ -136,7 +136,6 @@ public class ServerConectionManager implements Runnable {
                         if (!serverSenderMap.get(link.getStreamId()).isAlive()){
                             System.out.println("Vou começar a stream: " + link.getStreamId());
                             serverSenderMap.get(link.getStreamId()).start();
-                            
                         }
                     }
 

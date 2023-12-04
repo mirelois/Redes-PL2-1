@@ -94,13 +94,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
                     synchronized(streamIdToFileName) {
                         streamIdToFileName.put(shrimp.getStreamId(), new String(shrimp.getPayload()));
                     }
-
-                    //Create thread for the sending of the stream
-                    System.out.println("Criada Thread que envia a stream com ficheiro de nome: " + 
-                                       new String(shrimp.getPayload()));
-                    Thread serverSender = new Thread(new ServerSender(new String(shrimp.getPayload()), 
-                                                     shrimp.getStreamId(), this.rpIPAddr, RTPsocket));
-                    serverSenderMap.put(shrimp.getStreamId(), serverSender);
                 }
             }
         } catch (IOException e){
