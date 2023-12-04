@@ -33,7 +33,7 @@ public class VideoStream {
         //read current frame length
         readB = fis.read(frame_length, 0, 5);
         if (readB == -1){
-            fis.reset();
+            fis = new FileInputStream(filename);
             fis.read(frame_length,0,5);
         }
 
