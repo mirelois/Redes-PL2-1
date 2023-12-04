@@ -17,10 +17,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     static class Connector extends Thread {
 
         NeighbourInfo.StreamInfo streamInfo; 
-        Integer streamId; 
+        int streamId; 
         DatagramSocket socket;
 
-        public Connector(NeighbourInfo.StreamInfo streamInfo, Integer streamId, DatagramSocket socket) {
+        public Connector(NeighbourInfo.StreamInfo streamInfo, int streamId, DatagramSocket socket) {
             this.streamInfo = streamInfo;
             this.streamId = streamId;
             this.socket = socket;    
@@ -65,10 +65,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     static class Disconnector extends Thread {
 
         NeighbourInfo.StreamInfo streamInfo; 
-        Integer streamId; 
+        int streamId; 
         DatagramSocket socket;
 
-        public Disconnector(NeighbourInfo.StreamInfo streamInfo, Integer streamId, DatagramSocket socket) {
+        public Disconnector(NeighbourInfo.StreamInfo streamInfo, int streamId, DatagramSocket socket) {
             this.streamInfo = streamInfo;
             this.streamId = streamId;
             this.socket = socket;    
