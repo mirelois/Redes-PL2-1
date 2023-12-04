@@ -39,7 +39,6 @@ public class RPServerAdder implements Runnable{
                 System.out.println("Recebido Shrimp de conexão do servidor " + shrimp.getAddress());
                 int latency = Packet.getLatency(shrimp.getTimeStamp());
                 
-                System.out.println("    Adicionado servidor de endereço " + shrimp.getAddress().getHostAddress());
                 String streamName = new String(shrimp.getPayload());
                 Integer streamId;
                 //Verificar se a stream já existe no RP
@@ -47,8 +46,10 @@ public class RPServerAdder implements Runnable{
                     streamId = this.neighbourInfo.fileNameToStreamId.get(streamName);
                     ServerInfo.StreamInfo streamInfo;
                     synchronized(serverInfo) {
-
+                        
                         if (streamId == null) { //Stream ainda não existe no RP
+                            System.out.println("    Adicionado ficheiro " + streamName + "com o id" + 
+                                               streamId + " para o servidor " + shrimp.getAddress().getHostName());
                             this.neighbourInfo.fileNameToStreamId.put(streamName, curr_streamID);
                             streamId = curr_streamID;
                             curr_streamID++;
