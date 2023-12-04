@@ -96,8 +96,6 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                     }
 
                     for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
-                        System.out.println(streamId);
-                        System.out.println(server.address);
                         System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
                         socket.send(new Link(
                                 false,
