@@ -65,7 +65,7 @@ public class RPStreaming implements Runnable{
                     streamInfo = serverInfo.streamInfoMap.get(sup.getStreamId());
                 }
 
-                Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
+                Integer currLatency = Packet.getLatency(sup.getTime_stamp());
                 double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
                  
                 streamInfo.connectedLock.lock();
