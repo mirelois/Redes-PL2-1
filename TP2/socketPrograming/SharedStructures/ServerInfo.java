@@ -49,7 +49,7 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
             }
         }
 
-        public PriorityQueue<Server> minServer = new PriorityQueue<>((a,b) -> a.latency - b.latency);
+        public PriorityQueue<Server> minServerQueue = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         public Integer activeServerLatency = Integer.MAX_VALUE;
         
         //locks for altering the connecting and connected variable
@@ -71,6 +71,10 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         
         public Thread disconnectorThread;
 
+        public StreamInfo(Integer streamId) {
+            this.streamId = streamId;
+        }
+
         public HashSet<Server> getDisconnecting() {
             HashSet<Server> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
@@ -88,9 +92,9 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
         }
 
         public void updateLatency(Server server){//this method has O(log n) time complexity
-            synchronized(this.minServer){
-                this.minServer.remove(server);
-                this.minServer.add(server);
+            synchronized(this.minServerQueue){
+                this.minServerQueue.remove(server);
+                this.minServerQueue.add(server);
             }
         }
     }

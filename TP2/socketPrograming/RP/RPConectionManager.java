@@ -157,8 +157,8 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             } finally {
                 streamInfo.disconnectingDeprecatedLock.unlock();
             }
-            synchronized (streamInfo.minServer) {
-                streamInfo.connecting = streamInfo.minServer.peek(); // this operation has complexity O(1)
+            synchronized (streamInfo.minServerQueue) {
+                streamInfo.connecting = streamInfo.minServerQueue.peek(); // this operation has complexity O(1)
             }
             streamInfo.connectingEmpty.signal();
         } finally {
