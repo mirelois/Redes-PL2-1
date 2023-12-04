@@ -90,10 +90,8 @@ public class fullDuplex {
         for (InetAddress neighbour : neighbours.overlayNeighbours) {
             System.out.println(neighbour.getHostName());
         }
-
-        Thread streaming = new Thread(new Streaming(neighbours));
-        streaming.start();
-
+        Thread streaming;
+        
         if (isRP){
             System.out.println("Começo de RP!");
             ServerInfo serverInfo = new ServerInfo();
@@ -101,15 +99,17 @@ public class fullDuplex {
             new Thread(new RPServerAdder(serverInfo, neighbours)).start();
             new Thread(new NodeConnectionManager(neighbours)).start();
             new Thread(new RPConectionManager(serverInfo)).start();
-            new Thread(new RPStreaming(serverInfo, neighbours)).start();
+            streaming = new Thread(new RPStreaming(serverInfo, neighbours));
         }else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));
-            simpManager.start();
             Thread shrimpManager = new Thread(new ShrimpManager(neighbours));
-            shrimpManager.start();
             new Thread(new NodeConnectionManager(neighbours)).start();
+            streaming = new Thread(new Streaming(neighbours));
+            simpManager.start();
+            shrimpManager.start();
         }
+        streaming.start();
         boolean isClientAlive = false;
         boolean isServerAlive = false;
         boolean keepLooping = true;
