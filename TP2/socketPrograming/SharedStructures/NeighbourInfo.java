@@ -13,7 +13,7 @@ public class NeighbourInfo {
         public int totalReceivedPacket = 0;
         public double lossRate = -1;
         public int prevDiff = 0;
-        public double jitter = -1;
+        public int jitter = -1;
         
     }
 
@@ -39,6 +39,7 @@ public class NeighbourInfo {
             this.address = address;
             this.latency = latency;
             this.lossRate = lossRate;
+            this.jitter = jitter;
         }
 
         public double getMetrics(){//NOTE: isto é de total responsabilidade do Lucena
