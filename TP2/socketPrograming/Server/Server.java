@@ -132,9 +132,9 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
                 //send the packet as a DatagramPacket over the UDP socket
                 //senddp = new DatagramPacket(packet_bits, packet_length, rpIPAddr, RTP_dest_port);
-                RTPsocket.send(senddp);
+                //RTPsocket.send(senddp);
 
-                System.out.println("Send frame #"+imagenb);
+                //System.out.println("Send frame #"+imagenb);
                 //print the header bitstream
                 //rtp_packet.printheader();
 
