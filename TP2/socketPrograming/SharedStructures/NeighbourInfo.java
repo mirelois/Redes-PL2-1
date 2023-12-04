@@ -9,7 +9,7 @@ public class NeighbourInfo {
     public static class Node {
         public final InetAddress address;
         public int latency;
-        public Double lossRate = -1.;
+        public double lossRate = -1.;
 
         public Node(InetAddress address, int latency) {
             this.address = address;

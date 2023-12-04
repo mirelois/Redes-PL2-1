@@ -5,29 +5,25 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Sup;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
-import SharedStructures.NeighbourInfo.Node;
 
 public class Streaming implements Runnable{
 
     class lossInfo {
         
-        Integer latestReceivedPacket;
-        Double lossRate;
+        int latestReceivedPacket;
+        double lossRate;
         
     }
     HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
     
     private final NeighbourInfo neighbourInfo;
     NeighbourInfo.StreamInfo streamInfo;
-
-    
 
     public Streaming(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo){
         
@@ -50,6 +46,8 @@ public class Streaming implements Runnable{
                 Sup sup = new Sup(packet);
 
                 lossInfo lossInfo = this.lossInfo.get(sup.getStreamId());
+                
+                lossInfo.latestReceivedPacket = sup.getFrameNumber();
 
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
@@ -59,14 +57,15 @@ public class Streaming implements Runnable{
                                 
                 //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp());
+                double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
+                
                 this.streamInfo.connectedLock.lock();
-                Double currentmetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
                 
                 try {
                     if (streamInfo.connected != null) {
                         this.streamInfo.connected.latency = currLatency;
                         this.streamInfo.connected.lossRate = lossInfo.lossRate;
-                        currentmetrics = this.streamInfo.connected.getMetrics();
+                        currentMetrics = this.streamInfo.connected.getMetrics();
                     }
                 } finally {
                     this.streamInfo.connectedLock.unlock();
@@ -77,7 +76,7 @@ public class Streaming implements Runnable{
                         bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();    
                 }
 
-                if (bestMetrics < 0.95 * currentmetrics) {
+                if (bestMetrics < 0.95 * currentMetrics) {
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
                 }
 

@@ -1,5 +1,4 @@
 package SharedStructures;
-import java.io.ObjectInputStream.GetField;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,12 +18,20 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
             
             public final InetAddress address;
             public int latency;
+            public double lossRate = -1.;
             
             public Server(InetAddress address, int latency){
                 this.address =  address;
                 this.latency = latency;
+                
             }
-            
+
+            public Server(InetAddress address, int latency, Double lossRate){
+                this.address =  address;
+                this.latency = latency;
+                this.lossRate = lossRate;
+            }
+
             @Override
             public boolean equals(Object o) {
 
@@ -47,8 +54,17 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
             public int hashCode() {
                 return this.address.hashCode();
             }
-        }
 
+            public double getMetrics(){
+            if (this.lossRate < 0){
+                return (double)this.latency;
+            }else{
+                return (0.45 * this.latency + 0.55 * this.lossRate*600);
+            }
+        }
+         
+        }
+                
         public PriorityQueue<Server> minServerQueue = new PriorityQueue<>((a,b) -> a.latency - b.latency);
         public Integer activeServerLatency = Integer.MAX_VALUE;
         
@@ -97,6 +113,8 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
                 this.minServerQueue.add(server);
             }
         }
+
+           
     }
     
     public Map<Integer, StreamInfo> streamInfoMap = new HashMap<>();

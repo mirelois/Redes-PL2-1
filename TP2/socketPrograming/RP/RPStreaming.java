@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.Set;
 
 import Node.NodeConnectionManager;
@@ -14,6 +15,15 @@ import SharedStructures.NeighbourInfo;
 import SharedStructures.ServerInfo;
 
 public class RPStreaming implements Runnable{
+    
+    class lossInfo {
+        
+        int latestReceivedPacket;
+        double lossRate;
+        
+    }
+    
+    HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
     
     private final NeighbourInfo neighbourInfo;
 
@@ -35,6 +45,17 @@ public class RPStreaming implements Runnable{
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet); //this came from a server
+                                           
+                lossInfo lossInfo = this.lossInfo.get(sup.getStreamId());
+
+                if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
+                    continue;//Manda cu caralho
+                }
+
+                lossInfo.lossRate = (sup.getFrameNumber() - lossInfo.latestReceivedPacket)/(double)sup.getFrameNumber();
+
+                lossInfo.latestReceivedPacket = sup.getFrameNumber();
+                
                 System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
                 //calculatet and update server latencies
 
@@ -45,12 +66,15 @@ public class RPStreaming implements Runnable{
                 }
 
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
-
+                double currentMetrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
                  
                 streamInfo.connectedLock.lock();
+                
                 try {
                     if (streamInfo.connected != null)
                         streamInfo.connected.latency = currLatency;
+                        streamInfo.connected.lossRate = lossInfo.lossRate;
+                        currentMetrics = streamInfo.connected.getMetrics();
                 } finally {
                     streamInfo.connectedLock.unlock();
                 }
@@ -58,11 +82,9 @@ public class RPStreaming implements Runnable{
                 synchronized(this.neighbourInfo.minNodeQueue) {
                     if (this.neighbourInfo.minNodeQueue.peek() != null)
                         bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;
-                    else
-                        bestLatency = Integer.MAX_VALUE;
                 }
 
-                if (bestLatency < 0.95 * currLatency) {
+                if (bestMetrics < 0.95 * currentMetrics) {
                     RPServerConectionManager.updateBestServer(streamInfo, sup.getStreamId(), socket);
                 }
 
