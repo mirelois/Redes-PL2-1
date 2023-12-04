@@ -24,7 +24,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
         this.neighbourInfo = neighbourInfo;
         this.streamInfo = new StreamInfo();
-        System.out.println("Provamos assim que streamInfo é " + this.streamInfo);
     }
 
     //Called once at the start and everytime the Connected Node should change
