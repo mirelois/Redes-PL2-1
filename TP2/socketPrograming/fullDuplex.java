@@ -20,10 +20,7 @@ import Node.ShrimpManager;
 import Node.SimpManager;
 import Node.Streaming;
 import RP.RP;
-import RP.RPNodeConnectionManager;
-import RP.RPServerConectionManager;
 import RP.RPServerAdder;
-import RP.RPStreaming;
 import Server.Server;
 import Server.ServerConectionManager;
 import SharedStructures.Define;
@@ -91,26 +88,23 @@ public class fullDuplex {
         for (InetAddress neighbour : neighbours.overlayNeighbours) {
             System.out.println(neighbour.getHostName());
         }
-        Thread streaming;
-        
+
+        Thread streaming = new Thread(new Streaming(neighbours));
+        streaming.start();
+
         if (isRP){
             System.out.println("Começo de RP!");
             ServerInfo serverInfo = new ServerInfo();
             new Thread(new RP(serverInfo, neighbours)).start();
             new Thread(new RPServerAdder(serverInfo, neighbours)).start();
-            new Thread(new RPNodeConnectionManager(serverInfo, neighbours)).start();
-            new Thread(new RPServerConectionManager(serverInfo)).start();
-            streaming = new Thread(new RPStreaming(serverInfo, neighbours));
+            new Thread(new NodeConnectionManager(neighbours)).start();
         }else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));
-            Thread shrimpManager = new Thread(new ShrimpManager(neighbours));
-            new Thread(new NodeConnectionManager(neighbours)).start();
-            streaming = new Thread(new Streaming(neighbours));
             simpManager.start();
+            Thread shrimpManager = new Thread(new ShrimpManager(neighbours));
             shrimpManager.start();
         }
-        streaming.start();
         boolean isClientAlive = false;
         boolean isServerAlive = false;
         boolean keepLooping = true;
@@ -141,7 +135,7 @@ public class fullDuplex {
                                           streamIdToFileName, serverSenderMap, RTPsocket)).start();
     
                     new Thread(new ServerConectionManager(InetAddress.getByName(args[0]), 
-                                                          serverSenderMap, streamIdToFileName, RTPsocket)).start();
+                                                          serverSenderMap, streamIdToFileName, RTPsocket));
                     
                 } catch (SocketException e) {
                     System.out.println("Servidor: erro no socket: " + e.getMessage());

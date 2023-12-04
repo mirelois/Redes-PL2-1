@@ -8,7 +8,6 @@ import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
 
-import Protocols.Link;
 import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Rip;
@@ -40,11 +39,22 @@ public class ShrimpManager implements Runnable{
                                     " vindo de " + shrimp.getAddress().getHostAddress() +
                                     " com streamId " + shrimp.getStreamId());
 
-                socket.send(new Rip(0, packet.getAddress(), Define.ripPort).toDatagramPacket());
+                socket.send(new Rip(0, packet.getAddress(), packet.getPort()).toDatagramPacket());
 
                 synchronized(this.neighbourInfo) {
                     //Remover pedido feito por Simp
                     this.neighbourInfo.rpRequest.remove(shrimp.getAddress());
+                }
+
+                try {
+                    if (clientIP.isAnyLocalAddress() ||
+                        clientIP.isLoopbackAddress() || 
+                        NetworkInterface.getByInetAddress(clientIP) != null) {
+                        //TODO Avisar o Cliente anexo ao nodo de que a Stream chegou (ou não)!
+                        //continue;
+                    }
+                } catch (SocketException e) {
+
                 }
 
                 Set<InetAddress> clientAdjacent, rpAdjacent;
@@ -56,7 +66,6 @@ public class ShrimpManager implements Runnable{
                     
                     //Existe Stream (conseguiu caminho até ao RP)
                     if (streamId != 0 && streamId != 255) {
-                        System.out.println("Adicionado novo caminho para o RP: " + shrimp.getAddress());
                         this.neighbourInfo.isConnectedToRP = 1;
 
                         this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
@@ -67,25 +76,6 @@ public class ShrimpManager implements Runnable{
 
                         //Adicionar Novo Caminho para a Stream (Porque existe!)
                         rpAdjacent.add(shrimp.getAddress());
-
-                        try {
-                            if (clientIP.isAnyLocalAddress() ||
-                                clientIP.isLoopbackAddress() || 
-                                NetworkInterface.getByInetAddress(clientIP) != null) {
-                                //TODO Avisar o Cliente anexo ao nodo de que a Stream chegou (ou não)!
-                                System.out.println("    Shrimp veio para Cliente local - Enviado Link para local");
-                                socket.send(new Link(false, 
-                                                    true,
-                                                    false,
-                                                    shrimp.getStreamId(),
-                                                    InetAddress.getByName("localhost"),
-                                                    Define.nodeConnectionManagerPort,
-                                                    0,
-                                                    null).toDatagramPacket());     
-                            }
-                        } catch (SocketException e) {
-
-                        }
 
                         //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
                         for (InetAddress linkToClient : clientAdjacent) {

@@ -34,7 +34,7 @@ public class RPStreaming implements Runnable{
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet); //this came from a server
-                System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
+                
                 //calculatet and update server latencies
                 int latency = Packet.getLatency(sup.getTime_stamp());
 
@@ -53,8 +53,6 @@ public class RPStreaming implements Runnable{
                 }
 
                 for (InetAddress activeLink : streamActiveLinks) {
-                    System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
-                                       " com seq#: " + sup.getSequence_number());
                     socket.send(new Sup(
                             -1,
                             Packet.getCurrTime(),
