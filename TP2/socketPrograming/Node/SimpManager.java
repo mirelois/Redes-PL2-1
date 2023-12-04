@@ -81,7 +81,8 @@ public class SimpManager implements Runnable{
 
                             }
                             if (this.neighbourInfo.rpRequest.isEmpty()) {
-                                System.out.println("    Nodo não pediu a ninguém = não tem conexão para o RP");
+                                System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostName() + ", port " + Define.shrimpPort + 
+                                                   " com streamId: " + 0);
                                 this.neighbourInfo.isConnectedToRP = 0;
                                 this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
                                 socket.send(new Shrimp(Packet.getCurrTime(), clientIP, 0, Define.shrimpPort, simp.getAddress(),
