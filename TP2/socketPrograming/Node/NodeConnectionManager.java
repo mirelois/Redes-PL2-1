@@ -16,8 +16,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
     NeighbourInfo neighbourInfo;
 
-    NeighbourInfo.StreamInfo streamInfo;
-
     public NodeConnectionManager(NeighbourInfo neighbourInfo) {
 
         this.neighbourInfo = neighbourInfo;
@@ -184,7 +182,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 Link link = new Link(packet);
                 System.out.println("Recebido Link de " + link.getAddress() + " do tipo activate: " + link.isActivate());
-
+                NeighbourInfo.StreamInfo streamInfo = this.neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
                 //TODO this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
                 NeighbourInfo.Node node = 
@@ -213,8 +211,9 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         
                         if (isActiveEmpty) {
                             System.out.println("    Novo active link, update ao melhor nodo");
-                            updateBestNode(this.neighbourInfo, this.streamInfo, link.getStreamId(), socket);
+                            updateBestNode(this.neighbourInfo, streamInfo, link.getStreamId(), socket);
                         }
+
 
                         synchronized(streamInfo.clientAdjacent) {
                             streamInfo.clientAdjacent.put(link.getAddress(), streamInfo.clientAdjacent.get(link.getAddress()) + 1);
