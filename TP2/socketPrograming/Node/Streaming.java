@@ -4,6 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import Protocols.Packet;
 import Protocols.PacketSizeException;
@@ -13,7 +14,10 @@ import SharedStructures.NeighbourInfo;
 import SharedStructures.NeighbourInfo.Node;
 
 public class Streaming implements Runnable{
+    
     private final NeighbourInfo neighbourInfo;
+
+    private ArrayBlockingQueue<DatagramPacket> packetQueue = new ArrayBlockingQueue<>();
 
     public Streaming(NeighbourInfo neighbourInfo){
         this.neighbourInfo = neighbourInfo;
@@ -21,15 +25,28 @@ public class Streaming implements Runnable{
 
     @Override
     public void run(){
-        try(DatagramSocket socket = new DatagramSocket(Define.streamingPort)) {
 
+        try(DatagramSocket socket = new DatagramSocket(Define.streamingPort)) {
+            
             byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough? no
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            
+            new Thread(() -> {
+
+                while (true) {
+                    
+                    socket.receive(packet);
+
+                    packetQueue.add(packet);
+                }
+
+            });
+
 
             while (true){
-                socket.receive(packet);
+                // socket.receive(packet);
 
-                Sup sup = new Sup(packet);
+                Sup sup = new Sup(packetQueue.poll());
                                 
                 neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
 
