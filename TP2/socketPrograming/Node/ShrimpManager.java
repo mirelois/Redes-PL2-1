@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
 
+import Protocols.Link;
 import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Rip;
@@ -51,6 +52,15 @@ public class ShrimpManager implements Runnable{
                         clientIP.isLoopbackAddress() || 
                         NetworkInterface.getByInetAddress(clientIP) != null) {
                         //TODO Avisar o Cliente anexo ao nodo de que a Stream chegou (ou não)!
+                        System.out.println("    Shrimp veio para Cliente local");
+                        socket.send(new Link(false, 
+                                             true,
+                                             false,
+                                             shrimp.getStreamId(),
+                                             InetAddress.getByName("localhost"),
+                                             Define.linkPort,
+                                             0,
+                                             null).toDatagramPacket());     
                         //continue;
                     }
                 } catch (SocketException e) {

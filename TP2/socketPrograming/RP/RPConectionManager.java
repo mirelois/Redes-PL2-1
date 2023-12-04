@@ -57,7 +57,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                                 streamInfo.connectingLock.unlock();
                             }
                             
-                            System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
+                            System.out.println("Enviado Link de ativação para " + connecting.address.getHostName() + " da stream " + streamId);
                             socket.send(new Link(
                                     false,
                                     true,

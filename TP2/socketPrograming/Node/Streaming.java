@@ -45,11 +45,11 @@ public class Streaming implements Runnable{
                     for (InetAddress activeLink : streamActiveLinks) {
                         if (!activeLink.equals(sup.getAddress())) {
                             if (activeLink.equals(InetAddress.getByName("localhost"))) {
-                                socket.send(new Sup(0, sup.getTime_stamp(), sup.getVideo_time_stamp(), 0, sup.getSequence_number(),
+                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
                                      sup.getStreamId(), InetAddress.getByName("localhost"), 8389, sup.getPayloadSize(), sup.getPayload())
                                     .toDatagramPacket());
                             } else {
-                                socket.send(new Sup(0, sup.getTime_stamp(), sup.getVideo_time_stamp(), 0, sup.getSequence_number(),
+                                socket.send(new Sup(sup.getLossRate(), sup.getTime_stamp(), sup.getVideo_time_stamp(), sup.getFrameNumber(), sup.getSequence_number(),
                                      sup.getStreamId(), activeLink, Define.streamingPort, sup.getPayloadSize(), sup.getPayload())
                                     .toDatagramPacket());
                             }

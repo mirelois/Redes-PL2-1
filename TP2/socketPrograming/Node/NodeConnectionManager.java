@@ -43,9 +43,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
-                                                       // server
+    
+        
         if (streamInfo.connectorThread == null) {
-            
+            System.out.println("Started connector thread.");
             streamInfo.connectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -87,6 +88,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
         if (streamInfo.disconnectorThread == null) {
             //TODO Separar os Deprecated dos Disconnecting no futuro
+            System.out.println("Started disconnector thread.");
             streamInfo.disconnectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -192,6 +194,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 socket.receive(packet);
 
                 Link link = new Link(packet);
+                System.out.println("Recebido Link de " + link.getAddress() + " do tipo activate: " + link.isActivate());
 
                 this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
@@ -200,6 +203,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 //RP never receives acks as their logic exists in RP
                 if (!link.isAck()) {
+                    System.out.println("    Link não é Ack");
                     Set<InetAddress> activeLinks;
 
                     if (link.isActivate()) {
