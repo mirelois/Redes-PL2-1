@@ -9,17 +9,26 @@ public class NeighbourInfo {
     public static class Node {
         public final InetAddress address;
         public int latency;
-        public int lossRate = -1;
+        public Double lossRate = -1.;
 
         public Node(InetAddress address, int latency) {
             this.address = address;
             this.latency = latency;
         }
 
-        public Node(InetAddress address, int latency, int lossRate) {
+        public Node(InetAddress address, int latency, Double lossRate) {
             this.address = address;
             this.latency = latency;
             this.lossRate = lossRate;
+        }
+
+        public double getMetrics(){//NOTE: isto é de total responsabilidade do Lucena
+            
+            if (this.lossRate < 0){
+                return this.latency;
+            }else{
+                return (0.45 * this.latency + 0.55 * this.lossRate*600);
+            }
         }
 
         @Override
@@ -92,15 +101,7 @@ public class NeighbourInfo {
 
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
 
-    public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> {
-        
-        if (a.lossRate == -1 || b.lossRate == -1){
-            return a.latency - b.latency;
-        }else{
-            return (0.45 * a.latency + 0.55 * a.lossRate*600) - (0.45 * b.latency + 0.55 * b.lossRate * 600) > 0 ? 1 : -1;
-        }
-    
-    });
+    public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> (a.getMetrics() - b.getMetrics()) > 0 ? 1 : -1);
 
     public Map<Integer, Set<InetAddress>> streamActiveLinks = new HashMap<>(); // links para enviar a stream
 

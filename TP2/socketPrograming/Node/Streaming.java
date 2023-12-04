@@ -19,7 +19,7 @@ public class Streaming implements Runnable{
     class lossInfo {
         
         Integer latestReceivedPacket;
-        Integer lossRate;
+        Double lossRate;
         
     }
     HashMap<Integer, lossInfo> lossInfo = new HashMap<>();
@@ -30,8 +30,10 @@ public class Streaming implements Runnable{
     
 
     public Streaming(NeighbourInfo neighbourInfo, NeighbourInfo.StreamInfo streamInfo){
+        
         this.neighbourInfo = neighbourInfo;
         this.streamInfo = streamInfo;
+        
     }
 
     @Override
@@ -53,15 +55,18 @@ public class Streaming implements Runnable{
                     continue;//Manda cu caralho
                 }
 
-                lossInfo.lossRate = 100*(sup.getFrameNumber() - lossInfo.latestReceivedPacket)/sup.getFrameNumber();
+                lossInfo.lossRate = (sup.getFrameNumber() - lossInfo.latestReceivedPacket)/(double)sup.getFrameNumber();
                                 
                 //neighbourInfo.updateLatency(new NeighbourInfo.Node(sup.getAddress(), Packet.getLatency(sup.getTime_stamp())));
-                Integer currLatency = Packet.getLatency(sup.getTime_stamp()), bestLatency;
+                Integer currLatency = Packet.getLatency(sup.getTime_stamp());
                 this.streamInfo.connectedLock.lock();
+                Double metrics = Double.MAX_VALUE, bestMetrics = Double.MAX_VALUE;
+                
                 try {
                     if (streamInfo.connected != null) {
                         this.streamInfo.connected.latency = currLatency;
                         this.streamInfo.connected.lossRate = lossInfo.lossRate;
+                        metrics = this.streamInfo.connected.getMetrics();
                     }
                 } finally {
                     this.streamInfo.connectedLock.unlock();
@@ -69,12 +74,10 @@ public class Streaming implements Runnable{
                 
                 synchronized(this.neighbourInfo.minNodeQueue) {
                     if (this.neighbourInfo.minNodeQueue.peek() != null)
-                        bestLatency = this.neighbourInfo.minNodeQueue.peek().latency;    
-                    else
-                        bestLatency = Integer.MAX_VALUE;
+                        bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();    
                 }
 
-                if (bestLatency < 0.95 * currLatency) {
+                if (bestMetrics < 0.95 * metrics) {
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
                 }
 
