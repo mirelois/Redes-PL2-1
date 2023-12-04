@@ -75,7 +75,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
             for (String string : providedStreams) {
                 
                 System.out.println("Avisar RP da existência da stream " + string);
-                RTPsocket.send(new Shrimp(Packet.getCurrTime(), InetAddress.getLocalHost(), 0,
+                RTPsocket.send(new Shrimp(Packet.getCurrTime(), InetAddress.getByName("localhost"), 0,
                                Define.RPServerAdderPort, rpIPAddr, string.length(), string.getBytes()).toDatagramPacket());
                 
             }
@@ -94,15 +94,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
                     synchronized(streamIdToFileName) {
                         streamIdToFileName.put(shrimp.getStreamId(), new String(shrimp.getPayload()));
                     }
-
-                    //Create thread for the sending of the stream
-                    System.out.println("Criada Thread que envia a stream com ficheiro de nome: " + 
-                                       new String(shrimp.getPayload()));
-                    Thread serverSender = new Thread(new ServerSender(new String(shrimp.getPayload()), 
-                                                     shrimp.getStreamId(), this.rpIPAddr, RTPsocket));
-                    serverSenderMap.put(shrimp.getStreamId(), serverSender);
-                    serverSender.start();
-
                 }
             }
         } catch (IOException e){
@@ -200,9 +191,8 @@ public class Server extends JFrame implements ActionListener, Runnable {
                     int image_length = video.getnextframe(sBuf);
 
                     //Builds an RTPpacket object containing the frame
-                    Sup rtp_packet = new Sup(0, Packet.getCurrTime(), this.streamId,imagenb*FRAME_PERIOD,imagenb, 
-                                             streamId, rpIPAddr, Define.RPConectionManagerPort, image_length, sBuf);
-                    //Sup rtp_packet = new RTPpacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD, sBuf, image_length);
+                    Sup rtp_packet = new Sup(0, Packet.getCurrTime(), imagenb*FRAME_PERIOD, imagenb, imagenb,
+                                             this.streamId, rpIPAddr, Define.streamingPort, image_length, sBuf);
 
                     //get to total length of the full rtp packet to send
                     //int packet_length = rtp_packet.getlength();
@@ -222,6 +212,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
 
                     //update GUI
                     //label.setText("Send frame #" + imagenb);
+                    Thread.sleep(FRAME_PERIOD);
                 }catch(Exception ex) {
                     System.out.println("Exception caught: "+ex);
                     System.exit(0);

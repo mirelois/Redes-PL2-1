@@ -7,6 +7,8 @@ public class VideoStream {
     FileInputStream fis; //video file
     int frame_nb; //current frame nb
 
+    String filename;
+
     //-----------------------------------
     //constructor
     //-----------------------------------
@@ -15,6 +17,7 @@ public class VideoStream {
         //init variables
         fis = new FileInputStream(filename);
         frame_nb = 0;
+        this.filename = filename;
     }
 
     //-----------------------------------
@@ -26,8 +29,11 @@ public class VideoStream {
         String length_string;
         byte[] frame_length = new byte[5];
 
+        int readB;
         //read current frame length
-        fis.read(frame_length,0,5);
+        readB = fis.read(frame_length,0,5);
+        if(readB==0)//loop
+            fis = new FileInputStream(filename);
 
         //transform frame_length to integer
         length_string = new String(frame_length);

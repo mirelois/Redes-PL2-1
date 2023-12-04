@@ -10,7 +10,7 @@ import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.ServerInfo;
 
-public class RPConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
+public class RPServerConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
 
     ServerInfo serverInfo;
 
@@ -20,7 +20,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
 
     ServerInfo.StreamInfo streamInfo;
 
-    public RPConectionManager(ServerInfo serverInfo) {
+    public RPServerConectionManager(ServerInfo serverInfo) {
 
         // this.serverInfo = serverInfo;
         // this.streamId = streamId;
@@ -32,10 +32,12 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
     public static void updateBestServer(ServerInfo.StreamInfo streamInfo, Integer streamId, int bestServerLatency, DatagramSocket socket)
             throws UnknownHostException { // TODO: currently this is never called stfu
 
-        streamInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
+        if (streamInfo.connected != null) {
+            streamInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
+        }
                                                                // server
         if (streamInfo.connectorThread == null) {
-            
+            System.out.println("Started connector thread.");
             streamInfo.connectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -48,20 +50,21 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             try {
                                 streamInfo.connectingLock.lock();
                                 while (streamInfo.connecting == null) {
-                                    streamInfo.connectingEmpty.wait();
+                                    streamInfo.connectingEmpty.await();
                                 }
                                 connecting = streamInfo.getConnecting();// copy of the currentBestServer
                             } finally {
                                 streamInfo.connectingLock.unlock();
                             }
                             
+                            System.out.println("Enviado Link de ativação para " + connecting.address.getHostName() + " da stream " + streamId);
                             socket.send(new Link(
                                     false,
                                     true,
                                     false,
                                     streamId,
                                     connecting.address,
-                                    Define.serverPort,
+                                    Define.serverConnectionManagerPort,
                                     0,
                                     null).toDatagramPacket());
 
@@ -76,7 +79,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
         }
 
         if (streamInfo.disconnectorThread == null) {
-            
+            System.out.println("Started disconnector thread.");
             streamInfo.disconnectorThread = new Thread(new Runnable() {
 
                 public void run() {
@@ -99,27 +102,27 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             }
 
                             for (ServerInfo.StreamInfo.Server server : disconnecting) { // sends disconect link to
-                                                                                        // all servers in
+                                System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         false,
                                         true,
                                         streamId,
                                         server.address,
-                                        Define.serverPort,
+                                        Define.serverConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
 
                             for (ServerInfo.StreamInfo.Server server : deprecated) {
-                                
+                                System.out.println("Enviado Link de desativação para " + server.address + " da stream " + streamId);
                                 socket.send(new Link(
                                         false,
                                         true,
                                         false,
                                         streamId,
                                         server.address,
-                                        Define.serverPort,
+                                        Define.serverConnectionManagerPort,
                                         0,
                                         null).toDatagramPacket());
                             }
@@ -157,8 +160,9 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
             } finally {
                 streamInfo.disconnectingDeprecatedLock.unlock();
             }
-            synchronized (streamInfo.minServer) {
-                streamInfo.connecting = streamInfo.minServer.peek(); // this operation has complexity O(1)
+            synchronized (streamInfo.minServerQueue) {
+                streamInfo.connecting = streamInfo.minServerQueue.peek(); // this operation has complexity O(1)
+                System.out.println("Alterado connecting para " + streamInfo.connecting.address);
             }
             streamInfo.connectingEmpty.signal();
         } finally {
@@ -182,6 +186,7 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                 socket.receive(packet);
 
                 Link link = new Link(packet);
+                System.out.println("Recebido Link de " + link.getAddress() + " do tipo activate: " + link.isActivate());
 
                 this.streamInfo = serverInfo.streamInfoMap.get(link.getStreamId());
 
@@ -199,8 +204,10 @@ public class RPConectionManager implements Runnable { // TODO: ver concorrencia 
                             try {
                                 streamInfo.disconnectingDeprecatedLock.lock();
                                 try {
-                                    streamInfo.disconnecting.add(streamInfo.connected);
-                                    streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    if (streamInfo.connected != null) {
+                                        streamInfo.disconnecting.add(streamInfo.connected);
+                                        streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    }
                                     streamInfo.connected = streamInfo.connecting;
                                     streamInfo.connecting = null;
                                 } finally {
