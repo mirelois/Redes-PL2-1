@@ -49,8 +49,6 @@ public class Streaming implements Runnable{
                     continue;//Manda cu caralho
                 }
 
-                int expected_prior = lossInfo.latestReceivedPacket+1;
-                
                 int currentLatency = Packet.getLatency(sup.getTime_stamp());
 
                 int arrival = Packet.getCurrTime();
