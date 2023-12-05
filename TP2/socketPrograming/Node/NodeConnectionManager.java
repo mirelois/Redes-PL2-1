@@ -27,7 +27,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         NeighbourInfo.StreamInfo streamInfo,
         Integer streamId,
         DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
-
+        System.out.println("Update ao best Node da stream " + streamId);
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
@@ -52,7 +52,8 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             } finally {
                                 streamInfo.connectingLock.unlock();
                             }
-                            System.out.println("Enviado Link de ativação para " + connecting.address + " da stream " + streamId);
+                            System.out.println("Enviado Link de ativação para " + connecting.address.getHostName() + 
+                                               " da stream " + streamId);
                             socket.send(new Link(
                                     false,
                                     true,
@@ -181,7 +182,8 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 socket.receive(packet);
 
                 Link link = new Link(packet);
-                System.out.println("Recebido Link de " + link.getAddress() + " do tipo activate: " + link.isActivate());
+                System.out.println("Recebido Link de " + link.getAddress() + "\n    do tipo activate: " + link.isActivate() + 
+                                   "\n  do tipo ack: " + link.isAck());
                 NeighbourInfo.StreamInfo streamInfo = this.neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
                 //TODO this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
@@ -190,7 +192,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                 //RP never receives acks as their logic exists in RP
                 if (!link.isAck()) {
-                    System.out.println("    Link não é Ack");
                     Set<InetAddress> activeLinks;
 
                     if (link.isActivate()) {
@@ -205,7 +206,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 neighbourInfo.streamActiveLinks.put(link.getStreamId(), activeLinks);
                             }
                             isActiveEmpty = activeLinks.isEmpty();
-                            System.out.println("    Active Links vazios? " + isActiveEmpty);
                             activeLinks.add(link.getAddress());
                         }
                         
@@ -222,7 +222,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 streamInfo.clientAdjacent.put(link.getAddress(), n + 1);
                             }
                         }
-                        
+                        System.out.println("Enviada resposta de Link de ativação para " + link.getAddress());
                         socket.send(new Link(
                                         true,
                                         true,
@@ -289,9 +289,9 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     }  
 
                 } else if (link.isActivate()) { //this is a connection confirmation acknolegment
-                                         
+                    
                     if (node.equals(streamInfo.connecting)) { //this checks if connection has been established
-
+                        System.out.println("Established Connection!");
                         streamInfo.connectedLock.lock();
                         try {
                             streamInfo.connectingLock.lock();
