@@ -60,6 +60,14 @@ public class ShrimpManager implements Runnable{
                         //Adicionar Novo Caminho para o RP (Porque existe!)
                         rpAdjacent = this.neighbourInfo.rpAdjacent;
                         rpAdjacent.add(shrimp.getAddress());
+
+                        synchronized(this.neighbourInfo.minNodeQueue) {
+                            System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
+                                                Packet.getLatency(shrimp.getTimeStamp()));
+                            this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
+                                                                Packet.getLatency(shrimp.getTimeStamp())));
+                        }
+
                     } else {
                         System.out.println("    Não existe conexão!");
                         this.neighbourInfo.notRpAdjacent.add(shrimp.getAddress());
@@ -76,13 +84,6 @@ public class ShrimpManager implements Runnable{
         
                             synchronized(this.neighbourInfo.fileNameToStreamId) {
                                 this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
-                            }
-                            
-                            synchronized(this.neighbourInfo.minNodeQueue) {
-                                System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
-                                                   Packet.getLatency(shrimp.getTimeStamp()));
-                                this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
-                                                                    Packet.getLatency(shrimp.getTimeStamp())));
                             }
 
                             synchronized (clientRequestStreamSet) {
