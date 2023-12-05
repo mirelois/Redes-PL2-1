@@ -52,7 +52,7 @@ public class Idle implements Runnable {
                                                 false,
                                                 this.port,
                                                 address,
-                                                Packet.getCurrTime(),
+                                                Define.idlePort,
                                                 0,
                                                 null).toDatagramPacket());
                         }
@@ -66,7 +66,7 @@ public class Idle implements Runnable {
                                                             false,
                                                             this.port,
                                                             streamInfo.connected.address,
-                                                            Packet.getCurrTime(),
+                                                            Define.idlePort,
                                                             0,
                                                             null).toDatagramPacket());
                                     }
@@ -82,7 +82,7 @@ public class Idle implements Runnable {
                                                                 false,
                                                                 this.port,
                                                                 disco.address,
-                                                                Packet.getCurrTime(),
+                                                                Define.idlePort,
                                                                 0,
                                                                 null).toDatagramPacket());
                                         }
@@ -92,7 +92,7 @@ public class Idle implements Runnable {
                                                                 false,
                                                                 this.port,
                                                                 depre.address,
-                                                                Packet.getCurrTime(),
+                                                                Define.idlePort,
                                                                 0,
                                                                 null).toDatagramPacket());
                                         }
