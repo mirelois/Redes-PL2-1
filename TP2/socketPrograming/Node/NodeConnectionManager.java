@@ -3,8 +3,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import Protocols.Link;
 import SharedStructures.Define;
@@ -27,7 +30,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
         DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
-            
+
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
@@ -189,8 +192,15 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 while (true) {
                     try {
                         Thread.sleep(Define.chooserThreadTimeOut);
-                        for (NeighbourInfo.StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
-                            updateBestNode(neighbourInfo, streamInfo, socket);
+                        synchronized (this.neighbourInfo.streamActiveLinks) {
+                            while (this.neighbourInfo.streamActiveLinks.values().stream().flatMap(Collection::stream).collect(Collectors.toSet()).isEmpty()) {
+                                this.neighbourInfo.streamActiveLinks.wait();
+                            }
+                            for (NeighbourInfo.StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
+                                if (this.neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
+                                    updateBestNode(neighbourInfo, streamInfo, socket);
+                                }
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
