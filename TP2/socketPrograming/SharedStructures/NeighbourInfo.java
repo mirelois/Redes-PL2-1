@@ -21,7 +21,7 @@ public class NeighbourInfo {
         public final InetAddress address;
         public int latency;
         public double lossRate = -1.;
-        public int jitter;
+        public int jitter = -1;
 
 
         public Node(InetAddress address, int latency) {
