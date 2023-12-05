@@ -77,6 +77,7 @@ public class SimpManager implements Runnable{
                             this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
                             socket.send(new Shrimp(Packet.getCurrTime(), clientIP, streamId, Define.shrimpPort, simp.getAddress(),
                             streamName.length, streamName).toDatagramPacket());
+                            continue;
                         }
                     }
                     //255 significa que ainda não se sabe se a stream existe
