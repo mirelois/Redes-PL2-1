@@ -142,33 +142,40 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         if (!streamInfo.disconnectorThread.isAlive()) {
             streamInfo.disconnectorThread.start();
         }
-        streamInfo.connectingLock.lock();
+
+        streamInfo.connectedLock.lock();
         try {
-            /*synchronized (streamInfo.disconnecting) {
-                if (streamInfo.connected != null) {
-                    streamInfo.disconnecting.add(streamInfo.connected); //not supposed to add connected to disconnecting here
-                }
-            }*/
-            synchronized (neighbourInfo.minNodeQueue) {
-                if (!neighbourInfo.minNodeQueue.peek().equals(streamInfo.connected)) {
-                    streamInfo.disconnectingDeprecatedLock.lock();
-                    try {
-                        if (streamInfo.connecting != null) {
-                            System.out.println("Connecting deprecado: " + streamInfo.connecting.address.getHostName());
-                            streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
-                            streamInfo.disconnectingDeprecatedEmpty.signal();
-                        }
-                    } finally {
-                        streamInfo.disconnectingDeprecatedLock.unlock();
+            streamInfo.connectingLock.lock();
+            try {
+                /*synchronized (streamInfo.disconnecting) {
+                    if (streamInfo.connected != null) {
+                        streamInfo.disconnecting.add(streamInfo.connected); //not supposed to add connected to disconnecting here
                     }
-        
-                    streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
-                    System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
-                    streamInfo.connectingEmpty.signal();
+                }*/
+                synchronized (neighbourInfo.minNodeQueue) {
+                    if (!neighbourInfo.minNodeQueue.peek().equals(streamInfo.connected) &&
+                        !neighbourInfo.minNodeQueue.peek().equals(streamInfo.connecting)) {
+                        streamInfo.disconnectingDeprecatedLock.lock();
+                        try {
+                            if (streamInfo.connecting != null) {
+                                System.out.println("Connecting deprecado: " + streamInfo.connecting.address.getHostName());
+                                streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
+                                streamInfo.disconnectingDeprecatedEmpty.signal();
+                            }
+                        } finally {
+                            streamInfo.disconnectingDeprecatedLock.unlock();
+                        }
+            
+                        streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
+                        System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
+                        streamInfo.connectingEmpty.signal();
+                    }
                 }
+            } finally {
+                streamInfo.connectingLock.unlock();
             }
         } finally {
-            streamInfo.connectingLock.unlock();
+            streamInfo.connectedLock.unlock();
         }
 
     }
