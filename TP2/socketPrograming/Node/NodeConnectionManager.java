@@ -250,6 +250,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                             //if no more active links remain, then the stream doesn't have any more clients in that direction
                             if (activeLinks.isEmpty()) {
+                                System.out.println("    Active links became empty!");
                                 streamInfo.connectedLock.lock();
                                 try {
                                     streamInfo.connectingLock.lock();
@@ -257,9 +258,11 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         streamInfo.disconnectingDeprecatedLock.lock();
                                         try {
                                             if (streamInfo.connected != null) {
+                                                System.out.println("    Added to the disconnecting: " + streamInfo.connected);
                                                 streamInfo.disconnecting.add(streamInfo.connected);
                                             }
                                             if (streamInfo.connecting != null) {
+                                                System.out.println("    Added to the deprecated: " + streamInfo.connecting);
                                                 streamInfo.deprecated.add(streamInfo.connecting);
                                             }
                                             streamInfo.connecting = null;
