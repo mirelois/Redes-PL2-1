@@ -42,17 +42,28 @@ public class NeighbourInfo {
             this.jitter = jitter;
         }
 
-        public double getMetrics(){//NOTE: isto é de total responsabilidade do Lucena
+        public double getMetrics(){//NOTE: jitter pode ser percentagem de latencia
+
             
             if (this.lossRate < 0 && this.jitter < 0){
                 return this.latency;
-            }else if (this.jitter < 0){
-                return 0.45 * this.latency + 0.55 * this.lossRate;
-            }else if (this.lossRate < 0){
-                return 0.45 * this.latency + 0.55 * this.jitter;
-            }else {
-                return 0.33 * this.latency + 0.33 * this.jitter + 0.34 * this.lossRate;
-            }
+            } else{
+
+                double extraMetric = 0;
+
+                if ((this.lossRate < 0) && (this.jitter > 0)){
+                    extraMetric = (this.jitter/this.latency);
+                } 
+                else if ((this.jitter < 0) && (this.lossRate > 0)){
+                    extraMetric = this.lossRate;
+                }
+                else {
+                    extraMetric = (Define.extraMetricsDelta)*(this.jitter/this.latency) + (1-Define.extraMetricsDelta)*this.lossRate;
+                }
+
+                return (Define.mainDelta)*this.latency + (1-Define.mainDelta)*(60000*extraMetric);
+                
+                }
         }
 
         @Override

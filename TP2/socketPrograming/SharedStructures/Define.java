@@ -51,4 +51,9 @@ public final class Define {
     public static int streamBuffer                  = 15000;
     public static int infoBuffer                    = 1024;
 
+    //-------Deltas-------
+
+    public static float extraMetricsDelta           = 0.5;
+    public static float mainDelta                   = 0.6;
+
 }
