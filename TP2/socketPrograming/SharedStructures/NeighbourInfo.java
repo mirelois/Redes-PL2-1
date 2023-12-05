@@ -93,6 +93,10 @@ public class NeighbourInfo {
 
     public static class StreamInfo {
 
+        public StreamInfo(Integer streamId) {
+            this.streamId = streamId;
+        }
+
         //The order of the locks is connected->connecting->disconnecting
         public HashMap<InetAddress, Integer> clientAdjacent = new HashMap<>(); // vizinhos que levam ao cliente
         //
@@ -101,6 +105,8 @@ public class NeighbourInfo {
 
             return (a.getMetrics() - b.getMetrics()) > 0 ? 1 : -1;
         });
+
+        public Integer streamId = 255;
 
         public ReentrantLock connectedLock   = new ReentrantLock();
         public NeighbourInfo.Node connected  = null;

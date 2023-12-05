@@ -9,6 +9,7 @@ import java.util.Set;
 import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
+import SharedStructures.ServerInfo;
 
 import java.net.UnknownHostException;
 
@@ -25,10 +26,9 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     public static void updateBestNode( //TODO: fix args -> done? nao era isso lmao
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
-        Integer streamId,
         DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
-        System.out.println("Update ao best Node da stream " + streamId);
-        
+        System.out.println("Update ao best Node da stream " + streamInfo.streamId);
+
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
@@ -54,12 +54,12 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 streamInfo.connectingLock.unlock();
                             }
                             System.out.println("Enviado Link de ativação para " + connecting.address.getHostName() + 
-                                               " da stream " + streamId);
+                                               " da stream " + streamInfo.streamId);
                             socket.send(new Link(
                                     false,
                                     true,
                                     false,
-                                    streamId,
+                                    streamInfo.streamId,
                                     connecting.address,
                                     Define.nodeConnectionManagerPort,
                                     0,
@@ -101,12 +101,12 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             }
 
                             for (NeighbourInfo.Node node : disconnecting) { // sends disconect link to
-                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
+                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamInfo.streamId);
                                 socket.send(new Link(
                                         false,
                                         false,
                                         true,
-                                        streamId,
+                                        streamInfo.streamId,
                                         node.address,
                                         Define.nodeConnectionManagerPort,
                                         0,
@@ -114,12 +114,12 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             }
 
                             for (NeighbourInfo.Node node : deprecated) {
-                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamId);
+                                System.out.println("Enviado Link de desativação para " + node.address + " da stream " + streamInfo.streamId);
                                 socket.send(new Link(
                                         false,
                                         true,
                                         false,
-                                        streamId,
+                                        streamInfo.streamId,
                                         node.address,
                                         Define.nodeConnectionManagerPort,
                                         0,
@@ -181,8 +181,14 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
             System.out.println("Started chooser Thread");
             new Thread(() -> {
                 while (true) {
-                    sleep(Define.chooserThreadTimeOut);
-                    updateBestNode(neighbourInfo, streamInfo, streamId, socket);
+                    try {
+                        Thread.sleep(Define.chooserThreadTimeOut);
+                        for (NeighbourInfo.StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
+                            updateBestNode(neighbourInfo, streamInfo, socket);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
         
@@ -226,7 +232,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         
                         if (isActiveEmpty) {
                             System.out.println("    Novo active link, update ao melhor nodo");
-                            updateBestNode(this.neighbourInfo, streamInfo, link.getStreamId(), socket);
+                            updateBestNode(this.neighbourInfo, streamInfo, socket);
                         }
 
                         //Evitar loops de links ao apenas considerar respostas a não locais

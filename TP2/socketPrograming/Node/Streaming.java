@@ -116,7 +116,7 @@ public class Streaming implements Runnable {
 
                 if (bestMetrics < (0.95 * currentMetrics)) { // Mandar latencia melhor se isto fizer
 
-                    NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
+                    NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, socket);
                     streamInfo.connectingLock.lock();
 
                     try {
