@@ -59,6 +59,9 @@ public class fullDuplex {
         }
 
         NeighbourInfo neighbours = new NeighbourInfo();
+        ServerInfo serverInfo = isRP ? new ServerInfo() : null;
+        new Thread(new Idle(neighbours, serverInfo)).start(); // Começar o Idle o mais cedo possível para atender pedidos dos vizinhos
+
         InetAddress ip_bootstrapper;
         try {
             ip_bootstrapper = InetAddress.getByName(args[0]);
@@ -117,34 +120,36 @@ public class fullDuplex {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         while(keepLooping){
             String inputStr = input.readLine();
-            if (inputStr.contains("client") && !isClientAlive) {
+            if (inputStr.contains("client") && !isClientAlive) { // client [movie]
 
                 String[] clientStrName = inputStr.split(" ", 2);
                 new Client(clientStrName[1]);
 
-            } else if (inputStr.contains("server") && !isServerAlive) {
+            } else if (inputStr.contains("server") && !isServerAlive) { // server [moviesFolder] [RP_IP]
 
-                String[] file = inputStr.split(" ", 2);
-                File folder = new File(file[1]);
-                File[] listOfFiles = folder.listFiles();
-                ArrayList<String> streams = new ArrayList<>();
-                HashMap<Integer, String> streamIdToFileName = new HashMap<>();
-                HashMap<Integer, Thread> serverSenderMap = new HashMap<>();
+                String[] file = inputStr.split(" ", 3);
+                if(file.length==3) {
+                    File folder = new File(file[1]);
+                    File[] listOfFiles = folder.listFiles();
+                    ArrayList<String> streams = new ArrayList<>();
+                    HashMap<Integer, String> streamIdToFileName = new HashMap<>();
+                    HashMap<Integer, Thread> serverSenderMap = new HashMap<>();
 
-                for (int i = 0; i < Objects.requireNonNull(listOfFiles).length; i++) {
-                    System.out.println("File " + listOfFiles[i].getName());
-                    streams.add(file[1]+"/"+listOfFiles[i].getName());
-                }
-                try {
-                    DatagramSocket RTPsocket = new DatagramSocket(Define.serverPort); //init RTP socket
-                    new Thread(new Server(InetAddress.getByName(args[0]), streams, 
-                                          streamIdToFileName, serverSenderMap, RTPsocket)).start();
-    
-                    new Thread(new ServerConectionManager(InetAddress.getByName(args[0]), 
-                                                          serverSenderMap, streamIdToFileName, RTPsocket)).start();
-                    
-                } catch (SocketException e) {
-                    System.out.println("Servidor: erro no socket: " + e.getMessage());
+                    for (int i = 0; i < Objects.requireNonNull(listOfFiles).length; i++) {
+                        System.out.println("File " + listOfFiles[i].getName());
+                        streams.add(file[1] + "/" + listOfFiles[i].getName());
+                    }
+                    try {
+                        DatagramSocket RTPsocket = new DatagramSocket(Define.serverPort); //init RTP socket
+                        new Thread(new Server(InetAddress.getByName(args[0]), streams,
+                                streamIdToFileName, serverSenderMap, RTPsocket)).start();
+
+                        new Thread(new ServerConectionManager(InetAddress.getByName(file[2]),
+                                serverSenderMap, streamIdToFileName, RTPsocket)).start();
+
+                    } catch (SocketException e) {
+                        System.out.println("Servidor: erro no socket: " + e.getMessage());
+                    }
                 }
             }else if(inputStr.contains("kill"))
                 keepLooping = false;

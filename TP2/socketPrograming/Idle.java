@@ -19,15 +19,12 @@ public class Idle implements Runnable{
 
     private int port;
 
-    boolean isServer;
-
     Thread timeout;
 
-    public Idle(NeighbourInfo neighbourInfo, ServerInfo serverInfo, boolean isServer){
+    public Idle(NeighbourInfo neighbourInfo, ServerInfo serverInfo){
         this.port = Define.idlePort;
         this.neighbourInfo = neighbourInfo;
         this.serverInfo = serverInfo;
-        this.isServer = isServer;
     }
 
     @Override
@@ -43,14 +40,18 @@ public class Idle implements Runnable{
                             //Enviar para os adjacentes que não estão em uso
                             //TODO diminuir vida aos ajdacentes que foram enviados mensagens
                             for (InetAddress address : this.neighbourInfo.overlayNeighbours) {
-                                socket.send(new ITP(isServer, 
-                                                    !isServer, 
+                                socket.send(new ITP(false,
+                                                    true,
                                                     false, 
                                                     this.port,
                                                     address, 
                                                     Packet.getCurrTime(), 
                                                     0, 
                                                     null).toDatagramPacket());
+                            }
+
+                            if(serverInfo!=null){ // Ou seja, sou um server
+
                             }
                         }
                     } catch (Exception E) {
