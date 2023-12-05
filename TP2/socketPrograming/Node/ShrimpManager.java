@@ -78,6 +78,10 @@ public class ShrimpManager implements Runnable{
                         if (streamId != 255 && streamId != 0) {
                             //Colocar o nome da Stream associado ao seu Id
 
+                            synchronized(this.neighbourInfo.streamActiveLinks) {
+                                this.neighbourInfo.streamActiveLinks.put(streamId, new HashSet<>());
+                            }
+
                             synchronized(this.neighbourInfo.streamIdToStreamInfo) {
                                 this.neighbourInfo.streamIdToStreamInfo.put(streamId, new NeighbourInfo.StreamInfo(streamId));
                             }
