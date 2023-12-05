@@ -297,43 +297,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     }  
 
                 } else if (link.isActivate()) { //this is a connection confirmation acknolegment
-                    
-                    if (node.equals(streamInfo.connecting)) { //this checks if connection has been established
-                        streamInfo.connectedLock.lock();
-                        try {
-                            streamInfo.connectingLock.lock();
-                            try {
-                                streamInfo.disconnectingDeprecatedLock.lock();
-                                try {
-                                    if (streamInfo.connected != null) {
-                                        streamInfo.disconnecting.add(streamInfo.connected);
-                                        streamInfo.disconnectingDeprecatedEmpty.signal();
-                                    }
-                                    streamInfo.connected = streamInfo.connecting;
-                                    streamInfo.connecting = null;
-                                    System.out.println("Established Connection!\n   connected: " + 
-                                    streamInfo.connected.address.getHostName());
-                                } finally {
-                                    streamInfo.disconnectingDeprecatedLock.unlock();
-                                }
-                            } finally {
-                                streamInfo.connectingLock.unlock();
-                            }
-                        } finally {
-                            streamInfo.connectedLock.unlock();
-                        }
-
-                    } else if (streamInfo.deprecated.contains(node)) {
-                        
-                        streamInfo.disconnectingDeprecatedLock.lock();
-                        try {
-                            streamInfo.deprecated.remove(node);
-                            streamInfo.disconnecting.add(node);
-                            streamInfo.disconnectingDeprecatedEmpty.signal();
-                        } finally {
-                            streamInfo.disconnectingDeprecatedLock.unlock();
-                        }
-                    }
+                    //who cares
                     
                 } else if (link.isDeactivate()) { //this means a node acepted the disconnect request
                     
