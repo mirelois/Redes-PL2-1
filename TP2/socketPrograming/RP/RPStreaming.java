@@ -43,20 +43,32 @@ public class RPStreaming implements Runnable{
                     streamInfo = serverInfo.streamInfoMap.get(sup.getStreamId());
                 }
 
-                NeighbourInfo.LossInfo lossInfo = this.serverInfo.streamInfoMap.get(sup.getStreamId()).lossInfo;
+                NeighbourInfo.LossInfo lossInfo = streamInfo.lossInfo;
 
                 if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
                     continue;//Manda cu caralho
                 }
+
+                int currentLatency = Packet.getLatency(sup.getTime_stamp());
+
+                int arrival = Packet.getCurrTime();
+                
+                int timestap = Packet.getCurrTime();
+
+                //see section 6.4.1 of rfc3550
+                lossInfo.jitter = lossInfo.jitter + (Math.abs(lossInfo.prevDiff - (arrival - timestap)) - lossInfo.jitter)/16;
+
+                lossInfo.prevDiff = (arrival - timestap);
 
                 lossInfo.totalReceivedPacket++;
 
                 lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket/(double)sup.getFrameNumber();
                 
                 if (sup.getFrameNumber() < lossInfo.totalReceivedPacket) {
-                    lossInfo.totalReceivedPacket = 0;
                     lossInfo.latestReceivedPacket = 0;
-                    lossInfo.lossRate = -1.;
+                    lossInfo.totalReceivedPacket = 0;
+                    lossInfo.lossRate = -1;
+                    lossInfo.jitter = -1;
                 }
                                 
                 lossInfo.latestReceivedPacket = sup.getFrameNumber();

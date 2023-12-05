@@ -19,6 +19,7 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
             public final InetAddress address;
             public int latency;
             public double lossRate = -1.;
+            public int jitter = -1;
             
             public Server(InetAddress address, int latency){
                 this.address =  address;
@@ -30,6 +31,13 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
                 this.address =  address;
                 this.latency = latency;
                 this.lossRate = lossRate;
+            }
+            
+            public Server(InetAddress address, int latency, double lossRate, int jitter) {
+                this.address = address;
+                this.latency = latency;
+                this.lossRate = lossRate;
+                this.jitter = jitter;
             }
 
             @Override
@@ -56,13 +64,17 @@ public class ServerInfo { //NOTE: os gajos do java dizem que isto é melhor
             }
 
             public double getMetrics(){
-            if (this.lossRate < 0){
-                return (double)this.latency;
-            }else{
-                return (0.45 * this.latency + 0.55 * this.lossRate*600);
+                
+                if (this.lossRate < 0 && this.jitter < 0){
+                    return this.latency;
+                }else if (this.jitter < 0){
+                    return 0.45 * this.latency + 0.55 * this.lossRate;
+                }else if (this.lossRate < 0){
+                    return 0.45 * this.latency + 0.55 * this.jitter;
+                }else {
+                    return 0.33 * this.latency + 0.33 * this.jitter + 0.34 * this.lossRate;
+                }
             }
-        }
-         
         }
                 
         public NeighbourInfo.LossInfo lossInfo = new NeighbourInfo.LossInfo();
