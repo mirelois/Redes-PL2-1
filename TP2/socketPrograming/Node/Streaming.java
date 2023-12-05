@@ -41,7 +41,7 @@ public class Streaming implements Runnable {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
 
-                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequence_number());
+                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Frame#: " + sup.getFrameNumber());
 
                 NeighbourInfo.LossInfo lossInfo = streamInfo.lossInfo;
 

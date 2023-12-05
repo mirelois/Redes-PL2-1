@@ -55,13 +55,13 @@ public class ShrimpManager implements Runnable{
                     
                     //Existe caminho para o RP
                     if (streamId != 255) {
-                        System.out.println("Adicionado novo caminho para o RP: " + shrimp.getAddress());
+                        System.out.println("    Adicionado novo caminho para o RP: " + shrimp.getAddress());
                         this.neighbourInfo.isConnectedToRP = 1;
                         //Adicionar Novo Caminho para o RP (Porque existe!)
                         rpAdjacent = this.neighbourInfo.rpAdjacent;
                         rpAdjacent.add(shrimp.getAddress());
                     } else {
-                        System.out.println("Não existe conexão!");
+                        System.out.println("    Não existe conexão!");
                         this.neighbourInfo.notRpAdjacent.add(shrimp.getAddress());
                     }
 
@@ -81,7 +81,7 @@ public class ShrimpManager implements Runnable{
                                 //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
                                 for (InetAddress streamRequest : clientRequestStreamSet) {
                                     if (!streamRequest.equals(InetAddress.getByName("localhost"))) {
-                                        System.out.println("Enviado SHRIMP para " + streamRequest.getHostAddress() +
+                                        System.out.println("  Enviado SHRIMP para " + streamRequest.getHostAddress() +
                                                         " da stream com id " + streamId +
                                                         " pedida por " + clientIP.getHostAddress());
                                         socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, Define.shrimpPort, 
