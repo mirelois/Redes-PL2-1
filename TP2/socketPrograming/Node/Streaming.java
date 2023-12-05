@@ -96,14 +96,18 @@ public class Streaming implements Runnable{
                 int timeStampToSend = sup.getTime_stamp();
 
                 if (bestMetrics < 0.95 * currentMetrics) { //Mandar latencia melhor se isto fizer
-                    System.out.println("Chamada ao UpdateBestNode.\nMelhor: " + bestMetrics + 
+                    System.out.println("\nMelhor: " + bestMetrics + 
                     " do server " + this.neighbourInfo.minNodeQueue.peek().address.getHostName() + 
                     ": " + this.neighbourInfo.minNodeQueue.peek().jitter +
                     " , " + this.neighbourInfo.minNodeQueue.peek().latency +
                     " , " + this.neighbourInfo.minNodeQueue.peek().lossRate);
 
-                    System.out.println("Current Metrics: " + currentMetrics);
-                    
+                    System.out.println("\nCurrent: " + bestMetrics + 
+                    " do server " + streamInfo.connected.address.getHostName() + 
+                    ": " + streamInfo.connected.jitter +
+                    " , " + streamInfo.connected.latency +
+                    " , " + streamInfo.connected.lossRate);
+
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
                     streamInfo.connectingLock.lock();
                     try{
