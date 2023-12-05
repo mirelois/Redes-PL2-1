@@ -53,7 +53,7 @@ public final class Define {
 
     //-------Deltas-------
 
-    public static float extraMetricsDelta           = 0.5f;
-    public static float mainDelta                   = 0.6f;
+    public static double extraMetricsDelta           = 0.5;
+    public static double mainDelta                   = 0.6;
 
 }
