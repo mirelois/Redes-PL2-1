@@ -160,7 +160,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
             synchronized (neighbourInfo.minNodeQueue) {
                 streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
-                System.out.println("Alterado connecting para " + streamInfo.connecting);
+                System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
             }
             streamInfo.connectingEmpty.signal();
         } finally {
