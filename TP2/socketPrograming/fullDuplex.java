@@ -104,7 +104,7 @@ public class fullDuplex {
             new Thread(new RPNodeConnectionManager(serverInfo, neighbours)).start();
             new Thread(new RPServerConectionManager(serverInfo)).start();
             streaming = new Thread(new RPStreaming(serverInfo, neighbours));
-        }else {
+        } else {
             System.out.println("Começo de Nodo!");
             Thread simpManager = new Thread(new SimpManager(neighbours));
             Thread shrimpManager = new Thread(new ShrimpManager(neighbours));
