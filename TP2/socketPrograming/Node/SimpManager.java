@@ -41,15 +41,6 @@ public class SimpManager implements Runnable{
 
                 synchronized (this.neighbourInfo) {
                     
-                    //Se isto falha, falha tudo, restruturar para ter em conta as streamID e ter uma lógica mais limpa
-                    if (this.neighbourInfo.isConnectedToRP == 0) {
-                        System.out.println("    Nodo já sabe que não tem conexão para o RP");
-                        this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
-                        socket.send(new Shrimp(Packet.getCurrTime(), clientIP, 0, Define.shrimpPort, simp.getAddress(),
-                        streamName.length, streamName).toDatagramPacket());
-                        continue;
-                    }
-
                     streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
                     System.out.println("    StreamId do ficheiro pedido é: " + streamId);
 
@@ -63,41 +54,28 @@ public class SimpManager implements Runnable{
                     synchronized(this.neighbourInfo) {
 
                         //Ainda não sei onde está o RP
-                        if (this.neighbourInfo.isConnectedToRP != 1) {
 
-                            System.out.println("    Enviar pedido para todos os seus vizinhos, não conheço o RP");
-                            //Enviar para todos os vizinhos se não conhecer caminhos para o RP
-                            for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) {
+                        System.out.println("    Enviar pedido para todos os seus vizinhos, não conheço o RP");
+                        //Enviar para todos os vizinhos se não conhecer caminhos para o RP
+                        for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) {
+                            //Não envio para quem me enviou
+                            if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(clientIP) && !this.neighbourInfo.notRpAdjacent.contains(neighbour)) {
 
-                                //Não envio para quem me enviou
-                                if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(clientIP)) {
+                                System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
 
-                                    System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
-
-                                    socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
-                                    //Adicionar pedido feito por Simp
-                                    this.neighbourInfo.rpRequest.add(neighbour);
-                                }
-
+                                socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
+                                //Adicionar pedido feito por Simp
+                                this.neighbourInfo.rpRequest.add(neighbour);
                             }
-                            if (this.neighbourInfo.rpRequest.isEmpty()) {
-                                System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostName() + ", port " + Define.shrimpPort + 
-                                                   " com streamId: " + 0);
-                                this.neighbourInfo.isConnectedToRP = 0;
-                                this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
-                                socket.send(new Shrimp(Packet.getCurrTime(), clientIP, 0, Define.shrimpPort, simp.getAddress(),
-                                streamName.length, streamName).toDatagramPacket());
-                            }
-                        } else {
-                            //Enviar apenas para os caminhos conhecidos do RP
-                            System.out.println("    Enviar pedido só para os vizinhos que vão para o RP");
 
-                            for (InetAddress neighbour : this.neighbourInfo.rpAdjacent) {
-                                if (!neighbour.equals(simp.getAddress())) 
-                                    socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), 
-                                                         simp.getPayload()).toDatagramPacket());
+                        }
 
-                            }
+                        if (this.neighbourInfo.rpRequest.isEmpty()) {
+                            System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostName() + ", port " + Define.shrimpPort + 
+                                                " com streamId: " + 0);
+                            this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
+                            socket.send(new Shrimp(Packet.getCurrTime(), clientIP, 0, Define.shrimpPort, simp.getAddress(),
+                            streamName.length, streamName).toDatagramPacket());
                         }
                     }
                     //255 significa que ainda não se sabe se a stream existe

@@ -124,7 +124,7 @@ public class NeighbourInfo {
         
     }
     
-    public int isConnectedToRP = 255; // 255 significa que ainda não sabe, 0 no, 1 yes
+    public int isConnectedToRP = 0; // 255 significa que ainda não sabe, 0 no, 1 yes
     
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
     public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos
@@ -142,6 +142,8 @@ public class NeighbourInfo {
     public Set<InetAddress> clientRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
 
     public Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
+
+    public Set<InetAddress> notRpAdjacent = new HashSet<>(); // vizinhos que não levam ao RP
     
     public void updateLatency(Node node) { //this method has O(log n) time complexity
         synchronized(this.minNodeQueue){
