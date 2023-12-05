@@ -22,66 +22,27 @@ public class Streaming implements Runnable {
 
     }
 
-    public void checkLinkActivation(NeighbourInfo.Node node, NeighbourInfo.StreamInfo streamInfo) {
-        streamInfo.connectedLock.lock();
-        try {
-            streamInfo.connectingLock.lock();
-            try {
-                streamInfo.disconnectingDeprecatedLock.lock();
-                try {
-                    if (streamInfo.connecting != null && streamInfo.connecting.address.equals(node.address)) {
-                        if (streamInfo.connected != null) {
-                            streamInfo.disconnecting.add(streamInfo.connected);
-                            streamInfo.disconnectingDeprecatedEmpty.signal();
-                        }
-                        streamInfo.connected = streamInfo.connecting;
-                        streamInfo.connecting = null;
-                        System.out.println("Established Connection!\n   connected: " + 
-                        streamInfo.connected.address.getHostName());
-                    } else if (streamInfo.deprecated.contains(node)) {
-                        
-                        streamInfo.disconnectingDeprecatedLock.lock();
-                        try {
-                            streamInfo.deprecated.remove(node);
-                            streamInfo.disconnecting.add(node);
-                            streamInfo.disconnectingDeprecatedEmpty.signal();
-                        } finally {
-                            streamInfo.disconnectingDeprecatedLock.unlock();
-                        }
-                    }
-                } finally {
-                    streamInfo.disconnectingDeprecatedLock.unlock();
-                }
-            } finally {
-                streamInfo.connectingLock.unlock();
-            }
-        } finally {
-            streamInfo.connectedLock.unlock();
-        }
-    }
-
     @Override
     public void run() {
         try (DatagramSocket socket = new DatagramSocket(Define.streamingPort)) {
 
             byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough? no
+                                                        //
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            
-            NeighbourInfo.StreamInfo streamInfo;
+
             while (true) {
 
                 socket.receive(packet);
 
                 Sup sup = new Sup(packet);
 
+                NeighbourInfo.StreamInfo streamInfo;
 
                 synchronized (neighbourInfo.streamIdToStreamInfo) {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
 
-                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Frame#: " + sup.getFrameNumber());
-
-                checkLinkActivation(new NeighbourInfo.Node(sup.getAddress(), 0), streamInfo);
+                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequence_number());
 
                 NeighbourInfo.LossInfo lossInfo = streamInfo.lossInfo;
 
@@ -93,22 +54,22 @@ public class Streaming implements Runnable {
 
                 int arrival = Packet.getCurrTime();
 
-                int timestamp = Packet.getCurrTime();
+                int timestap = Packet.getCurrTime();
 
                 // see section 6.4.1 of rfc3550
-                lossInfo.jitter = lossInfo.jitter + (Math.abs(lossInfo.prevDiff - (arrival - timestamp)) - lossInfo.jitter) / 16;
+                lossInfo.jitter = lossInfo.jitter + (Math.abs(lossInfo.prevDiff - (arrival - timestap)) - lossInfo.jitter) / 16;
 
-                lossInfo.prevDiff = (arrival - timestamp);
+                lossInfo.prevDiff = (arrival - timestap);
 
                 lossInfo.totalReceivedPacket++;
 
-                lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket / (double) sup.getFrameNumber();
+                lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket / (double)sup.getFrameNumber();
 
                 if (sup.getFrameNumber() < lossInfo.totalReceivedPacket) {
                     lossInfo.latestReceivedPacket = 0;
-                    lossInfo.totalReceivedPacket = 0;
-                    lossInfo.lossRate = -1;
-                    lossInfo.jitter = -1;
+                    lossInfo.totalReceivedPacket  = 0;
+                    lossInfo.lossRate             = -1;
+                    lossInfo.jitter               = -1;
                 }
 
                 lossInfo.latestReceivedPacket = sup.getFrameNumber();
@@ -121,9 +82,9 @@ public class Streaming implements Runnable {
 
                 try {
                     if (streamInfo.connected != null) {
-                        streamInfo.connected.latency = currentLatency;
+                        streamInfo.connected.latency  = currentLatency;
                         streamInfo.connected.lossRate = lossInfo.lossRate;
-                        currentMetrics = streamInfo.connected.getMetrics();
+                        currentMetrics                = streamInfo.connected.getMetrics();
                     }
                 }
 
@@ -132,8 +93,9 @@ public class Streaming implements Runnable {
                 }
 
                 synchronized (this.neighbourInfo.minNodeQueue) {
-                    if (this.neighbourInfo.minNodeQueue.peek() != null)
+                    if (this.neighbourInfo.minNodeQueue.peek() != null) {
                         bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();
+                    }
                 }
 
                 int timeStampToSend = sup.getTime_stamp();
@@ -152,7 +114,7 @@ public class Streaming implements Runnable {
                                        " , " + streamInfo.connected.lossRate);
                 }
 
-                if (bestMetrics < (0.99 * currentMetrics)) { // Mandar latencia melhor se isto fizer
+                if (bestMetrics < (0.95 * currentMetrics)) { // Mandar latencia melhor se isto fizer
 
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
                     streamInfo.connectingLock.lock();
@@ -168,7 +130,7 @@ public class Streaming implements Runnable {
                     }
                 }
 
-                Integer streamId = sup.getStreamId();
+                Integer          streamId = sup.getStreamId();
                 Set<InetAddress> streamActiveLinks;
 
                 synchronized (this.neighbourInfo) {
@@ -210,8 +172,10 @@ public class Streaming implements Runnable {
                 }
             }
 
-        } catch (IOException | PacketSizeException e) {
+        }
+        catch (IOException | PacketSizeException e) {
             throw new RuntimeException(e);
         }
     }
+
 }

@@ -31,7 +31,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
-        
+
         if (streamInfo.connectorThread == null) {
             System.out.println("Started connector thread.");
             streamInfo.connectorThread = new Thread(new Runnable() {
@@ -176,6 +176,15 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     public void run() {
 
         try (DatagramSocket socket = new DatagramSocket(Define.nodeConnectionManagerPort)) {
+            
+            System.out.println("Started chooser Thread");
+            new Thread(() -> {
+                while (true) {
+                    sleep(Define.chooserThreadTimeOut);
+                    updateBestNode(neighbourInfo, streamInfo, streamId, socket);
+                }
+            }).start();
+        
 
             byte[] buf = new byte[Define.infoBuffer];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
