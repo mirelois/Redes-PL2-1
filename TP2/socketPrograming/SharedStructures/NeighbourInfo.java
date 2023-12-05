@@ -6,15 +6,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class NeighbourInfo {
-    
+
     public static class LossInfo {
-        
+
         public int latestReceivedPacket = 0;
         public int totalReceivedPacket = 0;
         public double lossRate = -1;
         public int prevDiff = 0;
         public int jitter = -1;
-        
+
     }
 
     public static class Node {
@@ -34,7 +34,7 @@ public class NeighbourInfo {
             this.latency = latency;
             this.lossRate = lossRate;
         }
-        
+
         public Node(InetAddress address, int latency, double lossRate, int jitter) {
             this.address = address;
             this.latency = latency;
@@ -42,19 +42,19 @@ public class NeighbourInfo {
             this.jitter = jitter;
         }
 
-        public double getMetrics(){//NOTE: jitter pode ser percentagem de latencia
+        public double getMetrics() { //NOTE: jitter pode ser percentagem de latencia
 
-            
-            if (this.lossRate < 0 && this.jitter < 0){
+
+            if (this.lossRate < 0 && this.jitter < 0) {
                 return this.latency;
-            } else{
+            } else {
 
                 double extraMetric = 0;
 
-                if ((this.lossRate < 0) && (this.jitter > 0)){
+                if ((this.lossRate < 0) && (this.jitter > 0)) {
                     extraMetric = (this.jitter/this.latency);
-                } 
-                else if ((this.jitter < 0) && (this.lossRate > 0)){
+                }
+                else if ((this.jitter < 0) && (this.lossRate > 0)) {
                     extraMetric = this.lossRate;
                 }
                 else {
@@ -62,8 +62,8 @@ public class NeighbourInfo {
                 }
 
                 return (Define.mainDelta)*this.latency + (1-Define.mainDelta)*(60000*extraMetric);
-                
-                }
+
+            }
         }
 
         @Override
@@ -91,21 +91,23 @@ public class NeighbourInfo {
             return this.address.hashCode();
         }
     }
-    
+
     public static class StreamInfo {
-        
+
         //The order of the locks is connected->connecting->disconnecting
         public HashMap<InetAddress, Integer> clientAdjacent = new HashMap<>(); // vizinhos que levam ao cliente
+        //
         public PriorityQueue<Node> minStreamNodeQ = new PriorityQueue<>((a, b) -> {
             if(clientAdjacent.get(a.address) > clientAdjacent.get(b.address)) return -1;
 
             return (a.getMetrics() - b.getMetrics()) > 0 ? 1 : -1;
         });
+
         public ReentrantLock connectedLock = new ReentrantLock();
         public NeighbourInfo.Node connected = null;
         public ReentrantLock connectingLock = new ReentrantLock();
         public Condition connectingEmpty = connectingLock.newCondition();
-		public NeighbourInfo.Node connecting = null;
+        public NeighbourInfo.Node connecting = null;
 
         public Lock disconnectingDeprecatedLock = new ReentrantLock();
         public Condition disconnectingDeprecatedEmpty = disconnectingDeprecatedLock.newCondition();
@@ -114,9 +116,9 @@ public class NeighbourInfo {
 
         public Thread connectorThread;
         public Thread disconnectorThread;
-    
+
         public NeighbourInfo.LossInfo lossInfo = new NeighbourInfo.LossInfo();
-        
+
         public HashSet<NeighbourInfo.Node> getDisconnecting() {
             HashSet<Node> disconnecting = new HashSet<>();
             disconnecting.addAll(this.disconnecting);
@@ -132,23 +134,23 @@ public class NeighbourInfo {
         public Node getConnecting() {
             return new Node(this.connecting.address, this.connecting.latency);
         }
-        
+
     }
-    
+
     public int isConnectedToRP = 255; // 255 significa que ainda não sabe, 0 no, 1 yes
-    
+
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
     public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos
-    
+
     //0 means connection but no stream, 255 means doesn't know, otherwise stream
     public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // filenames to stream id
-    
+
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
-    
+
     public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> (a.getMetrics() - b.getMetrics()) > 0 ? 1 : -1);
-    
+
     public Map<Integer, Set<InetAddress>> streamActiveLinks = new HashMap<>(); // links para enviar a stream
-    
+
     public Set<InetAddress> rpRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
 
     public Map<String, Set<InetAddress>> streamNameToClientRequests = new HashMap<>(); // vizinhos onde foram enviados Simp
@@ -156,9 +158,9 @@ public class NeighbourInfo {
     public Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
 
     public Set<InetAddress> notRpAdjacent = new HashSet<>(); // vizinhos que não levam ao RP
-    
+
     public void updateLatency(Node node) { //this method has O(log n) time complexity
-        synchronized(this.minNodeQueue){
+        synchronized(this.minNodeQueue) {
             this.minNodeQueue.remove(node);
             this.minNodeQueue.add(node);
         }
