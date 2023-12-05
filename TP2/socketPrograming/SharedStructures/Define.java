@@ -46,6 +46,8 @@ public final class Define {
 
     public static int idleTimeout                   = 1000;
 
+    public static int chooserThreadTimeOut          = 2000;
+
     //-------buffersize-------
 
     public static int streamBuffer                  = 15000;
