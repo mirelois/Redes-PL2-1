@@ -23,11 +23,14 @@ public class Idle implements Runnable{
 
     boolean isRP;
 
-    public Idle(NeighbourInfo neighbourInfo, ServerInfo serverInfo, boolean isRP){
+    InetAddress rpIp;
+
+    public Idle(NeighbourInfo neighbourInfo, ServerInfo serverInfo, boolean isRP, fullDuplex.ServerRPHolder rpHolder){
         this.port = Define.idlePort;
         this.neighbourInfo = neighbourInfo;
         this.serverInfo = serverInfo;
         this.isRP = isRP;
+        this.rpIp = rpHolder.rpIP;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class Idle implements Runnable{
                             //Enviar para os adjacentes que não estão em uso
                             //TODO diminuir vida aos ajdacentes que foram enviados mensagens
                             for (InetAddress address : this.neighbourInfo.overlayNeighbours) {
-                                socket.send(new ITP(false,
+                                socket.send(new ITP(address.equals(this.rpIp),
                                                     true,
                                                     false, 
                                                     this.port,

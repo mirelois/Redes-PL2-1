@@ -31,6 +31,11 @@ import SharedStructures.NeighbourInfo;
 import SharedStructures.ServerInfo;
 
 public class fullDuplex {
+
+    static class ServerRPHolder{
+        public InetAddress rpIP = null;
+    }
+
     public static void main(String[] args) throws IOException {
         if (args.length < 1 || args.length > 5) {
             System.out.println("Wrong Arguments!" +
@@ -60,7 +65,8 @@ public class fullDuplex {
 
         NeighbourInfo neighbours = new NeighbourInfo();
         ServerInfo serverInfo = isRP ? new ServerInfo() : null;
-        new Thread(new Idle(neighbours, serverInfo, isRP)).start(); // Começar o Idle o mais cedo possível para atender pedidos dos vizinhos
+        ServerRPHolder rpHolder = new ServerRPHolder();
+        new Thread(new Idle(neighbours, serverInfo, isRP, rpHolder)).start(); // Começar o Idle o mais cedo possível para atender pedidos dos vizinhos
 
         InetAddress ip_bootstrapper;
         try {
