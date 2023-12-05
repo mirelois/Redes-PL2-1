@@ -148,21 +148,24 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     streamInfo.disconnecting.add(streamInfo.connected); //not supposed to add connected to disconnecting here
                 }
             }*/
-            streamInfo.disconnectingDeprecatedLock.lock();
-            try {
-                if (streamInfo.connecting != null) {
-                    streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
-                    streamInfo.disconnectingDeprecatedEmpty.signal();
-                }
-            } finally {
-                streamInfo.disconnectingDeprecatedLock.unlock();
-            }
-
             synchronized (neighbourInfo.minNodeQueue) {
-                streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
-                System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
+                if (!neighbourInfo.minNodeQueue.peek().equals(streamInfo.connected)) {
+                    streamInfo.disconnectingDeprecatedLock.lock();
+                    try {
+                        if (streamInfo.connecting != null) {
+                            System.out.println("Connecting deprecado: " + streamInfo.connecting.address.getHostName());
+                            streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
+                            streamInfo.disconnectingDeprecatedEmpty.signal();
+                        }
+                    } finally {
+                        streamInfo.disconnectingDeprecatedLock.unlock();
+                    }
+        
+                    streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
+                    System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
+                    streamInfo.connectingEmpty.signal();
+                }
             }
-            streamInfo.connectingEmpty.signal();
         } finally {
             streamInfo.connectingLock.unlock();
         }
