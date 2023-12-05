@@ -129,6 +129,7 @@ public class NeighbourInfo {
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
     public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos
     
+    //0 means connection but no stream, 255 means no connection, otherwise stream
     public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // filenames to stream id
     
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
@@ -139,7 +140,7 @@ public class NeighbourInfo {
     
     public Set<InetAddress> rpRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
 
-    public Set<InetAddress> clientRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
+    public Map<String, Set<InetAddress>> clientRequest = new HashMap<>(); // vizinhos onde foram enviados Simp
 
     public Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
 

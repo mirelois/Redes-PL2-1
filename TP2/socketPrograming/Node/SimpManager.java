@@ -37,14 +37,21 @@ public class SimpManager implements Runnable{
 
                 InetAddress clientIP = simp.getSourceAddress();
                 Integer streamId;
-                byte[] streamName = simp.getPayload();
+                Set<InetAddress> clientRequestStreamSet;
+                String streamName = new String(simp.getPayload());
+                byte[] streamNameBytes = simp.getPayload();
 
                 synchronized (this.neighbourInfo) {
                     
                     streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
                     System.out.println("    StreamId do ficheiro pedido é: " + streamId);
 
-                    this.neighbourInfo.clientRequest.add(simp.getAddress());
+                    clientRequestStreamSet = this.neighbourInfo.clientRequest.get(streamName);
+                    if (clientRequestStreamSet == null) {
+                        clientRequestStreamSet = new HashSet<>();
+                        this.neighbourInfo.clientRequest.put(streamName, clientRequestStreamSet);
+                    }
+                    clientRequestStreamSet.add(simp.getAddress());
 
                 }
 
@@ -76,7 +83,7 @@ public class SimpManager implements Runnable{
                                                 " com streamId: " + streamId);
                             this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
                             socket.send(new Shrimp(Packet.getCurrTime(), clientIP, streamId, Define.shrimpPort, simp.getAddress(),
-                            streamName.length, streamName).toDatagramPacket());
+                            streamNameBytes.length, streamNameBytes).toDatagramPacket());
                             continue;
                         }
                     }
@@ -86,7 +93,7 @@ public class SimpManager implements Runnable{
                 } else if (streamId != 255) {
                     //Stream existe (porque existe conexão)
                     synchronized (this.neighbourInfo) {
-                        socket.send(new Shrimp((Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency)%60000, clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
+                        socket.send(new Shrimp((Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency)%60000, clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamNameBytes.length, streamNameBytes).toDatagramPacket());
                     }
                 }
             }
