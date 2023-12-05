@@ -70,12 +70,20 @@ public class ShrimpManager implements Runnable{
                         if (streamId != 255 && streamId != 0) {
                             //Colocar o nome da Stream associado ao seu Id
 
-                            this.neighbourInfo.streamIdToStreamInfo.put(streamId, new NeighbourInfo.StreamInfo());
+                            synchronized(this.neighbourInfo.streamIdToStreamInfo) {
+                                this.neighbourInfo.streamIdToStreamInfo.put(streamId, new NeighbourInfo.StreamInfo());
+                            }
         
-                            this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
-        
-                            this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
-                                                                Packet.getLatency(shrimp.getTimeStamp())));
+                            synchronized(this.neighbourInfo.fileNameToStreamId) {
+                                this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
+                            }
+                            
+                            synchronized(this.neighbourInfo.minNodeQueue) {
+                                System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
+                                                   Packet.getLatency(shrimp.getTimeStamp()));
+                                this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
+                                                                    Packet.getLatency(shrimp.getTimeStamp())));
+                            }
 
                             synchronized (clientRequestStreamSet) {
                                 //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
