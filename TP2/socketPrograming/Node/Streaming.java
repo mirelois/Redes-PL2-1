@@ -158,7 +158,9 @@ public class Streaming implements Runnable {
                     streamInfo.connectingLock.lock();
 
                     try {
-                        timeStampToSend = (Packet.getCurrTime() - streamInfo.connecting.latency) % 60000;
+                        if (streamInfo.connecting != null) {
+                            timeStampToSend = (Packet.getCurrTime() - streamInfo.connecting.latency) % 60000;
+                        }
                     }
 
                     finally {
