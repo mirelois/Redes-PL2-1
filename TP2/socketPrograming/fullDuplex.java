@@ -31,11 +31,17 @@ import SharedStructures.NeighbourInfo;
 import SharedStructures.ServerInfo;
 
 public class fullDuplex {
+
+    static class ServerRPHolder{
+        public InetAddress rpIP = null;
+    }
+
     public static void main(String[] args) throws IOException {
         if (args.length < 1 || args.length > 5) {
-            System.out.println("Wrong Arguments!" +
-                    "\nIP_Bootstrapper [-b] [-s] [-r]" +
-                    "\n -b: Bootstrapper, -s: Server, -r: RP");
+            System.out.println("""
+                    Wrong Arguments!
+                    IP_Bootstrapper [-b] [-s] [-r]
+                     -b: Bootstrapper, -s: Server, -r: RP""");
             return;
         }
 
@@ -60,7 +66,8 @@ public class fullDuplex {
 
         NeighbourInfo neighbours = new NeighbourInfo();
         ServerInfo serverInfo = isRP ? new ServerInfo() : null;
-        new Thread(new Idle(neighbours, serverInfo)).start(); // Começar o Idle o mais cedo possível para atender pedidos dos vizinhos
+        ServerRPHolder rpHolder = new ServerRPHolder();
+        new Thread(new Idle(neighbours, serverInfo, isRP, rpHolder)).start(); // Começar o Idle o mais cedo possível para atender pedidos dos vizinhos
 
         InetAddress ip_bootstrapper;
         try {
@@ -87,9 +94,9 @@ public class fullDuplex {
 
 
         // Phase 2
-        //Thread client = new Thread(new Client()); // criar um client a priori não funcional que só fazemos run quando o user pede,
-        // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e ver a stream porque também somos clientes
-        // senão tinhamos de por o nome do cliente destino no packet, do be cringe sometimes
+        //Thread client = new Thread(new Client()); // criar um client a 'priori' não funcional que só fazemos run quando o user pede,
+        // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e observar a stream porque também somos clientes
+        // senão tinhamos de pôr o nome do cliente destino no packet, do be cringe sometimes
         System.out.println("Os meus Adjacentes:");
         for (InetAddress neighbour : neighbours.overlayNeighbours) {
             System.out.println(neighbour.getHostName());
@@ -129,6 +136,7 @@ public class fullDuplex {
 
                 String[] file = inputStr.split(" ", 3);
                 if(file.length==3) {
+                    rpHolder.rpIP = InetAddress.getByName(args[0]);
                     File folder = new File(file[1]);
                     File[] listOfFiles = folder.listFiles();
                     ArrayList<String> streams = new ArrayList<>();
@@ -141,7 +149,7 @@ public class fullDuplex {
                     }
                     try {
                         DatagramSocket RTPsocket = new DatagramSocket(Define.serverPort); //init RTP socket
-                        new Thread(new Server(InetAddress.getByName(args[0]), streams,
+                        new Thread(new Server(rpHolder.rpIP, streams,
                                 streamIdToFileName, serverSenderMap, RTPsocket)).start();
 
                         new Thread(new ServerConectionManager(InetAddress.getByName(file[2]),

@@ -21,10 +21,16 @@ public class Idle implements Runnable{
 
     Thread timeout;
 
-    public Idle(NeighbourInfo neighbourInfo, ServerInfo serverInfo){
+    boolean isRP;
+
+    InetAddress rpIp;
+
+    public Idle(NeighbourInfo neighbourInfo, ServerInfo serverInfo, boolean isRP, fullDuplex.ServerRPHolder rpHolder){
         this.port = Define.idlePort;
         this.neighbourInfo = neighbourInfo;
         this.serverInfo = serverInfo;
+        this.isRP = isRP;
+        this.rpIp = rpHolder.rpIP;
     }
 
     @Override
@@ -40,7 +46,7 @@ public class Idle implements Runnable{
                             //Enviar para os adjacentes que não estão em uso
                             //TODO diminuir vida aos ajdacentes que foram enviados mensagens
                             for (InetAddress address : this.neighbourInfo.overlayNeighbours) {
-                                socket.send(new ITP(false,
+                                socket.send(new ITP(address.equals(this.rpIp),
                                                     true,
                                                     false, 
                                                     this.port,
@@ -49,9 +55,48 @@ public class Idle implements Runnable{
                                                     0, 
                                                     null).toDatagramPacket());
                             }
+                            if(this.isRP){
+                                synchronized (this.serverInfo.streamInfoMap) {
+                                    for (ServerInfo.StreamInfo streamInfo : this.serverInfo.streamInfoMap.values()) {
+                                        streamInfo.connectingLock.lock();
+                                        try {
+                                            socket.send(new ITP(false,
+                                                    true,
+                                                    false,
+                                                    this.port,
+                                                    streamInfo.connected.address,
+                                                    Packet.getCurrTime(),
+                                                    0,
+                                                    null).toDatagramPacket());
+                                        } finally {
+                                            streamInfo.connectingLock.unlock();
+                                        }
 
-                            if(serverInfo!=null){ // Ou seja, sou um server
-
+                                        streamInfo.disconnectingDeprecatedLock.lock();
+                                        try {
+                                            for (ServerInfo.StreamInfo.Server disco: streamInfo.disconnecting)
+                                                socket.send(new ITP(false,
+                                                        true,
+                                                        false,
+                                                        this.port,
+                                                        disco.address,
+                                                        Packet.getCurrTime(),
+                                                        0,
+                                                        null).toDatagramPacket());
+                                            for(ServerInfo.StreamInfo.Server depre: streamInfo.deprecated)
+                                                socket.send(new ITP(false,
+                                                        true,
+                                                        false,
+                                                        this.port,
+                                                        depre.address,
+                                                        Packet.getCurrTime(),
+                                                        0,
+                                                        null).toDatagramPacket());
+                                        } finally {
+                                            streamInfo.disconnectingDeprecatedLock.unlock();
+                                        }
+                                    }
+                                }
                             }
                         }
                     } catch (Exception E) {
