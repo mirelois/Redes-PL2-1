@@ -35,20 +35,20 @@ public class ShrimpManager implements Runnable{
                 socket.receive(packet);
 
                 Shrimp shrimp = new Shrimp(packet);
+
                 InetAddress clientIP = shrimp.getSourceAddress();
+                Integer streamId = shrimp.getStreamId();
+                String streamName = new String(shrimp.getPayload());
+                Set<InetAddress> rpAdjacent, clientRequestStreamSet;
+                
                 System.out.println( "Recebido SHRIMP de " + clientIP.toString() + 
                                     " vindo de " + shrimp.getAddress().getHostAddress() +
                                     " com streamId " + shrimp.getStreamId());
 
                 socket.send(new Rip(0, packet.getAddress(), Define.ripPort).toDatagramPacket());
-                
-                Set<InetAddress> rpAdjacent, clientRequestStreamSet;
-
-                //Retirar streamId do pacote
-                Integer streamId = shrimp.getStreamId();
-                String streamName = new String(shrimp.getPayload());
 
                 synchronized(this.neighbourInfo) {
+
                     //Remover pedido feito por Simp
                     this.neighbourInfo.rpRequest.remove(shrimp.getAddress());
                     clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
@@ -60,68 +60,65 @@ public class ShrimpManager implements Runnable{
                         //Adicionar Novo Caminho para o RP (Porque existe!)
                         rpAdjacent = this.neighbourInfo.rpAdjacent;
                         rpAdjacent.add(shrimp.getAddress());
-                        
                     } else {
                         System.out.println("Não existe conexão!");
                         this.neighbourInfo.notRpAdjacent.add(shrimp.getAddress());
                     }
-                    
-                    if (streamId != 255 && streamId != 0) {
-                        //Colocar o nome da Stream associado ao seu Id
-                        this.neighbourInfo.streamIdToStreamInfo.put(streamId, new NeighbourInfo.StreamInfo());
-    
-                        this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
-    
-                        this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
-                                                            Packet.getLatency(shrimp.getTimeStamp())));
 
-                        synchronized (clientRequestStreamSet) {
+                    //Se for a primeira vez que a Stream é adicionada ao Nodo
+                    if (this.neighbourInfo.fileNameToStreamId.get(streamName) == null) {
+                        if (streamId != 255 && streamId != 0) {
+                            //Colocar o nome da Stream associado ao seu Id
 
-                            //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
-                            for (InetAddress linkToClient : clientRequestStreamSet) {
-                                if (!linkToClient.equals(InetAddress.getByName("localhost"))) {
-                                    System.out.println("Enviado SHRIMP para " + linkToClient.getHostAddress() +
-                                                    " da stream com id " + streamId +
-                                                    " pedida por " + clientIP.getHostAddress());
-                                    socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, Define.shrimpPort, 
-                                                        linkToClient, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
-                                } else {
-                                    System.out.println("    Shrimp veio para Cliente local - Enviado Link para local");
-                                    socket.send(new Link(false, 
-                                                        true,
-                                                        false,
-                                                        shrimp.getStreamId(),
-                                                        InetAddress.getByName("localhost"),
-                                                        Define.nodeConnectionManagerPort,
-                                                        0,
-                                                        null).toDatagramPacket());   
+                            this.neighbourInfo.streamIdToStreamInfo.put(streamId, new NeighbourInfo.StreamInfo());
+        
+                            this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
+        
+                            this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
+                                                                Packet.getLatency(shrimp.getTimeStamp())));
+
+                            synchronized (clientRequestStreamSet) {
+                                //Avisar todos os caminhos de todo Cliente que pediu a Stream de que há Stream
+                                for (InetAddress streamRequest : clientRequestStreamSet) {
+                                    if (!streamRequest.equals(InetAddress.getByName("localhost"))) {
+                                        System.out.println("Enviado SHRIMP para " + streamRequest.getHostAddress() +
+                                                        " da stream com id " + streamId +
+                                                        " pedida por " + clientIP.getHostAddress());
+                                        socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, Define.shrimpPort, 
+                                                            streamRequest, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
+                                    } else {
+                                        System.out.println("    Shrimp veio para Cliente local - Enviado Link para local");
+                                        socket.send(new Link(false, 
+                                                            true,
+                                                            false,
+                                                            shrimp.getStreamId(),
+                                                            InetAddress.getByName("localhost"),
+                                                            Define.nodeConnectionManagerPort,
+                                                            0,
+                                                            null).toDatagramPacket());   
+                                    }
                                 }
-                                clientRequestStreamSet.remove(linkToClient);
                             }
 
-                        }
-
-                    } else {
-
-                        //Pode não haver stream
-                        if (this.neighbourInfo.rpRequest.isEmpty() && this.neighbourInfo.fileNameToStreamId.get(new String(shrimp.getPayload())) == null) {
-                        
+                        } else if (this.neighbourInfo.rpRequest.isEmpty()) {
+                            //Pode não haver stream
+                            
                             synchronized(clientRequestStreamSet) {
                                 streamId = this.neighbourInfo.isConnectedToRP == 1 ? 0 : 255;
                                 this.neighbourInfo.fileNameToStreamId.put(new String(shrimp.getPayload()), streamId);
                                 
                                 //Avisar todos os Clientes da falta de conexão
-                                for (InetAddress linkToClient : clientRequestStreamSet) {
-                                    socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, Define.shrimpPort, linkToClient, 
+                                for (InetAddress streamRequest : clientRequestStreamSet) {
+                                    socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, Define.shrimpPort, streamRequest, 
                                                 shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
-    
-                                    clientRequestStreamSet.remove(linkToClient);
+
                                 }
                             }
-
                         }
-                        
+
+                        this.neighbourInfo.streamNameToClientRequests.put(streamName, new HashSet<>());
                     }
+                    
                 }
             }
 

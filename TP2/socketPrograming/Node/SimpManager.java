@@ -46,13 +46,6 @@ public class SimpManager implements Runnable{
                     streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
                     System.out.println("    StreamId do ficheiro pedido é: " + streamId);
 
-                    clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
-                    if (clientRequestStreamSet == null) {
-                        clientRequestStreamSet = new HashSet<>();
-                        this.neighbourInfo.streamNameToClientRequests.put(streamName, clientRequestStreamSet);
-                    }
-                    clientRequestStreamSet.add(simp.getAddress());
-
                 }
 
                 if (streamId == null || streamId == 0) {
@@ -86,6 +79,14 @@ public class SimpManager implements Runnable{
                             streamNameBytes.length, streamNameBytes).toDatagramPacket());
                             continue;
                         }
+                        
+                        clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
+                        if (clientRequestStreamSet == null) {
+                            clientRequestStreamSet = new HashSet<>();
+                            this.neighbourInfo.streamNameToClientRequests.put(streamName, clientRequestStreamSet);
+                        }
+                        clientRequestStreamSet.add(simp.getAddress());
+                        
                     }
                     //255 significa que ainda não se sabe se a stream existe
                     this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 255);
