@@ -76,7 +76,6 @@ public class Streaming implements Runnable {
 
                 Sup sup = new Sup(packet);
 
-
                 synchronized (neighbourInfo.streamIdToStreamInfo) {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
