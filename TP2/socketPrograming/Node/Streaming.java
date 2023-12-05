@@ -102,7 +102,7 @@ public class Streaming implements Runnable{
                     " , " + this.neighbourInfo.minNodeQueue.peek().latency +
                     " , " + this.neighbourInfo.minNodeQueue.peek().lossRate);
 
-                    System.out.println("\nCurrent: " + bestMetrics + 
+                    System.out.println("\nCurrent: " + currentMetrics + 
                     " do server " + streamInfo.connected.address.getHostName() + 
                     ": " + streamInfo.connected.jitter +
                     " , " + streamInfo.connected.latency +

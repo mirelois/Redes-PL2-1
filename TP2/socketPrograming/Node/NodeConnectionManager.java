@@ -214,24 +214,27 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             updateBestNode(this.neighbourInfo, streamInfo, link.getStreamId(), socket);
                         }
 
-                        synchronized(streamInfo.clientAdjacent) {
-                            Integer n = streamInfo.clientAdjacent.get(link.getAddress());
-                            if (n == null) {
-                                streamInfo.clientAdjacent.put(link.getAddress(), 1);
-                            } else {
-                                streamInfo.clientAdjacent.put(link.getAddress(), n + 1);
+                        
+                        if (!link.getAddress().equals(InetAddress.getByName("localhost"))) {
+                            synchronized(streamInfo.clientAdjacent) {
+                                Integer n = streamInfo.clientAdjacent.get(link.getAddress());
+                                if (n == null) {
+                                    streamInfo.clientAdjacent.put(link.getAddress(), 1);
+                                } else {
+                                    streamInfo.clientAdjacent.put(link.getAddress(), n + 1);
+                                }
                             }
+                            System.out.println("Enviada resposta de Link de ativação para " + link.getAddress());
+                            socket.send(new Link(
+                                            true,
+                                            true,
+                                            false,
+                                            link.getStreamId(),
+                                            link.getAddress(),
+                                            Define.nodeConnectionManagerPort,
+                                            0,
+                                            null).toDatagramPacket());
                         }
-                        System.out.println("Enviada resposta de Link de ativação para " + link.getAddress());
-                        socket.send(new Link(
-                                        true,
-                                        true,
-                                        false,
-                                        link.getStreamId(),
-                                        link.getAddress(),
-                                        Define.nodeConnectionManagerPort,
-                                        0,
-                                        null).toDatagramPacket());
 
                     } else if (link.isDeactivate()) {
 
