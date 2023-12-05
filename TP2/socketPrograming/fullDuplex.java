@@ -97,7 +97,7 @@ public class fullDuplex {
         Thread streaming;
 
         if (isRP){
-            ServerInfo serverInfo = new ServerInfo();        
+            serverInfo = new ServerInfo();        
             System.out.println("Começo de RP!");
             new Thread(new RP(serverInfo, neighbours)).start();
             new Thread(new RPServerAdder(serverInfo, neighbours)).start();
