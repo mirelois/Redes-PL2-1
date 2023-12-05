@@ -197,7 +197,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 this.neighbourInfo.streamActiveLinks.wait();
                             }
                             for (NeighbourInfo.StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
-                                if (this.neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
+                                if (!this.neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
                                     updateBestNode(neighbourInfo, streamInfo, socket);
                                 }
                             }
