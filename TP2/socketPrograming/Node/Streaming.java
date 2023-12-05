@@ -106,6 +106,7 @@ public class Streaming implements Runnable{
                 ": " + streamInfo.connected.jitter +
                 " , " + streamInfo.connected.latency +
                 " , " + streamInfo.connected.lossRate);
+                
                 if (bestMetrics < (0.95 * currentMetrics)) { //Mandar latencia melhor se isto fizer
 
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
