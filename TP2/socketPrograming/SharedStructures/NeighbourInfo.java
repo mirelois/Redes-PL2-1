@@ -129,7 +129,7 @@ public class NeighbourInfo {
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
     public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos
     
-    //0 means connection but no stream, 255 means no connection, otherwise stream
+    //0 means connection but no stream, 255 means doesn't know, otherwise stream
     public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // filenames to stream id
     
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();

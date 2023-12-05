@@ -66,7 +66,7 @@ public class ShrimpManager implements Runnable{
                     }
 
                     //Se for a primeira vez que a Stream é adicionada ao Nodo
-                    if (this.neighbourInfo.fileNameToStreamId.get(streamName) == null) {
+                    if (this.neighbourInfo.fileNameToStreamId.get(streamName) == 255) {
                         if (streamId != 255 && streamId != 0) {
                             //Colocar o nome da Stream associado ao seu Id
 
@@ -100,6 +100,8 @@ public class ShrimpManager implements Runnable{
                                 }
                             }
 
+                            this.neighbourInfo.streamNameToClientRequests.put(streamName, new HashSet<>());
+
                         } else if (this.neighbourInfo.rpRequest.isEmpty()) {
                             //Pode não haver stream
                             
@@ -114,9 +116,12 @@ public class ShrimpManager implements Runnable{
 
                                 }
                             }
+
+                            this.neighbourInfo.streamNameToClientRequests.put(streamName, new HashSet<>());
+                        } else {
+                            //DO NOTHING
                         }
 
-                        this.neighbourInfo.streamNameToClientRequests.put(streamName, new HashSet<>());
                     }
                     
                 }

@@ -48,50 +48,59 @@ public class SimpManager implements Runnable{
 
                 }
 
-                if (streamId == null || streamId == 0) {
-                    //Stream nunca foi testada
-                    System.out.println("    Não conheço a stream...");
-                    synchronized(this.neighbourInfo) {
+                if (streamId == null || streamId == 255) {
 
-                        //Ainda não sei onde está o RP
+                    //Novo Pedido de Stream desconhecida
+                    clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
+                    if (clientRequestStreamSet == null) {
+                        clientRequestStreamSet = new HashSet<>();
+                        this.neighbourInfo.streamNameToClientRequests.put(streamName, clientRequestStreamSet);
+                    }
+                    synchronized(clientRequestStreamSet) {
+                        clientRequestStreamSet.add(simp.getAddress());
+                    }
 
-                        System.out.println("    Enviar pedido para todos os seus vizinhos, não conheço o RP");
-                        //Enviar para todos os vizinhos se não conhecer caminhos para o RP
-                        for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) {
-                            //Não envio para quem me enviou
-                            if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(clientIP) && !this.neighbourInfo.notRpAdjacent.contains(neighbour)) {
+                    if (streamId == null) {
 
-                                System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
+                        //Ainda não fiz pedidos para este ficheiro
+                        System.out.println("    Não pedi o ficheiro ainda...");
+                        synchronized(this.neighbourInfo) {
 
-                                socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
-                                //Adicionar pedido feito por Simp
-                                this.neighbourInfo.rpRequest.add(neighbour);
+                            System.out.println("    Enviar pedido para todos os vizinhos (exceto os que garantidamente não vão para o RP)");
+                            //Enviar para todos os vizinhos se não conhecer caminhos para o RP
+                            for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) {
+                                //Não envio para quem me enviou nem para quem sei que não tem o RP
+                                if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(clientIP) && 
+                                    !this.neighbourInfo.notRpAdjacent.contains(neighbour)) {
+
+                                    System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
+
+                                    socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
+                                    //Adicionar pedido feito por Simp
+                                    this.neighbourInfo.rpRequest.add(neighbour);
+                                }
+
+                            }
+
+                            if (this.neighbourInfo.rpRequest.isEmpty()) {
+                                streamId = this.neighbourInfo.isConnectedToRP == 1 ? 0 : 255;
+                                System.out.println("    Não há vizinhos para o RP: Enviado SHRIMP para " + simp.getAddress().getHostName() + " com streamId: " + streamId);
+                                socket.send(new Shrimp(Packet.getCurrTime(), clientIP, streamId, Define.shrimpPort, simp.getAddress(),
+                                                       streamNameBytes.length, streamNameBytes).toDatagramPacket());
+
+                                synchronized(clientRequestStreamSet) {
+                                    clientRequestStreamSet.remove(simp.getAddress());
+                                }
+                                continue;
                             }
 
                         }
+                        //255 significa que já se pediu a stream mas não sabe se existe
+                        this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 255);
 
-                        if (this.neighbourInfo.rpRequest.isEmpty()) {
-                            streamId = this.neighbourInfo.isConnectedToRP == 1 ? 0 : 255;
-                            System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostName() + ", port " + Define.shrimpPort + 
-                                                " com streamId: " + streamId);
-                            this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
-                            socket.send(new Shrimp(Packet.getCurrTime(), clientIP, streamId, Define.shrimpPort, simp.getAddress(),
-                            streamNameBytes.length, streamNameBytes).toDatagramPacket());
-                            continue;
-                        }
-                        
-                        clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
-                        if (clientRequestStreamSet == null) {
-                            clientRequestStreamSet = new HashSet<>();
-                            this.neighbourInfo.streamNameToClientRequests.put(streamName, clientRequestStreamSet);
-                        }
-                        clientRequestStreamSet.add(simp.getAddress());
-                        
                     }
-                    //255 significa que ainda não se sabe se a stream existe
-                    this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 255);
 
-                } else if (streamId != 255) {
+                } else {
                     //Stream existe (porque existe conexão)
                     synchronized (this.neighbourInfo) {
                         socket.send(new Shrimp((Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency)%60000, clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamNameBytes.length, streamNameBytes).toDatagramPacket());
