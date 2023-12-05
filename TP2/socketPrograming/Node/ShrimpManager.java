@@ -80,6 +80,7 @@ public class ShrimpManager implements Runnable{
 
                             synchronized(this.neighbourInfo.streamActiveLinks) {
                                 this.neighbourInfo.streamActiveLinks.put(streamId, new HashSet<>());
+                                this.neighbourInfo.streamActiveLinks.notifyAll();
                             }
 
                             synchronized(this.neighbourInfo.streamIdToStreamInfo) {
