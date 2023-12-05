@@ -191,7 +191,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     }
                 }
             }).start();
-        
 
             byte[] buf = new byte[Define.infoBuffer];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
