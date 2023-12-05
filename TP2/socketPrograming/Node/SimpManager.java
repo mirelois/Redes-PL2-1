@@ -71,7 +71,7 @@ public class SimpManager implements Runnable{
                         }
 
                         if (this.neighbourInfo.rpRequest.isEmpty()) {
-                            streamId = streamId != 0 ? 255 : 0;
+                            streamId = this.neighbourInfo.isConnectedToRP == 1 ? 0 : 255;
                             System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostName() + ", port " + Define.shrimpPort + 
                                                 " com streamId: " + streamId);
                             this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 0);
