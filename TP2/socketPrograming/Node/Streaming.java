@@ -22,6 +22,44 @@ public class Streaming implements Runnable {
 
     }
 
+    public void checkLinkActivation(NeighbourInfo.Node node, NeighbourInfo.StreamInfo streamInfo) {
+        streamInfo.connectedLock.lock();
+        try {
+            streamInfo.connectingLock.lock();
+            try {
+                streamInfo.disconnectingDeprecatedLock.lock();
+                try {
+                    if (streamInfo.connecting.address.equals(node.address)) {
+                        if (streamInfo.connected != null) {
+                            streamInfo.disconnecting.add(streamInfo.connected);
+                            streamInfo.disconnectingDeprecatedEmpty.signal();
+                        }
+                        streamInfo.connected = streamInfo.connecting;
+                        streamInfo.connecting = null;
+                        System.out.println("Established Connection!\n   connected: " + 
+                        streamInfo.connected.address.getHostName());
+                    } else if (streamInfo.deprecated.contains(node)) {
+                        
+                        streamInfo.disconnectingDeprecatedLock.lock();
+                        try {
+                            streamInfo.deprecated.remove(node);
+                            streamInfo.disconnecting.add(node);
+                            streamInfo.disconnectingDeprecatedEmpty.signal();
+                        } finally {
+                            streamInfo.disconnectingDeprecatedLock.unlock();
+                        }
+                    }
+                } finally {
+                    streamInfo.disconnectingDeprecatedLock.unlock();
+                }
+            } finally {
+                streamInfo.connectingLock.unlock();
+            }
+        } finally {
+            streamInfo.connectedLock.unlock();
+        }
+    }
+
     @Override
     public void run() {
         try (DatagramSocket socket = new DatagramSocket(Define.streamingPort)) {
@@ -29,6 +67,8 @@ public class Streaming implements Runnable {
             byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough? no
                                                         //
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            
+            NeighbourInfo.StreamInfo streamInfo;
 
             while (true) {
 
@@ -36,13 +76,14 @@ public class Streaming implements Runnable {
 
                 Sup sup = new Sup(packet);
 
-                NeighbourInfo.StreamInfo streamInfo;
 
                 synchronized (neighbourInfo.streamIdToStreamInfo) {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
 
                 System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequence_number());
+
+                checkLinkActivation(new NeighbourInfo.Node(sup.getAddress(), 0), streamInfo);
 
                 NeighbourInfo.LossInfo lossInfo = streamInfo.lossInfo;
 
@@ -54,12 +95,12 @@ public class Streaming implements Runnable {
 
                 int arrival = Packet.getCurrTime();
 
-                int timestap = Packet.getCurrTime();
+                int timestamp = Packet.getCurrTime();
 
                 // see section 6.4.1 of rfc3550
-                lossInfo.jitter = lossInfo.jitter + (Math.abs(lossInfo.prevDiff - (arrival - timestap)) - lossInfo.jitter) / 16;
+                lossInfo.jitter = lossInfo.jitter + (Math.abs(lossInfo.prevDiff - (arrival - timestamp)) - lossInfo.jitter) / 16;
 
-                lossInfo.prevDiff = (arrival - timestap);
+                lossInfo.prevDiff = (arrival - timestamp);
 
                 lossInfo.totalReceivedPacket++;
 

@@ -27,8 +27,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
         DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
-        System.out.println("Update ao best Node da stream " + streamInfo.streamId);
-
+            
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
