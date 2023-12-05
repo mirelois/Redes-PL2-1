@@ -199,6 +199,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                         boolean isActiveEmpty = false;
                         //TODO better locking mechanism to not stall the entire streamActiveLinks structure
                         synchronized(neighbourInfo.streamActiveLinks) {
+                            
                             //Get the Set of active links (activated by clients)
                             activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
                             if (activeLinks == null) {
@@ -206,6 +207,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 neighbourInfo.streamActiveLinks.put(link.getStreamId(), activeLinks);
                             }
                             isActiveEmpty = activeLinks.isEmpty();
+                            //Tem de ter o active link local ou não manda para o streaming
                             activeLinks.add(link.getAddress());
                         }
                         
@@ -214,7 +216,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             updateBestNode(this.neighbourInfo, streamInfo, link.getStreamId(), socket);
                         }
 
-                        
+                        //Evitar loops de links ao apenas considerar respostas a não locais
                         if (!link.getAddress().equals(InetAddress.getByName("localhost"))) {
                             synchronized(streamInfo.clientAdjacent) {
                                 Integer n = streamInfo.clientAdjacent.get(link.getAddress());
