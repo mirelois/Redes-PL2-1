@@ -96,6 +96,7 @@ public class Streaming implements Runnable{
                 int timeStampToSend = sup.getTime_stamp();
 
                 if (bestMetrics < 0.95 * currentMetrics) { //Mandar latencia melhor se isto fizer
+                    System.out.println("Chamada ao UpdateBestNode. Melhor: " + bestMetrics + " vs " + currentMetrics);
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, sup.getStreamId(), socket);
                     streamInfo.connectingLock.lock();
                     try{
