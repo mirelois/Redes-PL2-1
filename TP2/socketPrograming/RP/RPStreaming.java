@@ -96,7 +96,7 @@ public class RPStreaming implements Runnable{
                         bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();
                 }
 
-                if (bestMetrics < 0.95 * currentMetrics) {
+                if (bestMetrics < 0.99 * currentMetrics) {
                     RPServerConectionManager.updateBestServer(streamInfo, sup.getStreamId(), socket);
                 }
 
