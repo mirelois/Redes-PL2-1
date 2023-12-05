@@ -124,7 +124,7 @@ public class NeighbourInfo {
         
     }
     
-    public int isConnectedToRP = 0; // 255 significa que ainda não sabe, 0 no, 1 yes
+    public int isConnectedToRP = 255; // 255 significa que ainda não sabe, 0 no, 1 yes
     
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
     public List<InetAddress> activeNeighbours = new ArrayList<>(); // lista de vizinhos vivos

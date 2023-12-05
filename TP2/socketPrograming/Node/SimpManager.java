@@ -48,7 +48,7 @@ public class SimpManager implements Runnable{
 
                 }
 
-                if (streamId == null) {
+                if (streamId == null || streamId == 0) {
                     //Stream nunca foi testada
                     System.out.println("    Não conheço a stream...");
                     synchronized(this.neighbourInfo) {
@@ -81,7 +81,7 @@ public class SimpManager implements Runnable{
                     //255 significa que ainda não se sabe se a stream existe
                     this.neighbourInfo.fileNameToStreamId.put(new String(simp.getPayload()), 255);
 
-                } else {
+                } else if (streamId != 255) {
                     //Stream existe (porque existe conexão)
                     synchronized (this.neighbourInfo) {
                         socket.send(new Shrimp((Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency)%60000, clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamName.length, streamName).toDatagramPacket());
