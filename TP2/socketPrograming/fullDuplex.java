@@ -135,6 +135,7 @@ public class fullDuplex {
 
                 String[] file = inputStr.split(" ", 3);
                 if(file.length==3) {
+                    rpHolder.rpIP = InetAddress.getByName(args[0]);
                     File folder = new File(file[1]);
                     File[] listOfFiles = folder.listFiles();
                     ArrayList<String> streams = new ArrayList<>();
@@ -147,7 +148,7 @@ public class fullDuplex {
                     }
                     try {
                         DatagramSocket RTPsocket = new DatagramSocket(Define.serverPort); //init RTP socket
-                        new Thread(new Server(InetAddress.getByName(args[0]), streams,
+                        new Thread(new Server(rpHolder.rpIP, streams,
                                 streamIdToFileName, serverSenderMap, RTPsocket)).start();
 
                         new Thread(new ServerConectionManager(InetAddress.getByName(file[2]),
