@@ -38,10 +38,9 @@ public class fullDuplex {
 
     public static void main(String[] args) throws IOException {
         if (args.length < 1 || args.length > 5) {
-            System.out.println("""
-                    Wrong Arguments!
-                    IP_Bootstrapper [-b] [-s] [-r]
-                     -b: Bootstrapper, -s: Server, -r: RP""");
+            System.out.println("Wrong Arguments!" +
+                    "\nIP_Bootstrapper [-b] [-s] [-r]" +
+                    "\n -b: Bootstrapper, -s: Server, -r: RP");
             return;
         }
 
@@ -94,9 +93,9 @@ public class fullDuplex {
 
 
         // Phase 2
-        //Thread client = new Thread(new Client()); // criar um client a 'priori' não funcional que só fazemos run quando o user pede,
-        // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e observar a stream porque também somos clientes
-        // senão tinhamos de pôr o nome do cliente destino no packet, do be cringe sometimes
+        //Thread client = new Thread(new Client()); // criar um client a priori não funcional que só fazemos run quando o user pede,
+        // dessa forma podiamos ter uma lógica fácil de propagar a stream para os próximos nodos e ver a stream porque também somos clientes
+        // senão tinhamos de por o nome do cliente destino no packet, do be cringe sometimes
         System.out.println("Os meus Adjacentes:");
         for (InetAddress neighbour : neighbours.overlayNeighbours) {
             System.out.println(neighbour.getHostName());
