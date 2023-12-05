@@ -291,7 +291,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 } else if (link.isActivate()) { //this is a connection confirmation acknolegment
                     
                     if (node.equals(streamInfo.connecting)) { //this checks if connection has been established
-                        System.out.println("Established Connection!");
                         streamInfo.connectedLock.lock();
                         try {
                             streamInfo.connectingLock.lock();
@@ -304,6 +303,9 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                     }
                                     streamInfo.connected = streamInfo.connecting;
                                     streamInfo.connecting = null;
+                                    System.out.println("Established Connection!\n   connected: " + 
+                                    streamInfo.connected.address.getHostName() + "\n    connecting: " + 
+                                    streamInfo.connecting.address.getHostName());
                                 } finally {
                                     streamInfo.disconnectingDeprecatedLock.unlock();
                                 }
