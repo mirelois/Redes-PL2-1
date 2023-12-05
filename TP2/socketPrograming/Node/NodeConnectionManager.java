@@ -304,8 +304,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                     streamInfo.connected = streamInfo.connecting;
                                     streamInfo.connecting = null;
                                     System.out.println("Established Connection!\n   connected: " + 
-                                    streamInfo.connected.address.getHostName() + "\n    connecting: " + 
-                                    streamInfo.connecting.address.getHostName());
+                                    streamInfo.connected.address.getHostName());
                                 } finally {
                                     streamInfo.disconnectingDeprecatedLock.unlock();
                                 }
