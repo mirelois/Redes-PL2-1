@@ -51,7 +51,7 @@ public class ShrimpManager implements Runnable{
                 synchronized(this.neighbourInfo) {
                     //Remover pedido feito por Simp
                     this.neighbourInfo.rpRequest.remove(shrimp.getAddress());
-                    clientRequestStreamSet = this.neighbourInfo.clientRequest.get(streamName);
+                    clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
                     
                     //Existe caminho para o RP
                     if (streamId != 255) {

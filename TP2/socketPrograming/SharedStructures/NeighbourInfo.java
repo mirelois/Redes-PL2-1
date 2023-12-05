@@ -140,7 +140,7 @@ public class NeighbourInfo {
     
     public Set<InetAddress> rpRequest = new HashSet<>(); // vizinhos onde foram enviados Simp
 
-    public Map<String, Set<InetAddress>> clientRequest = new HashMap<>(); // vizinhos onde foram enviados Simp
+    public Map<String, Set<InetAddress>> streamNameToClientRequests = new HashMap<>(); // vizinhos onde foram enviados Simp
 
     public Set<InetAddress> rpAdjacent = new HashSet<>(); // vizinhos que levam ao RP
 

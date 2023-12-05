@@ -46,10 +46,10 @@ public class SimpManager implements Runnable{
                     streamId = this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload()));
                     System.out.println("    StreamId do ficheiro pedido é: " + streamId);
 
-                    clientRequestStreamSet = this.neighbourInfo.clientRequest.get(streamName);
+                    clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
                     if (clientRequestStreamSet == null) {
                         clientRequestStreamSet = new HashSet<>();
-                        this.neighbourInfo.clientRequest.put(streamName, clientRequestStreamSet);
+                        this.neighbourInfo.streamNameToClientRequests.put(streamName, clientRequestStreamSet);
                     }
                     clientRequestStreamSet.add(simp.getAddress());
 
