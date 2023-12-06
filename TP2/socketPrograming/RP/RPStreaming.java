@@ -45,8 +45,8 @@ public class RPStreaming implements Runnable{
 
                 NeighbourInfo.LossInfo lossInfo = streamInfo.lossInfo;
 
-                if (sup.getFrameNumber() < lossInfo.latestReceivedPacket) {
-                    continue;//Manda cu caralho
+                if (sup.getSequenceNumber() < lossInfo.latestReceivedPacket) {
+                    continue;
                 }
 
                 int currentLatency = Packet.getLatency(sup.getTime_stamp());
@@ -62,16 +62,16 @@ public class RPStreaming implements Runnable{
 
                 lossInfo.totalReceivedPacket++;
 
-                lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket/(double)sup.getFrameNumber();
+                lossInfo.lossRate = 1 - lossInfo.totalReceivedPacket/(double)sup.getSequenceNumber();
                 
-                if (sup.getFrameNumber() < lossInfo.totalReceivedPacket) {
+                if (sup.getSequenceNumber() < lossInfo.totalReceivedPacket) {
                     lossInfo.latestReceivedPacket = 0;
                     lossInfo.totalReceivedPacket = 0;
                     lossInfo.lossRate = -1;
                     lossInfo.jitter = -1;
                 }
                                 
-                lossInfo.latestReceivedPacket = sup.getFrameNumber();
+                lossInfo.latestReceivedPacket = sup.getSequenceNumber();
                 
                 System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
                 //calculatet and update server latencies
@@ -115,7 +115,7 @@ public class RPStreaming implements Runnable{
                             -1,
                             Packet.getCurrTime(),
                             sup.getVideo_time_stamp(),
-                            sup.getFrameNumber(),
+                            sup.getSequenceNumber(),
                             sup.getSequence_number(),
                             sup.getStreamId(),
                             activeLink,

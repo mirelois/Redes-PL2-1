@@ -144,7 +144,6 @@ public class Server extends JFrame implements ActionListener, Runnable {
             catch(Exception ex)
             {
                 ex.printStackTrace();
-                System.exit(0);
             }
         }
         else
@@ -161,6 +160,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
         Integer streamId;
         InetAddress rpIPAddr; //RP IP address
         int imagenb = 0; //image nb of the image currently transmitted
+        int seqnb = 0; //image nb of the image currently transmitted
         int VIDEO_LENGTH = 500; //length of the video in frames
         VideoStream video; //Server.VideoStream object used to access video frames
         DatagramSocket socket;
@@ -185,13 +185,13 @@ public class Server extends JFrame implements ActionListener, Runnable {
             while(true) {
                 //update current imagenb
                 this.imagenb = (this.imagenb + 1) % VIDEO_LENGTH;
-
+                this.seqnb = this.seqnb + 1;
                 try {
                     //get next frame to send from the video, as well as its size
                     int image_length = video.getnextframe(sBuf);
 
                     //Builds an RTPpacket object containing the frame
-                    Sup rtp_packet = new Sup(0, Packet.getCurrTime(), imagenb*FRAME_PERIOD, imagenb, imagenb,
+                    Sup rtp_packet = new Sup(0, Packet.getCurrTime(), imagenb*FRAME_PERIOD, imagenb, seqnb,
                                              this.streamId, rpIPAddr, Define.streamingPort, image_length, sBuf);
 
                     //get to total length of the full rtp packet to send

@@ -123,7 +123,7 @@ public class Sup extends Packet { //Streaming over UDP Protocol
 		return video_time_stamp;
 	}
 
-	public int getFrameNumber() {
+	public int getSequenceNumber() {
 		return frameNumber;
 	}
 
