@@ -196,9 +196,9 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     try {
                         Thread.sleep(Define.chooserThreadTimeOut);
                         synchronized (this.neighbourInfo.streamActiveLinks) {
-                            while (this.neighbourInfo.streamActiveLinks.values().stream().flatMap(Collection::stream).collect(Collectors.toSet()).isEmpty()) {
+                            /*while (this.neighbourInfo.streamActiveLinks.values().stream().flatMap(Collection::stream).collect(Collectors.toSet()).isEmpty()) {
                                 this.neighbourInfo.streamActiveLinks.wait();
-                            }
+                            }*/
                             for (NeighbourInfo.StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
                                 if (!this.neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
                                     System.out.println("Update de timeout à stream " + streamInfo.streamId);
