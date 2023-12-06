@@ -49,10 +49,11 @@ public class Idle implements Runnable {
                         //Colecionar num conjunto todos os adjacentes em uso
                         //Enviar para os adjacentes que não estão em uso
                         // diminuir vida aos ajdacentes que foram enviados mensagens
+                        synchronized (this.neighbourInfo.neighBoursLifePoints){
                         Set<InetAddress> aux = new HashSet<>(this.neighbourInfo.neighBoursLifePoints.keySet());
                         for (InetAddress address : aux) {
                             int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
-                            if(lifePoints > 0) {
+                            if (lifePoints > 0) {
                                 this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints - 1);
                                 try {
                                     socket.send(new ITP(address.equals(this.rpIp),
@@ -63,7 +64,7 @@ public class Idle implements Runnable {
                                             Define.idlePort,
                                             0,
                                             null).toDatagramPacket());
-                                } catch (SocketException e){
+                                } catch (SocketException e) {
                                     // Vizinho está morto? Será que esta exception faz o que queremos?
                                     this.neighbourInfo.neighBoursLifePoints.remove(address);
                                 }
@@ -71,6 +72,7 @@ public class Idle implements Runnable {
                             } else {
                                 this.neighbourInfo.neighBoursLifePoints.remove(address);
                             }
+                        }
                         }
                         if (this.isRP) {
                             synchronized (this.serverInfo.streamInfoMap) {
@@ -138,15 +140,17 @@ public class Idle implements Runnable {
 
                 if (itp.isNode) {
                     InetAddress address = packet.getAddress();
-                    if(this.neighbourInfo.neighBoursLifePoints.get(address)!=null) {
-                        neighbourInfo.updateLatency(new NeighbourInfo.Node(address, Packet.getLatency(itp.timeStamp)));
-                        //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
-                        int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
-                        if(lifePoints < 5){
-                            this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
+                    synchronized (this.neighbourInfo.neighBoursLifePoints) {
+                        if (this.neighbourInfo.neighBoursLifePoints.get(address) != null) {
+                            neighbourInfo.updateLatency(new NeighbourInfo.Node(address, Packet.getLatency(itp.timeStamp)));
+                            //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
+                            int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
+                            if (lifePoints < 5) {
+                                this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
+                            }
+                        } else { // vizinho "nasceu"
+                            neighbourInfo.neighBoursLifePoints.put(packet.getAddress(), 5);
                         }
-                    } else { // vizinho "nasceu"
-                        neighbourInfo.neighBoursLifePoints.put(packet.getAddress(), 5);
                     }
                 }
 
