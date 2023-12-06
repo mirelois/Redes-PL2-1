@@ -298,11 +298,11 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                         streamInfo.disconnectingDeprecatedLock.lock();
                                         try {
                                             if (streamInfo.connected != null) {
-                                                System.out.println("    Added to the disconnecting: " + streamInfo.connected);
+                                                System.out.println("    Added to the disconnecting: " + streamInfo.connected.address.getHostName());
                                                 streamInfo.disconnecting.add(streamInfo.connected);
                                             }
                                             if (streamInfo.connecting != null) {
-                                                System.out.println("    Added to the deprecated: " + streamInfo.connecting);
+                                                System.out.println("    Added to the deprecated: " + streamInfo.connecting.address.getHostName());
                                                 streamInfo.deprecated.add(streamInfo.connecting);
                                             }
                                             streamInfo.connecting = null;
