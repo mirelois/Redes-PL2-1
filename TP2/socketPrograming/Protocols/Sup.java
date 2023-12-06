@@ -4,26 +4,20 @@ import java.net.InetAddress;
 
 public class Sup extends Packet { //Streaming over UDP Protocol
 
-    static int HEADER_SIZE = 19;
+    static int HEADER_SIZE = 13;
 
-    int lossRate; //2 
-    
-    int time_stamp; //2
-                    
-    int video_time_stamp; // 4 in ms
-                          
     int frameNumber; // 4
                            
     int sequence_number; //4
     
-    int streamId; //1
+    int time_stamp; //2
 
     int checksum; //2
                   
+    int streamId; //1
+
     public Sup(
-            int lossRate,
             int time_stamp,
-            int video_time_stamp,
             int frameNumber,
             int sequence_number,
             int streamId,
@@ -35,15 +29,11 @@ public class Sup extends Packet { //Streaming over UDP Protocol
 
         super(HEADER_SIZE, payload, payload_size, address, port);
 
-        this.lossRate = lossRate;
-
-        this.time_stamp = time_stamp;
-
-        this.video_time_stamp = video_time_stamp;
-
         this.frameNumber = frameNumber;
 
         this.sequence_number = sequence_number;
+
+        this.time_stamp = time_stamp;
 
         this.streamId = streamId;
         
@@ -51,31 +41,23 @@ public class Sup extends Packet { //Streaming over UDP Protocol
 
         // System.err.println(this.time_stamp);
 
-        this.header[0]  = (byte) (lossRate >> 8  /* & 0xFF */ );
-        this.header[1]  = (byte) (lossRate       /* & 0xFF */ );
+        this.header[0] = (byte) (frameNumber >> 24 /* & 0xFF */);
+        this.header[1] = (byte) (frameNumber >> 16 /* & 0xFF */);
+        this.header[2] = (byte) (frameNumber >> 8  /* & 0xFF */);
+        this.header[3] = (byte) (frameNumber       /* & 0xFF */);
+        
+        this.header[4] = (byte) (sequence_number >> 24 /* & 0xFF */);
+        this.header[5] = (byte) (sequence_number >> 16 /* & 0xFF */);
+        this.header[6] = (byte) (sequence_number >> 8  /* & 0xFF */);
+        this.header[7] = (byte) (sequence_number       /* & 0xFF */);
+        
+        this.header[8] = (byte) (time_stamp >> 8  /* & 0xFF */ );
+        this.header[9] = (byte) (time_stamp       /* & 0xFF */ );
 
-        this.header[2]  = (byte) (time_stamp >> 8  /* & 0xFF */ );
-        this.header[3]  = (byte) (time_stamp       /* & 0xFF */ );
-
-        this.header[4]  = (byte) (video_time_stamp >> 24 /* & 0xFF */);
-        this.header[5]  = (byte) (video_time_stamp >> 16 /* & 0xFF */);
-        this.header[6]  = (byte) (video_time_stamp >> 8  /* & 0xFF */);
-        this.header[7]  = (byte) (video_time_stamp       /* & 0xFF */);
+        this.header[10] = (byte) (this.streamId        /* & 0xFF */);
         
-        this.header[8]  = (byte) (frameNumber >> 24 /* & 0xFF */);
-        this.header[9]  = (byte) (frameNumber >> 16 /* & 0xFF */);
-        this.header[10] = (byte) (frameNumber >> 8  /* & 0xFF */);
-        this.header[11] = (byte) (frameNumber       /* & 0xFF */);
-        
-        this.header[12] = (byte) (sequence_number >> 24 /* & 0xFF */);
-        this.header[13] = (byte) (sequence_number >> 16 /* & 0xFF */);
-        this.header[14] = (byte) (sequence_number >> 8  /* & 0xFF */);
-        this.header[15] = (byte) (sequence_number       /* & 0xFF */);
-        
-        this.header[16] = (byte) (this.streamId        /* & 0xFF */);
-        
-        this.header[17] = (byte) (this.checksum >> 8   /* & 0xFF */);
-        this.header[18] = (byte) (this.checksum        /* & 0xFF */);
+        this.header[11] = (byte) (this.checksum >> 8   /* & 0xFF */);
+        this.header[12] = (byte) (this.checksum        /* & 0xFF */);
 
     }
 
@@ -83,44 +65,28 @@ public class Sup extends Packet { //Streaming over UDP Protocol
         
         super(packet, HEADER_SIZE);
         
-        this.lossRate         = (Byte.toUnsignedInt(this.header[0]) << 8) |
-                                 Byte.toUnsignedInt(this.header[1]);
-
-        this.time_stamp       = (Byte.toUnsignedInt(this.header[2]) << 8) |
+        this.frameNumber      = (Byte.toUnsignedInt(this.header[0]) << 24) |
+                                (Byte.toUnsignedInt(this.header[1]) << 16) |
+                                (Byte.toUnsignedInt(this.header[2]) << 8)  |
                                  Byte.toUnsignedInt(this.header[3]);
-
-        this.video_time_stamp = (Byte.toUnsignedInt(this.header[4]) << 24) |
+        
+        this.sequence_number  = (Byte.toUnsignedInt(this.header[4]) << 24) |
                                 (Byte.toUnsignedInt(this.header[5]) << 16) |
                                 (Byte.toUnsignedInt(this.header[6]) << 8)  |
                                  Byte.toUnsignedInt(this.header[7]);
-        
-        this.frameNumber      = (Byte.toUnsignedInt(this.header[8]) << 24) |
-                                (Byte.toUnsignedInt(this.header[9]) << 16) |
-                                (Byte.toUnsignedInt(this.header[10]) << 8)  |
-                                 Byte.toUnsignedInt(this.header[11]);
-        
-        this.sequence_number  = (Byte.toUnsignedInt(this.header[12]) << 24) |
-                                (Byte.toUnsignedInt(this.header[13]) << 16) |
-                                (Byte.toUnsignedInt(this.header[14]) << 8)  |
-                                 Byte.toUnsignedInt(this.header[15]);
 
-        this.streamId         =  Byte.toUnsignedInt(this.header[16]);
+        this.time_stamp       = (Byte.toUnsignedInt(this.header[8]) << 8) |
+                                 Byte.toUnsignedInt(this.header[9]);
+
+        this.streamId         =  Byte.toUnsignedInt(this.header[10]);
                         
-        this.checksum         = (Byte.toUnsignedInt(this.header[17]) << 8)  |
-                                 Byte.toUnsignedInt(this.header[18]);
+        this.checksum         = (Byte.toUnsignedInt(this.header[11]) << 8)  |
+                                 Byte.toUnsignedInt(this.header[12]);
 
     }
 
-	public int getLossRate() {
-		return lossRate;
-	}
-
 	public int getTime_stamp() {
 		return time_stamp;
-	}
-
-	public int getVideo_time_stamp() {
-		return video_time_stamp;
 	}
 
 	public int getFrameNumber() {

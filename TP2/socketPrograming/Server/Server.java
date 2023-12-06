@@ -191,7 +191,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
                     int image_length = video.getnextframe(sBuf);
 
                     //Builds an RTPpacket object containing the frame
-                    Sup rtp_packet = new Sup(0, Packet.getCurrTime(), imagenb*FRAME_PERIOD, imagenb, seqnb,
+                    Sup rtp_packet = new Sup(Packet.getCurrTime(), imagenb, seqnb,
                                              this.streamId, rpIPAddr, Define.streamingPort, image_length, sBuf);
 
                     //get to total length of the full rtp packet to send

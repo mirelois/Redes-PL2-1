@@ -112,9 +112,7 @@ public class RPStreaming implements Runnable{
                     System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
                                        " com seq#: " + sup.getSequenceNumber());
                     socket.send(new Sup(
-                            -1,
                             Packet.getCurrTime(),
-                            sup.getVideo_time_stamp(),
                             sup.getFrameNumber(),
                             sup.getSequenceNumber(),
                             sup.getStreamId(),
