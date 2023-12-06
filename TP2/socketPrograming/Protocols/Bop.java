@@ -26,8 +26,8 @@ public class Bop extends Packet{
 
         // TODO: check packet_size
 
-        this.checksum = (Byte.toUnsignedInt( this.header[0] ) << 8) | 
-                         Byte.toUnsignedInt( this.header[1] ) ;
+        this.checksum = (( this.header[0] ) << 8) | 
+                         ( this.header[1] ) ;
         
     }
 
