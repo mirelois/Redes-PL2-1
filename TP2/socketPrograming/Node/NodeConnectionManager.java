@@ -3,20 +3,16 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
-import SharedStructures.ServerInfo;
 
 import java.net.UnknownHostException;
 
-public class NodeConnectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
+public class NodeConnectionManager implements Runnable {
 
     NeighbourInfo neighbourInfo;
 
@@ -26,10 +22,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
     }
 
     //Called once at the start and everytime the Connected Node should change
-    public static void updateBestNode( //TODO: fix args -> done? nao era isso lmao
+    public static void updateBestNode(
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
-        DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
+        DatagramSocket socket) throws UnknownHostException {
 
         if (neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
             return;
@@ -225,7 +221,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 System.out.println("Recebido Link de " + link.getAddress() + "\n    do tipo activate: " + link.isActivate() + 
                                    "\n  do tipo ack: " + link.isAck());
                 NeighbourInfo.StreamInfo streamInfo = this.neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
-                //TODO this.streamInfo = neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
                 NeighbourInfo.Node node = 
                     new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
@@ -249,6 +244,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             isActiveEmpty = activeLinks.isEmpty();
                             //Tem de ter o active link local ou não manda para o streaming
                             activeLinks.add(link.getAddress());
+                            //remover o nodo da Priority Queue
+                            synchronized(neighbourInfo.minNodeQueue) {
+                                neighbourInfo.minNodeQueue.remove(new NeighbourInfo.Node(link.getAddress(),0));
+                            }
                         }
                         
                         if (isActiveEmpty) {
@@ -287,6 +286,16 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
                             //remove from the active links the one asked to be deactivated
                             activeLinks.remove(link.getAddress());
+                            //return it to the minNodeQueue if it is RpAdjacent
+                            synchronized(neighbourInfo.rpAdjacent) {
+                                if (neighbourInfo.rpAdjacent.contains(link.getAddress())) {
+                                    synchronized(neighbourInfo.minNodeQueue) {
+                                        //TODO a latência aqui não pode ser 0
+                                        node = new NeighbourInfo.Node(link.getAddress(), 0);
+                                        neighbourInfo.updateLatency(node);
+                                    }
+                                }
+                            }
 
                             //if no more active links remain, then the stream doesn't have any more clients in that direction
                             if (activeLinks.isEmpty()) {
@@ -354,8 +363,6 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
 
         } catch (Exception e) {
             e.printStackTrace();
-            // TODO: handle exception
         }
     }
-
 }

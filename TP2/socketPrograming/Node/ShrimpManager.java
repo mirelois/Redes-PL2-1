@@ -62,11 +62,14 @@ public class ShrimpManager implements Runnable{
                         rpAdjacent.add(shrimp.getAddress());
 
                         synchronized(this.neighbourInfo.minNodeQueue) {
-                            System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
-                                                Packet.getLatency(shrimp.getTimeStamp()));
-
-                            this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
-                                                                Packet.getLatency(shrimp.getTimeStamp())));
+                            //Nodo só é adicionado à Priority Queue se não pertencer aos active links
+                            if (!neighbourInfo.streamActiveLinks.get(streamId).contains(shrimp.getAddress())) {
+                                System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
+                                                    Packet.getLatency(shrimp.getTimeStamp()));
+    
+                                this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
+                                                                    Packet.getLatency(shrimp.getTimeStamp())));
+                            }
                         }
 
                     } else {

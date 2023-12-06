@@ -284,3 +284,21 @@
 ### Conexões *Overlay*
  * Para cada um dos vizinhos, criar um ***Listener*** *Thread* que gere a conexão, com um *Socket* para cada
  * O ***Listener*** deve comunicar ao vizinho designado qual a porta que foi aberta para a sua conversação
+
+# Last Ditch Things
+
+A -> SIMP -> B
+B -> SHRIMP -> A
+
+B petence ao RpAdjacent de A -> B pertence à Priority Queue de A
+
+A -> LINK -> B
+
+A pertence aos Active Links de B
+
+B -> SIMP -> A
+A -> SHRIMP -> B
+
+A pertence aos RpAdjacent de B -> A pertence à Priority Queue de B (NÃO PODE SER)
+
+Isto implica que B só pode adicionar à Priority Queue se não estiver nos Active Link
