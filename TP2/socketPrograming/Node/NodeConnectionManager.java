@@ -31,6 +31,10 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
         NeighbourInfo.StreamInfo streamInfo,
         DatagramSocket socket) throws UnknownHostException { // TODO: called once, only in the first time it is needed
 
+        if (neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
+            return;
+        }
+
         if (streamInfo.connected != null) {
             neighbourInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
         }
@@ -200,10 +204,8 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                                 this.neighbourInfo.streamActiveLinks.wait();
                             }*/
                             for (NeighbourInfo.StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
-                                if (!this.neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
-                                    System.out.println("Update de timeout à stream " + streamInfo.streamId);
-                                    updateBestNode(neighbourInfo, streamInfo, socket);
-                                }
+                                System.out.println("Update de timeout à stream " + streamInfo.streamId);
+                                updateBestNode(neighbourInfo, streamInfo, socket);
                             }
                         }
                     } catch (Exception e) {
