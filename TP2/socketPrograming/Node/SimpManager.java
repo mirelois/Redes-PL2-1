@@ -13,7 +13,6 @@ import Protocols.Shrimp;
 import Protocols.Simp;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
-import SharedStructures.NeighbourInfo.StreamInfo;
 
 public class SimpManager implements Runnable{
 
@@ -70,7 +69,7 @@ public class SimpManager implements Runnable{
                             //Enviar para todos os vizinhos se não conhecer caminhos para o RP
                             for (InetAddress neighbour : this.neighbourInfo.overlayNeighbours) {
                                 //Não envio para quem me enviou nem para quem sei que não tem o RP
-                                if (!neighbour.equals(simp.getAddress()) && !neighbour.equals(clientIP) && 
+                                if (!neighbour.equals(simp.getAddress()) && 
                                     !this.neighbourInfo.notRpAdjacent.contains(neighbour)) {
 
                                     System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
