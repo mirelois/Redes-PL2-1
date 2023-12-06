@@ -43,8 +43,8 @@ public class ITP extends Packet { // Idle Tick Protocol
 
         int flags = Byte.toUnsignedInt(this.header[0]);
 
-        this.isServer = (flags & 0x02) > 0;
-        this.isNode   = (flags & 0x01) > 0;
+        this.isServer = (flags & 0x01) > 0;
+        this.isNode   = (flags & 0x02) > 0;
         this.isAck    = (flags & 0x04) > 0;
 
     }
