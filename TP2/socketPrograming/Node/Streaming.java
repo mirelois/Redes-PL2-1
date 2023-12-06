@@ -162,7 +162,7 @@ public class Streaming implements Runnable {
 
                     try {
                         if (streamInfo.connecting != null) {
-                            timeStampToSend = (Packet.getCurrTime() - streamInfo.connecting.latency) % 60000;
+                            timeStampToSend = Math.floorMod(Packet.getCurrTime() - streamInfo.connecting.latency, 60000);
                         }
                     }
 

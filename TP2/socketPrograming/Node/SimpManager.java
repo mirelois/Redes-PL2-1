@@ -103,7 +103,7 @@ public class SimpManager implements Runnable{
                 } else {
                     //Stream existe (porque existe conexão)
                     synchronized (this.neighbourInfo) {
-                        socket.send(new Shrimp((Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency)%60000, clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamNameBytes.length, streamNameBytes).toDatagramPacket());
+                        socket.send(new Shrimp(Math.floorMod(Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency,60000), clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamNameBytes.length, streamNameBytes).toDatagramPacket());
                     }
                 }
             }

@@ -161,7 +161,7 @@ public class Idle implements Runnable {
                         socket.send(new ITP(false,
                                             true,
                                             true,
-                                            (Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency) % 60000,
+                                            Math.floorMod(Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency, 60000),
                                             itp.getAddress(),
                                             itp.getPort(),
                                             itp.getPayloadSize(),

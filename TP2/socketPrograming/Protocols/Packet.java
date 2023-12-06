@@ -154,7 +154,7 @@ public class Packet {
     }
 
     public static int getLatency(int timeStamp){
-        return (getCurrTime() - timeStamp) % 60000;
+        return Math.floorMod(getCurrTime() - timeStamp, 60000);
     }
 
 }
