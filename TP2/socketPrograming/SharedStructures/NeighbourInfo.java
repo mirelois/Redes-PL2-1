@@ -49,6 +49,7 @@ public class NeighbourInfo {
                 return this.latency;
             } else {
 
+                //extraMetric does not fluctuate the same way
                 double extraMetric = 0;
 
                 double jitterVariance = this.latency == 0 ? 0 : this.jitter/this.latency;
@@ -57,7 +58,7 @@ public class NeighbourInfo {
                     extraMetric = jitterVariance;
                 } else if ((this.jitter < 0) && (this.lossRate >= 0))  {
                     extraMetric = this.lossRate;
-                } else  {
+                } else {
                     extraMetric = (Define.extraMetricsDelta)*jitterVariance + (1 - Define.extraMetricsDelta) * this.lossRate;
                 }
 
