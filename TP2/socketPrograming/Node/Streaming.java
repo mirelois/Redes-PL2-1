@@ -124,6 +124,7 @@ public class Streaming implements Runnable {
                     if (streamInfo.connected != null) {
                         streamInfo.connected.latency  = currentLatency;
                         streamInfo.connected.lossRate = lossInfo.lossRate;
+                        streamInfo.connected.jitter   = lossInfo.jitter;
                         currentMetrics                = streamInfo.connected.getMetrics();
                     }
                 }
@@ -168,7 +169,7 @@ public class Streaming implements Runnable {
                     finally {
                         streamInfo.connectingLock.unlock();
                     }
-                }
+                } 
 
                 Integer          streamId = sup.getStreamId();
                 Set<InetAddress> streamActiveLinks;
