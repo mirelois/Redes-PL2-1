@@ -71,6 +71,9 @@ public class BootClient implements Runnable{
                     t.interrupt();
 
                     this.neighbours.overlayNeighbours = (List<InetAddress>) deserialize(bopReceived.getPayload());
+                    for(InetAddress neighbour: this.neighbours.overlayNeighbours){
+                        this.neighbours.neighBoursLifePoints.put(neighbour, 5); // Default 5 life points ao nascer
+                    }
 
                     //System.out.println(neighbours);
                     synchronized (neighbours) {

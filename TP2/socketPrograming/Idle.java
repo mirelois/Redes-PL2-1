@@ -1,6 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,24 +38,38 @@ public class Idle implements Runnable {
     @Override
     public void run() {
         try (DatagramSocket socket = new DatagramSocket(Define.idlePort)) {
+            // Acabei de nascer, vou avisar todos ao meu redor
             //Criar a thread que vai dar timeout e enviar os Idles para todos os adjacentes
             this.timeout = new Thread(
                 () -> {
                 try {
+                    // Acabei de saber os meus vizinhos pelo bootstrapper, vou testa-los para ver se tão
                     while (true) {
                         Thread.sleep(Define.idleTimeout);
                         //Colecionar num conjunto todos os adjacentes em uso
                         //Enviar para os adjacentes que não estão em uso
-                        //TODO diminuir vida aos ajdacentes que foram enviados mensagens
-                        for (InetAddress address : this.neighbourInfo.overlayNeighbours) {
-                            socket.send(new ITP(address.equals(this.rpIp),
-                                                true,
-                                                false,
-                                                this.port,
-                                                address,
-                                                Define.idlePort,
-                                                0,
-                                                null).toDatagramPacket());
+                        // diminuir vida aos ajdacentes que foram enviados mensagens
+                        for (InetAddress address : this.neighbourInfo.neighBoursLifePoints.keySet()) {
+                            int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
+                            if(lifePoints > 0) {
+                                this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints - 1);
+                                try {
+                                    socket.send(new ITP(address.equals(this.rpIp),
+                                            true,
+                                            false,
+                                            this.port,
+                                            address,
+                                            Define.idlePort,
+                                            0,
+                                            null).toDatagramPacket());
+                                } catch (SocketException e){
+                                    // Vizinho está morto? Será que esta exception faz o que queremos?
+                                    this.neighbourInfo.neighBoursLifePoints.remove(address);
+                                }
+
+                            } else {
+                                this.neighbourInfo.neighBoursLifePoints.remove(address);
+                            }
                         }
                         if (this.isRP) {
                             synchronized (this.serverInfo.streamInfoMap) {
@@ -121,9 +136,18 @@ public class Idle implements Runnable {
                 ITP itp = new ITP(packet);
 
                 if (itp.isNode) {
-                    neighbourInfo.updateLatency(new NeighbourInfo.Node(packet.getAddress(), Packet.getLatency(itp.timeStamp)));
-                    //TODO adicionar "vida" aos nodos adjacentes (ainda estão vivos)
-                    //Isto vai implicar uma lista dos nodos verdadeiramente vivos, e não só dos adjacentes (neighbours)
+                    InetAddress address = packet.getAddress();
+                    if(this.neighbourInfo.neighBoursLifePoints.get(address)!=null) {
+                        neighbourInfo.updateLatency(new NeighbourInfo.Node(address, Packet.getLatency(itp.timeStamp)));
+                        //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
+                        int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
+                        if(lifePoints < 5){
+                            this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
+                        }
+                    } else { // vizinho "nasceu"
+                        neighbourInfo.neighBoursLifePoints.put(packet.getAddress(), 5);
+                    }
+
                 } else {
                     for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
                         streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
