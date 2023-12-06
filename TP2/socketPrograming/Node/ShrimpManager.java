@@ -64,7 +64,7 @@ public class ShrimpManager implements Runnable{
                         synchronized(this.neighbourInfo.minNodeQueue) {
                             //Nodo só é adicionado à Priority Queue se não pertencer aos active links
                             synchronized(this.neighbourInfo.streamActiveLinks) {
-                                if (this.neighbourInfo.streamActiveLinks == null ||
+                                if (this.neighbourInfo.streamActiveLinks.get(streamId) == null ||
                                     !this.neighbourInfo.streamActiveLinks.get(streamId).contains(shrimp.getAddress())) {
                                     System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
                                                         Packet.getLatency(shrimp.getTimeStamp()));
