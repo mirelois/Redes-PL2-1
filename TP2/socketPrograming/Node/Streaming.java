@@ -140,7 +140,7 @@ public class Streaming implements Runnable {
 
                 int timeStampToSend = sup.getTime_stamp();
 
-                System.out.println("\nMelhor: " + bestMetrics +
+                /* System.out.println("\nMelhor: " + bestMetrics +
                                    " do server " + this.neighbourInfo.minNodeQueue.peek().address.getHostName() +
                                    ": " + this.neighbourInfo.minNodeQueue.peek().jitter +
                                    " , " + this.neighbourInfo.minNodeQueue.peek().latency +
@@ -152,7 +152,7 @@ public class Streaming implements Runnable {
                                        ": " + streamInfo.connected.jitter +
                                        " , " + streamInfo.connected.latency +
                                        " , " + streamInfo.connected.lossRate);
-                }
+                } */
 
                 if (bestMetrics < (0.95 * currentMetrics)) { // Mandar latencia melhor se isto fizer
 
