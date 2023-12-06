@@ -144,8 +144,8 @@ public class Client implements Runnable{
 
                 // TODO falta só configurar isto aqui, mandar o simp para o meu nodo aka o streaming de mim mesmo
                 System.out.println("Enviado pacote de pedido ao Nodo correspondente");
-                RTPsocket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), 
-                                        Define.simpPort, this.streamName.length(), this.streamName.getBytes()).toDatagramPacket());
+                RTPsocket.send(new Simp(InetAddress.getByName("localhost"), Define.simpPort, 
+                this.streamName.length(), this.streamName.getBytes()).toDatagramPacket());
                 while(true) {
                     RTPsocket.receive(rcvdp);
                     //create an RTPpacket object from the DP

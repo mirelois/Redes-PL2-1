@@ -64,7 +64,7 @@ public class RPServerAdder implements Runnable{
                     }
                 }
 
-                socket.send(new Shrimp(0, InetAddress.getByName("localhost"), streamId, Define.serverPort, shrimp.getAddress(), shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
+                socket.send(new Shrimp(0, streamId, Define.serverPort, shrimp.getAddress(), shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
 
                 //TODO fazer check de perdas para nao dar barraco
 

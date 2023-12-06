@@ -43,7 +43,6 @@ public class RP implements Runnable {
                         " que pede Stream " + new String(simp.getPayload()));
 
                 Integer streamId;
-                InetAddress clientIP = simp.getSourceAddress();
                 String streamName = new String(simp.getPayload());
 
                 synchronized (this.neighbourInfo) {
@@ -55,7 +54,6 @@ public class RP implements Runnable {
                     //TODO não existe ainda a stream no RP
                     socket.send(new Shrimp(
                         Packet.getCurrTime(),
-                        simp.getSourceAddress(),
                         0,
                         Define.shrimpPort,
                         simp.getAddress(),
@@ -63,8 +61,7 @@ public class RP implements Runnable {
                         simp.getPayload()).toDatagramPacket());
 
                         System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
-                            " da stream com id " + 0 +
-                            " pedida por " + clientIP.getHostAddress());
+                            " da stream com id " + 0);
                 } else {
 
                     ServerInfo.StreamInfo streamInfo = this.serverInfo.streamInfoMap.get(streamId);
@@ -80,7 +77,6 @@ public class RP implements Runnable {
 
                     socket.send(new Shrimp(
                             Packet.getCurrTime(),
-                            simp.getSourceAddress(),
                             streamId,
                             Define.shrimpPort,
                             simp.getAddress(),
@@ -88,8 +84,7 @@ public class RP implements Runnable {
                             simp.getPayload()).toDatagramPacket());
     
                     System.out.println("Enviado SHRIMP para " + simp.getAddress().getHostAddress() +
-                            " da stream com id " + streamId +
-                            " pedida por " + clientIP.getHostAddress());
+                            " da stream com id " + streamId);
                 }
 
             }

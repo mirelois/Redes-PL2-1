@@ -36,13 +36,11 @@ public class ShrimpManager implements Runnable{
 
                 Shrimp shrimp = new Shrimp(packet);
 
-                InetAddress clientIP = shrimp.getSourceAddress();
                 Integer streamId = shrimp.getStreamId();
                 String streamName = new String(shrimp.getPayload());
                 Set<InetAddress> rpAdjacent, clientRequestStreamSet;
                 
-                System.out.println( "Recebido SHRIMP de " + clientIP.toString() + 
-                                    " vindo de " + shrimp.getAddress().getHostAddress() +
+                System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() +
                                     " com streamId " + shrimp.getStreamId());
 
                 socket.send(new Rip(0, packet.getAddress(), Define.ripPort).toDatagramPacket());
@@ -97,9 +95,8 @@ public class ShrimpManager implements Runnable{
                                 for (InetAddress streamRequest : clientRequestStreamSet) {
                                     if (!streamRequest.equals(InetAddress.getByName("localhost"))) {
                                         System.out.println("  Enviado SHRIMP para " + streamRequest.getHostAddress() +
-                                                        " da stream com id " + streamId +
-                                                        " pedida por " + clientIP.getHostAddress());
-                                        socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, Define.shrimpPort, 
+                                                        " da stream com id " + streamId);
+                                        socket.send(new Shrimp(shrimp.getTimeStamp(), streamId, Define.shrimpPort, 
                                                             streamRequest, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
                                     } else {
                                         System.out.println("    Shrimp veio para Cliente local - Enviado Link para local");
@@ -126,7 +123,7 @@ public class ShrimpManager implements Runnable{
                                 
                                 //Avisar todos os Clientes da falta de conexão
                                 for (InetAddress streamRequest : clientRequestStreamSet) {
-                                    socket.send(new Shrimp(shrimp.getTimeStamp(), clientIP, streamId, Define.shrimpPort, streamRequest, 
+                                    socket.send(new Shrimp(shrimp.getTimeStamp(), streamId, Define.shrimpPort, streamRequest, 
                                                 shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
 
                                 }

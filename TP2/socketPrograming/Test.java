@@ -6,7 +6,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 public class Test {
@@ -22,7 +21,8 @@ public class Test {
 
             System.out.println(file.length());
 
-            socket.send(new Simp(InetAddress.getByName("localhost"), InetAddress.getByName("localhost"), 2000, file.length(), file.getBytes(StandardCharsets.US_ASCII)).toDatagramPacket());
+            socket.send(new Simp(InetAddress.getByName("localhost"), 2000, file.length(), 
+            file.getBytes(StandardCharsets.US_ASCII)).toDatagramPacket());
 
             socket.receive(datagramPacket);
 
