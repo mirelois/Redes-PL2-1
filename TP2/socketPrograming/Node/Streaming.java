@@ -80,7 +80,7 @@ public class Streaming implements Runnable {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
 
-                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequence_number());
+                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequenceNumber());
 
                 checkLinkActivation(new NeighbourInfo.Node(sup.getAddress(), 0), streamInfo);
 
@@ -189,8 +189,8 @@ public class Streaming implements Runnable {
                                                 sup.getLossRate(),
                                                 timeStampToSend,
                                                 sup.getVideo_time_stamp(),
+                                                sup.getFrameNumber(),
                                                 sup.getSequenceNumber(),
-                                                sup.getSequence_number(),
                                                 sup.getStreamId(),
                                                 InetAddress.getByName("localhost"), // podia ser active link
                                                 Define.clientPort,
@@ -200,8 +200,8 @@ public class Streaming implements Runnable {
                                 socket.send(new Sup(sup.getLossRate(),
                                                     timeStampToSend,
                                                     sup.getVideo_time_stamp(),
+                                                    sup.getFrameNumber(),
                                                     sup.getSequenceNumber(),
-                                                    sup.getSequence_number(),
                                                     sup.getStreamId(),
                                                     activeLink,
                                                     Define.streamingPort,

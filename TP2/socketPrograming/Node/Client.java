@@ -151,7 +151,7 @@ public class Client implements Runnable{
                     //create an RTPpacket object from the DP
                     Sup rtp_packet = new Sup(rcvdp);
                     System.out.println("Recebeu Stream " + rtp_packet.getStreamId());
-                    System.out.println("    Seq# = " + rtp_packet.getSequence_number() +
+                    System.out.println("    Seq# = " + rtp_packet.getSequenceNumber() +
                                        "    Payload Size = " + rtp_packet.getPayloadSize());
 
                     //print important header fields of the RTP packet received:

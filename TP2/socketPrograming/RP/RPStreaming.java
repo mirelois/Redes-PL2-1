@@ -110,13 +110,13 @@ public class RPStreaming implements Runnable{
 
                 for (InetAddress activeLink : streamActiveLinks) {
                     System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
-                                       " com seq#: " + sup.getSequence_number());
+                                       " com seq#: " + sup.getSequenceNumber());
                     socket.send(new Sup(
                             -1,
                             Packet.getCurrTime(),
                             sup.getVideo_time_stamp(),
+                            sup.getFrameNumber(),
                             sup.getSequenceNumber(),
-                            sup.getSequence_number(),
                             sup.getStreamId(),
                             activeLink,
                             Define.streamingPort,
