@@ -28,7 +28,7 @@ public class Simp extends Packet {  //Stream Initiation Management Protocol
      * não funciona
      */
 
-    public Simp(InetAddress sourceAddress, InetAddress address, int port, int payload_size, byte[] payload) {
+    public Simp(InetAddress address, int port, int payload_size, byte[] payload) {
 
         super(HEADER_SIZE, payload, payload_size, address, port);
 
@@ -45,18 +45,9 @@ public class Simp extends Packet {  //Stream Initiation Management Protocol
 
         // this.time_stamp = (Byte.toUnsignedInt(this.header[0]) << 8) |
         //                    Byte.toUnsignedInt(this.header[1]);
-
-        this.checksum = (Byte.toUnsignedInt(this.header[0]) << 8) |
-                         Byte.toUnsignedInt(this.header[1]);
-
     }
 
 	// public int getTime_stamp() {
 	// 	return time_stamp;
 	// }
-
-	public int getChecksum() {
-		return checksum;
-	}
-
 }

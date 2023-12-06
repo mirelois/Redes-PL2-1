@@ -43,9 +43,4 @@ public class Shrimp extends Packet { //Stream Hard Response Initiation Managemen
     public int getStreamId() {
         return streamId;
     }
-
-    public InetAddress getSourceAddress() {
-        return sourceAddress;
-    }
-
 }

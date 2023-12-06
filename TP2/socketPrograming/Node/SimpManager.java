@@ -34,7 +34,6 @@ public class SimpManager implements Runnable{
                 System.out.println("Recebeu Pedido de Stream de " + simp.getAddress().toString() +
                                    " com nome: " + new String(simp.getPayload()));
 
-                InetAddress clientIP = simp.getSourceAddress();
                 Integer streamId;
                 Set<InetAddress> clientRequestStreamSet;
                 String streamName = new String(simp.getPayload());
@@ -74,7 +73,7 @@ public class SimpManager implements Runnable{
 
                                     System.out.println("Enviado SIMP para " + neighbour.getHostName() + ", port " + Define.simpPort);
 
-                                    socket.send(new Simp(clientIP, neighbour, Define.simpPort, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
+                                    socket.send(new Simp(neighbour, Define.simpPort, simp.getPayloadSize(), simp.getPayload()).toDatagramPacket());
                                     //Adicionar pedido feito por Simp
                                     this.neighbourInfo.rpRequest.add(neighbour);
                                 }
@@ -84,7 +83,7 @@ public class SimpManager implements Runnable{
                             if (this.neighbourInfo.rpRequest.isEmpty()) {
                                 streamId = this.neighbourInfo.isConnectedToRP == 1 ? 0 : 255;
                                 System.out.println("    Não há vizinhos para o RP: Enviado SHRIMP para " + simp.getAddress().getHostName() + " com streamId: " + streamId);
-                                socket.send(new Shrimp(Packet.getCurrTime(), clientIP, streamId, Define.shrimpPort, simp.getAddress(),
+                                socket.send(new Shrimp(Packet.getCurrTime(), streamId, Define.shrimpPort, simp.getAddress(),
                                                        streamNameBytes.length, streamNameBytes).toDatagramPacket());
 
                                 synchronized(clientRequestStreamSet) {
@@ -102,7 +101,14 @@ public class SimpManager implements Runnable{
                 } else {
                     //Stream existe (porque existe conexão)
                     synchronized (this.neighbourInfo) {
-                        socket.send(new Shrimp(Math.floorMod(Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency,60000), clientIP, this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())), Define.shrimpPort, simp.getAddress(), streamNameBytes.length, streamNameBytes).toDatagramPacket());
+                        socket.send(new Shrimp(
+                            Math.floorMod(Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency,60000),
+                            this.neighbourInfo.fileNameToStreamId.get(new String(simp.getPayload())),
+                            Define.shrimpPort,
+                            simp.getAddress(),
+                            streamNameBytes.length,
+                            streamNameBytes
+                        ).toDatagramPacket());
                     }
                 }
             }
