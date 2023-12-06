@@ -139,12 +139,10 @@ public class Idle implements Runnable {
                 
                 if (itp.isNode) {
                     InetAddress address = itp.getAddress();
-                    System.out.println("Recebido Idle do " + address);
                     synchronized (this.neighbourInfo.neighBoursLifePoints) {
                         if (this.neighbourInfo.neighBoursLifePoints.get(address) != null) {
                             //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
                             int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
-                            System.out.println("    Tem vida " + lifePoints);
                             if (lifePoints < Define.maxLifePoints) {
                                 this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
                             }
