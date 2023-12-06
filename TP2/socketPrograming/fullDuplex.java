@@ -64,10 +64,6 @@ public class fullDuplex {
         }
 
         NeighbourInfo neighbours = new NeighbourInfo();
-        ServerInfo serverInfo = isRP ? new ServerInfo() : null;
-        ServerRPHolder rpHolder = new ServerRPHolder();
-        new Thread(new Idle(neighbours, serverInfo, isRP, rpHolder)).start(); // Começar o Idle o mais cedo possível para atender pedidos dos vizinhos
-
         InetAddress ip_bootstrapper;
         try {
             ip_bootstrapper = InetAddress.getByName(args[0]);
@@ -82,6 +78,10 @@ public class fullDuplex {
         } catch (UnknownHostException e) {
             System.out.println("The IP " + args[0] + " is Invalid for IP_Bootstrapper");
         }
+
+        ServerInfo serverInfo = isRP ? new ServerInfo() : null;
+        ServerRPHolder rpHolder = new ServerRPHolder();
+        new Thread(new Idle(neighbours, serverInfo, isRP, rpHolder)).start(); // Começar o Idle o mais cedo possível para atender pedidos dos vizinhos
 
         try {
             synchronized (neighbours) {
