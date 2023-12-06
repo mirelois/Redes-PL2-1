@@ -136,10 +136,10 @@ public class Idle implements Runnable {
 
                 ITP itp = new ITP(packet);
 
-                System.out.println("Recebido Idle do " + itp.getAddress());
-
+                
                 if (itp.isNode) {
-                    InetAddress address = packet.getAddress();
+                    InetAddress address = itp.getAddress();
+                    System.out.println("Recebido Idle do " + address);
                     synchronized (this.neighbourInfo.neighBoursLifePoints) {
                         if (this.neighbourInfo.neighBoursLifePoints.get(address) != null) {
                             //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
@@ -149,7 +149,7 @@ public class Idle implements Runnable {
                                 this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
                             }
                         } else { // vizinho "nasceu"
-                            neighbourInfo.neighBoursLifePoints.put(packet.getAddress(), Define.maxLifePoints);
+                            this.neighbourInfo.neighBoursLifePoints.put(address, Define.maxLifePoints);
                         }
                     }
                 }
@@ -163,12 +163,12 @@ public class Idle implements Runnable {
                 }
 
                 if (!itp.isAck) {
-                    synchronized (neighbourInfo.minNodeQueue) {
-                        if (neighbourInfo.isConnectedToRP == 1 && neighbourInfo.minNodeQueue.peek() != null) {
+                    synchronized (this.neighbourInfo.minNodeQueue) {
+                        if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
                             socket.send(new ITP(false,
                                     true,
                                     true,
-                                    Math.floorMod(Packet.getCurrTime() - neighbourInfo.minNodeQueue.peek().latency, 60000),
+                                    Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000),
                                     itp.getAddress(),
                                     itp.getPort(),
                                     itp.getPayloadSize(),
