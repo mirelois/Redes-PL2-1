@@ -147,7 +147,7 @@ public class NeighbourInfo {
     public int isConnectedToRP = 255;                               // 255 significa que ainda não sabe, 0 no, 1 yes
 
     public List<InetAddress> overlayNeighbours = new ArrayList<>(); // lista de vizinhos
-    public List<InetAddress> activeNeighbours  = new ArrayList<>(); // lista de vizinhos vivos
+    public Map<InetAddress, Integer> neighBoursLifePoints = new HashMap<>(); // mapa vizinhos vivos -> life points (de 0 a 5)
 
     //0 means connection but no stream, 255 means doesn't know, otherwise stream
     public Map<String, Integer> fileNameToStreamId = new HashMap<>(); // filenames to stream id
