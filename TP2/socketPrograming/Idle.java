@@ -156,7 +156,7 @@ public class Idle implements Runnable {
                     for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
                         streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                     }
-                } else {
+                } else if (this.neighbourInfo.rpAdjacent.contains((itp.getAddress()))) {
                     this.neighbourInfo.updateLatency(new NeighbourInfo.Node(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                 }
 
