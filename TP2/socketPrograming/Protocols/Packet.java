@@ -158,7 +158,13 @@ public class Packet {
     }
 
     public int getPayloadChecksum() {
+
+        if (this.payload == null) {
+            return 0;
+        }
+        
         int checksum = 0;
+
         for (byte b : this.payload) {
             checksum += Byte.toUnsignedInt(b);
         }
