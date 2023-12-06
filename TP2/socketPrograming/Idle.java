@@ -136,6 +136,8 @@ public class Idle implements Runnable {
 
                 ITP itp = new ITP(packet);
 
+                System.out.println("Recebido Idle do " + itp.getAddress());
+
                 if (itp.isNode) {
                     InetAddress address = packet.getAddress();
                     synchronized (this.neighbourInfo.neighBoursLifePoints) {
