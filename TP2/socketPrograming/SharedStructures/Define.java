@@ -58,4 +58,6 @@ public final class Define {
     public static double extraMetricsDelta           = 0.5;
     public static double mainDelta                   = 0.6;
 
+    public static int maxLifePoints                  = 10;
+
 }

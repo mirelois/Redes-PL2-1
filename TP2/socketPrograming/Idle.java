@@ -142,14 +142,14 @@ public class Idle implements Runnable {
                     InetAddress address = packet.getAddress();
                     synchronized (this.neighbourInfo.neighBoursLifePoints) {
                         if (this.neighbourInfo.neighBoursLifePoints.get(address) != null) {
-                            neighbourInfo.updateLatency(new NeighbourInfo.Node(address, Packet.getLatency(itp.timeStamp)));
                             //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
                             int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
-                            if (lifePoints < 5) {
+                            System.out.println("    Tem vida " + lifePoints);
+                            if (lifePoints < Define.maxLifePoints) {
                                 this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
                             }
                         } else { // vizinho "nasceu"
-                            neighbourInfo.neighBoursLifePoints.put(packet.getAddress(), 5);
+                            neighbourInfo.neighBoursLifePoints.put(packet.getAddress(), Define.maxLifePoints);
                         }
                     }
                 }
