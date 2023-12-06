@@ -80,7 +80,8 @@ public class Streaming implements Runnable {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
 
-                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequenceNumber());
+                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequenceNumber() + 
+                                   " Frame#: " + sup.getFrameNumber());
 
                 checkLinkActivation(new NeighbourInfo.Node(sup.getAddress(), 0), streamInfo);
 
