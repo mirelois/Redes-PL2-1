@@ -8,6 +8,7 @@ package Server;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -73,26 +74,25 @@ public class Server extends JFrame implements ActionListener, Runnable {
     public void run() {
         try {
             for (String string : providedStreams) {
+                while(true){
+                    System.out.println("Avisar RP da existência da stream " + string);
+                    RTPsocket.send(new Shrimp(Packet.getCurrTime(), InetAddress.getByName("localhost"), 0,
+                                Define.RPServerAdderPort, rpIPAddr, string.length(), string.getBytes()).toDatagramPacket());
+                    
                 
-                System.out.println("Avisar RP da existência da stream " + string);
-                RTPsocket.send(new Shrimp(Packet.getCurrTime(), InetAddress.getByName("localhost"), 0,
-                               Define.RPServerAdderPort, rpIPAddr, string.length(), string.getBytes()).toDatagramPacket());
-                
-            }
-            while(true){
-                byte[] buf = new byte[Define.infoBuffer];
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                RTPsocket.receive(packet);
-                Shrimp shrimp = new Shrimp(packet);
+                    byte[] buf = new byte[Define.infoBuffer];
+                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                    RTPsocket.receive(packet);
+                    Shrimp shrimp = new Shrimp(packet);
 
-                System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() + 
-                                    " de id " + shrimp.getStreamId());
+                    System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() + 
+                                        " de id " + shrimp.getStreamId());
 
-                if (serverSenderMap.get(shrimp.getStreamId()) == null) {
-
-                    //Put FileName and StreamId into map
-                    synchronized(streamIdToFileName) {
-                        streamIdToFileName.put(shrimp.getStreamId(), new String(shrimp.getPayload()));
+                    if (serverSenderMap.get(shrimp.getStreamId()) == null) {
+                        //Put FileName and StreamId into map
+                        synchronized(streamIdToFileName) {
+                            streamIdToFileName.put(shrimp.getStreamId(), new String(shrimp.getPayload()));
+                        }
                     }
                 }
             }
