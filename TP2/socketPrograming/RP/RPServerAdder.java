@@ -36,10 +36,10 @@ public class RPServerAdder implements Runnable{
                 socket.receive(packet);
 
                 Shrimp shrimp = new Shrimp(packet); // servidor manda shrimps
-                System.out.println("Recebido Shrimp de conexão do servidor " + shrimp.getAddress());
+                String streamName = new String(shrimp.getPayload());
+                System.out.println("Recebido Shrimp de conexão do servidor " + shrimp.getAddress() + " do servidor " + streamName);
                 int latency = Packet.getLatency(shrimp.getTimeStamp());
                 
-                String streamName = new String(shrimp.getPayload());
                 Integer streamId;
                 //Verificar se a stream já existe no RP
                 synchronized (this.neighbourInfo) {
