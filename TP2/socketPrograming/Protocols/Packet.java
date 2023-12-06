@@ -20,17 +20,21 @@ public class Packet {
     public Packet(int header_size, byte[] payload, int payload_size, InetAddress address, int port) {
 
         this.header_size = header_size;
-        this.header = new byte[header_size];
+        if (header_size == 0) {
+            this.header = null;
+        }else{
+            this.header = new byte[header_size];
+        }
         this.payload_size = payload_size;
 
         this.address = address;
-        this.port = port;
+        this.port    = port;
 
-        if(payload_size == 0){
+        if (payload_size == 0) {
             this.payload = null;
         }else{
             this.payload = new byte[payload_size];
-            
+
             for (int i = 0; i < payload_size; i++) {
                 this.payload[i] = payload[i];
             }
@@ -38,26 +42,30 @@ public class Packet {
 
     }
 
-    public Packet(DatagramPacket packet, int header_size) throws PacketSizeException{
+    public Packet(DatagramPacket packet, int header_size) throws PacketSizeException {
 
         byte[] data = packet.getData();
-        
+
         this.payload_size = packet.getLength() - header_size;
 
-        if(packet.getLength() < header_size) {
-            throw new PacketSizeException("Packet size to smol" + "\nIt came from " + packet.getAddress() + " and port " + packet.getPort() + 
-                                          "\nConsidered as " + this.getClass().getName() + 
-                                          ": Header size: " + header_size + 
-                                          "\nPacket size: " + packet.getLength() + 
+        if (packet.getLength() < header_size) {
+            throw new PacketSizeException("Packet size to smol" + "\nIt came from " + packet.getAddress() + " and port " + packet.getPort() +
+                                          "\nConsidered as " + this.getClass().getName() +
+                                          ": Header size: " + header_size +
+                                          "\nPacket size: " + packet.getLength() +
                                           "\nPayload as String: " + new String(packet.getData()));
         }
 
         this.header_size = header_size;
-        this.header = new byte[header_size];
+        if (header_size == 0) {
+            this.header = null;
+        }else{
+            this.header = new byte[header_size];
+        }
         this.address = packet.getAddress();
-        this.port = packet.getPort();
+        this.port    = packet.getPort();
 
-        if(payload_size == 0){
+        if (payload_size == 0) {
             this.payload = null;
         }else{
             this.payload = new byte[this.payload_size]; // TODO: check data length
@@ -75,7 +83,7 @@ public class Packet {
 
     public byte[] getPayload() {
 
-        if(this.payload_size == 0){
+        if (this.payload_size == 0) {
             return null;
         }
 
@@ -118,7 +126,7 @@ public class Packet {
         for (int i = 0; i < header_size; i++) {
             packet[i] = this.header[i];
         }
-            
+
         for (int i = 0; i < payload_size; i++) {
             packet[i + header_size] = this.payload[i];
         }
@@ -138,23 +146,23 @@ public class Packet {
         return this.address;
     }
 
-    public static int checksum(byte[] data){
-        int sum = 0;
-        for (byte b : data) {
-            sum += b;
-        }
-        return ~sum;
-    }
-    
-    public static int getCurrTime(){
-        
+    public static int getCurrTime() {
+
         LocalTime now = LocalTime.now();
-        
+
         return now.getSecond() * 1000 + now.getNano() / 1000000;
     }
 
-    public static int getLatency(int timeStamp){
+    public static int getLatency(int timeStamp) {
         return Math.floorMod(getCurrTime() - timeStamp, 60000);
+    }
+
+    public int getPayloadChecksum() {
+        int checksum = 0;
+        for (byte b : this.payload) {
+            checksum += Byte.toUnsignedInt(b);
+        }
+        return checksum;
     }
 
 }

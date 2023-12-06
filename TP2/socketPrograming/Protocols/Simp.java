@@ -5,17 +5,13 @@ import java.time.LocalTime;
 
 public class Simp extends Packet {  //Stream Initiation Management Protocol
 
-    static int HEADER_SIZE = 6;
+    static int HEADER_SIZE = 0;
 
     // int time_stamp; // 2
 
     // int latency; //2
 
     // int throughput; //2 (Max. 9999)
-
-    InetAddress sourceAddress; // 4
-
-    int checksum; // 2
 
     /*
      * Definir uma Socket para cada uma das funcionalidades deste protocolo:
@@ -38,22 +34,8 @@ public class Simp extends Packet {  //Stream Initiation Management Protocol
 
         // this.time_stamp = Packet.getCurrTime();
 
-        this.sourceAddress = sourceAddress;
-
-        this.checksum = 0;
-
-        String[] ip_values = sourceAddress.getHostAddress().split("\\.", 4);
-
         // this.header[0] = (byte) (this.time_stamp >> 8 /* & 0xFF */);
         // this.header[1] = (byte) (this.time_stamp      /* & 0xFF */);
-        
-        this.header[0] = Byte.parseByte(ip_values[0]);
-        this.header[1] = Byte.parseByte(ip_values[1]);
-        this.header[2] = Byte.parseByte(ip_values[2]);
-        this.header[3] = Byte.parseByte(ip_values[3]);
-
-        this.header[4] = (byte) (this.checksum >> 8  /* & 0xFF */);
-        this.header[5] = (byte) (this.checksum       /* & 0xFF */);
 
     }
 
@@ -64,30 +46,14 @@ public class Simp extends Packet {  //Stream Initiation Management Protocol
         // this.time_stamp = (Byte.toUnsignedInt(this.header[0]) << 8) |
         //                    Byte.toUnsignedInt(this.header[1]);
 
-        StringBuilder ip = new StringBuilder(15);
-
-        ip.append(this.header[0]);
-        ip.append('.');
-        ip.append(this.header[1]);
-        ip.append('.');
-        ip.append(this.header[2]);
-        ip.append('.');
-        ip.append(this.header[3]);
-
-        this.sourceAddress = InetAddress.getByName(ip.toString());
-
-        this.checksum = (Byte.toUnsignedInt(this.header[4]) << 8) |
-                         Byte.toUnsignedInt(this.header[5]);
+        this.checksum = (Byte.toUnsignedInt(this.header[0]) << 8) |
+                         Byte.toUnsignedInt(this.header[1]);
 
     }
 
 	// public int getTime_stamp() {
 	// 	return time_stamp;
 	// }
-
-	public InetAddress getSourceAddress() {
-		return sourceAddress;
-	}
 
 	public int getChecksum() {
 		return checksum;
