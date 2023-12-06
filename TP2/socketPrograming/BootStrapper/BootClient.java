@@ -65,7 +65,7 @@ public class BootClient implements Runnable{
 
                 Bop bopReceived = new Bop(packet);
 
-                if (bopReceived.getChecksum() == 0) { // TODO checksum
+                if (bopReceived.getChecksum() == bopReceived.getPayloadChecksum()) { // TODO checksum
 
                     // entra aqui quando receber o pacote bem
                     t.interrupt();

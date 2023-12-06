@@ -12,8 +12,10 @@ public class Bop extends Packet{
 
         super(HEADER_SIZE, payload, payload_size, address, port);
 
-            this.header[0] = (byte) (checksum >> 8);
-            this.header[1] = (byte) (checksum);
+        this.checksum = this.getPayloadChecksum();
+
+        this.header[0] = (byte) (checksum >> 8);
+        this.header[1] = (byte) (checksum);
 
     }
 

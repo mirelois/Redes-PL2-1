@@ -4,7 +4,7 @@ import java.net.InetAddress;
 
 public class Sup extends Packet { //Streaming over UDP Protocol
 
-    static int HEADER_SIZE = 13;
+    static int HEADER_SIZE = 11;
 
     int frameNumber; // 4
                            
@@ -12,8 +12,6 @@ public class Sup extends Packet { //Streaming over UDP Protocol
     
     int time_stamp; //2
 
-    int checksum; //2
-                  
     int streamId; //1
 
     public Sup(
@@ -37,8 +35,6 @@ public class Sup extends Packet { //Streaming over UDP Protocol
 
         this.streamId = streamId;
         
-        this.checksum = 0; //TODO make good checksum, not bad checksum, only good checksum
-
         // System.err.println(this.time_stamp);
 
         this.header[0] = (byte) (frameNumber >> 24 /* & 0xFF */);
@@ -55,9 +51,6 @@ public class Sup extends Packet { //Streaming over UDP Protocol
         this.header[9] = (byte) (time_stamp       /* & 0xFF */ );
 
         this.header[10] = (byte) (this.streamId        /* & 0xFF */);
-        
-        this.header[11] = (byte) (this.checksum >> 8   /* & 0xFF */);
-        this.header[12] = (byte) (this.checksum        /* & 0xFF */);
 
     }
 
@@ -79,9 +72,6 @@ public class Sup extends Packet { //Streaming over UDP Protocol
                                  Byte.toUnsignedInt(this.header[9]);
 
         this.streamId         =  Byte.toUnsignedInt(this.header[10]);
-                        
-        this.checksum         = (Byte.toUnsignedInt(this.header[11]) << 8)  |
-                                 Byte.toUnsignedInt(this.header[12]);
 
     }
 
@@ -99,9 +89,5 @@ public class Sup extends Packet { //Streaming over UDP Protocol
 
 	public int getStreamId() {
 		return streamId;
-	}
-
-	public int getChecksum() {
-		return checksum;
 	}
 }
