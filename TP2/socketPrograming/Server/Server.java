@@ -93,7 +93,7 @@ public class Server extends JFrame implements ActionListener, Runnable {
                         synchronized(streamIdToFileName) {
                             streamIdToFileName.put(shrimp.getStreamId(), new String(shrimp.getPayload()));
                         }
-                        continue;
+                        break;
                     }
                 }
             }
