@@ -291,7 +291,7 @@ public class NodeConnectionManager implements Runnable {
                                 if (neighbourInfo.rpAdjacent.contains(link.getAddress())) {
                                     synchronized(neighbourInfo.minNodeQueue) {
                                         //TODO a latência aqui não pode ser 0
-                                        node = new NeighbourInfo.Node(link.getAddress(), 0);
+                                        node = new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
                                         neighbourInfo.updateLatency(node);
                                     }
                                 }
