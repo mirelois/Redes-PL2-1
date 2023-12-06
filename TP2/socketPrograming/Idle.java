@@ -148,12 +148,14 @@ public class Idle implements Runnable {
                     } else { // vizinho "nasceu"
                         neighbourInfo.neighBoursLifePoints.put(packet.getAddress(), 5);
                     }
+                }
 
-                } else {
+                if(this.isRP && itp.isServer){
                     for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
                         streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                     }
                 }
+
                 if (!itp.isAck) {
                     if (neighbourInfo.isConnectedToRP == 1) {
                         socket.send(new ITP(false,
