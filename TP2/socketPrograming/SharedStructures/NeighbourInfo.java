@@ -53,11 +53,11 @@ public class NeighbourInfo {
 
                 double jitterVariance = this.latency == 0 ? 0 : this.jitter/this.latency;
 
-                if ((this.lossRate < 0) && (this.jitter > 0)) {
+                if ((this.lossRate < 0) && (this.jitter >= 0)) {
                     extraMetric = jitterVariance;
-                }else if ((this.jitter < 0) && (this.lossRate > 0))  {
+                } else if ((this.jitter < 0) && (this.lossRate >= 0))  {
                     extraMetric = this.lossRate;
-                }else  {
+                } else  {
                     extraMetric = (Define.extraMetricsDelta)*jitterVariance + (1 - Define.extraMetricsDelta) * this.lossRate;
                 }
 
