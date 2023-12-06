@@ -176,5 +176,4 @@ public class NeighbourInfo {
             this.minNodeQueue.add(node);
         }
     }
-
 }

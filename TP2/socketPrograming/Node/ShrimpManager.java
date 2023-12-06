@@ -64,6 +64,7 @@ public class ShrimpManager implements Runnable{
                         synchronized(this.neighbourInfo.minNodeQueue) {
                             System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
                                                 Packet.getLatency(shrimp.getTimeStamp()));
+                                                
                             this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
                                                                 Packet.getLatency(shrimp.getTimeStamp())));
                         }

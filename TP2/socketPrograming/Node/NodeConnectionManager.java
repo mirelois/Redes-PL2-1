@@ -155,6 +155,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                     }
                 }*/
                 synchronized (neighbourInfo.minNodeQueue) {
+                    System.out.println("    Tamanho da Queue: " + neighbourInfo.minNodeQueue.size());
                     if (!neighbourInfo.minNodeQueue.peek().equals(streamInfo.connected) &&
                         !neighbourInfo.minNodeQueue.peek().equals(streamInfo.connecting)) {
                         streamInfo.disconnectingDeprecatedLock.lock();
@@ -198,6 +199,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                             }
                             for (NeighbourInfo.StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
                                 if (!this.neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
+                                    System.out.println("Update de timeout à stream " + streamInfo.streamId);
                                     updateBestNode(neighbourInfo, streamInfo, socket);
                                 }
                             }
