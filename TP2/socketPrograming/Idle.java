@@ -105,7 +105,9 @@ public class Idle implements Runnable {
                         }
                     }
                 }
-                catch (Exception E) {}
+                catch (Exception E) {
+                    E.printStackTrace();
+                }
             }
                 );
             //Correr o timeout
@@ -151,7 +153,7 @@ public class Idle implements Runnable {
             }
         }
         catch (Exception e) {
-            //TODO
+            e.printStackTrace();
         }
     }
 

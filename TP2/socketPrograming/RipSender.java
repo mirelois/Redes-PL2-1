@@ -144,6 +144,7 @@ public class RipSender implements Runnable {
             }
         } catch (Exception e) {
             // TODO: handle exception
+            e.printStackTrace();
         }
     }
 }
