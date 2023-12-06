@@ -157,7 +157,7 @@ public class Idle implements Runnable {
                 }
 
                 if (!itp.isAck) {
-                    if (neighbourInfo.isConnectedToRP == 1) {
+                    if (neighbourInfo.isConnectedToRP == 1 && neighbourInfo.minNodeQueue.peek() != null) {
                         socket.send(new ITP(false,
                                             true,
                                             true,
