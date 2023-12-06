@@ -73,7 +73,7 @@ public class fullDuplex {
 
             // Setup Phase:
             if (filePath!=null) {
-                new Thread(new BootStrapper( filePath)).start();
+                new Thread(new BootStrapper(filePath)).start();
             }
 
             new Thread(new BootClient(ip_bootstrapper, neighbours)).start();

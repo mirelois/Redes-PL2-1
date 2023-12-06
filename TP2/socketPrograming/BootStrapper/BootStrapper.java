@@ -133,7 +133,7 @@ public class BootStrapper implements Runnable {
 
                 // unpack BOP packet
                 Bop bop = new Bop(datagramPacket);
-                
+                System.out.println("Recebido Bop");
                 byte[] payload = serialize(tree.get(bop.getAddress()));
 
                 Bop send_bop = new Bop(payload, payload.length, bop.getAddress(), bop.getPort());
