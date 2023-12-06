@@ -156,7 +156,7 @@ public class NodeConnectionManager implements Runnable { // TODO: ver concorrenc
                 }*/
                 synchronized (neighbourInfo.minNodeQueue) {
                     for (NeighbourInfo.Node node : neighbourInfo.minNodeQueue) {
-                        System.out.println("\n" + node.address + ":" + node.getMetrics());
+                        System.out.println(node.address.getHostName() + ":" + node.getMetrics());
                     }
                     if (!neighbourInfo.minNodeQueue.peek().equals(streamInfo.connected) &&
                         !neighbourInfo.minNodeQueue.peek().equals(streamInfo.connecting)) {
