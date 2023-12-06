@@ -13,8 +13,6 @@ public class Bop extends Packet{
         super(HEADER_SIZE, payload, payload_size, address, port);
 
         this.checksum = ~this.getPayloadChecksum();
-        System.out.println("before negating BOP: " + this.getPayloadChecksum());
-        System.out.println("before putting in BOP: " + this.checksum);
         this.header[0] = (byte) (checksum >> 8);
         this.header[1] = (byte) (checksum);
 
