@@ -88,11 +88,12 @@ public class Server extends JFrame implements ActionListener, Runnable {
                     System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() + 
                                         " de id " + shrimp.getStreamId());
 
-                    if (serverSenderMap.get(shrimp.getStreamId()) == null) {
+                    if (string.equals(new String(shrimp.getPayload())) && serverSenderMap.get(shrimp.getStreamId()) == null) {
                         //Put FileName and StreamId into map
                         synchronized(streamIdToFileName) {
                             streamIdToFileName.put(shrimp.getStreamId(), new String(shrimp.getPayload()));
                         }
+                        continue;
                     }
                 }
             }
