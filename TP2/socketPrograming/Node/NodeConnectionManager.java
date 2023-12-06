@@ -9,6 +9,7 @@ import java.util.Set;
 import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
+import SharedStructures.NeighbourInfo.StreamInfo;
 
 import java.net.UnknownHostException;
 
@@ -170,8 +171,19 @@ public class NodeConnectionManager implements Runnable {
                         } finally {
                             streamInfo.disconnectingDeprecatedLock.unlock();
                         }
-            
+                        
+                        Set<NeighbourInfo.Node> removeSet = new HashSet<>();
                         streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
+                        while (streamInfo.connecting != null && 
+                            neighbourInfo.streamActiveLinks.get(streamInfo.streamId).contains(neighbourInfo.minNodeQueue.peek().address)) {
+                                removeSet.add(streamInfo.connecting);
+                                neighbourInfo.minNodeQueue.remove(streamInfo.connecting);
+                                streamInfo.connecting = neighbourInfo.minNodeQueue.peek();
+                        }
+                        for (NeighbourInfo.Node node : removeSet) {
+                            neighbourInfo.minNodeQueue.add(node);
+                        }
+                        
                         System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
                         streamInfo.connectingEmpty.signal();
                     }
@@ -244,10 +256,6 @@ public class NodeConnectionManager implements Runnable {
                             isActiveEmpty = activeLinks.isEmpty();
                             //Tem de ter o active link local ou não manda para o streaming
                             activeLinks.add(link.getAddress());
-                            //remover o nodo da Priority Queue
-                            synchronized(neighbourInfo.minNodeQueue) {
-                                neighbourInfo.minNodeQueue.remove(new NeighbourInfo.Node(link.getAddress(),0));
-                            }
                         }
                         
                         if (isActiveEmpty) {
