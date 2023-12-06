@@ -155,7 +155,7 @@ public class NeighbourInfo {
     public Map<Integer, StreamInfo> streamIdToStreamInfo = new HashMap<>();
 
     public PriorityQueue<Node> minNodeQueue = new PriorityQueue<>((a, b) -> {
-        double result = Math.abs(a.getMetrics() - b.getMetrics());
+        double result = a.getMetrics() - b.getMetrics();
         if (result == 0) return 0;
         else return result > 0 ? 1 : -1;
     });
