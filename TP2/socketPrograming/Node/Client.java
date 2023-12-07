@@ -12,7 +12,12 @@ import Protocols.Simp;
 import Protocols.Sup;
 import SharedStructures.Define;
 
+
+
 public class Client implements Runnable{
+    public static class ClientAlive {
+        public boolean isAlive = false;
+    }
 
     //GUI
     //----
@@ -34,7 +39,7 @@ public class Client implements Runnable{
     Timer cTimer; //timer used to receive data from the UDP socket
     byte[] cBuf; //buffer used to store data received from the server
 
-    public Client(String streamName) {
+    public Client(String streamName, ClientAlive clientAlive) {
 
         //build GUI
         //--------------------------
@@ -73,7 +78,7 @@ public class Client implements Runnable{
 
         //init para a parte do cliente
         //--------------------------
-        cTimer = new Timer(20, new clientTimerListener(streamName));
+        cTimer = new Timer(20, new clientTimerListener(streamName, clientAlive));
         cTimer.setInitialDelay(0);
         cTimer.setCoalesce(true);
         cBuf = new byte[Define.streamBuffer]; //allocate enough memory for the buffer used to receive data from the server
@@ -132,8 +137,11 @@ public class Client implements Runnable{
 
         String streamName;
 
-        public clientTimerListener(String streamName) {
+        ClientAlive clientAlive;
+
+        public clientTimerListener(String streamName, ClientAlive clientAlive) {
             this.streamName = streamName;
+            this.clientAlive = clientAlive;
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -146,7 +154,9 @@ public class Client implements Runnable{
                 System.out.println("Enviado pacote de pedido ao Nodo correspondente");
                 RTPsocket.send(new Simp(InetAddress.getByName("localhost"), Define.simpPort, 
                 this.streamName.length(), this.streamName.getBytes()).toDatagramPacket());
-                while(true) {
+                boolean loop=true;
+
+                while(loop) {
                     RTPsocket.receive(rcvdp);
                     //create an RTPpacket object from the DP
                     Sup rtp_packet = new Sup(rcvdp);
@@ -173,6 +183,10 @@ public class Client implements Runnable{
                     iconLabel.setIcon(icon);
                     iconLabel.update(f.getGraphics());
                     //f.getContentPane().imageUpdate(image, 0, 0,0,380,280);
+
+                    synchronized (this.clientAlive){
+                        loop = this.clientAlive.isAlive;
+                    }
                 }
             } catch (IOException eio){
                 eio.printStackTrace();
