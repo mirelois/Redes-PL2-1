@@ -68,6 +68,7 @@ public class Idle implements Runnable {
                                 }
 
                             } else {
+                                System.out.println("Matar por falta de idle: " + address);
                                 this.neighbourInfo.neighBoursLifePoints.remove(address);
                             }
                         }
