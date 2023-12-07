@@ -38,7 +38,7 @@ public class RPStreaming implements Runnable{
                             }*/
                             for (ServerInfo.StreamInfo streamInfo : this.serverInfo.streamInfoMap.values()) {
                                 System.out.println("Update de timeout à stream " + streamInfo.streamId);
-                                RPServerConectionManager.updateBestServer(streamInfo, socket);
+                                RPServerConectionManager.updateBestServer(streamInfo, neighbourInfo, socket);
                             }
                         }
                     } catch (Exception e) {
@@ -115,7 +115,7 @@ public class RPStreaming implements Runnable{
                 }
 
                 if (bestMetrics < 0.95 * currentMetrics) {
-                    RPServerConectionManager.updateBestServer(streamInfo, socket);
+                    RPServerConectionManager.updateBestServer(streamInfo, neighbourInfo, socket);
                 }
 
                 Set<InetAddress> streamActiveLinks;

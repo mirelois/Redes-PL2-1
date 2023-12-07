@@ -59,7 +59,7 @@ public class RPNodeConnectionManager implements Runnable { // TODO: ver concorre
                     
                     if (streamInfo.connected == null && streamInfo.connecting == null) {
                         System.out.println("    Recebido pedido da Stream " + link.getStreamId() + " que ainda não estava ativa");
-                        RPServerConectionManager.updateBestServer(streamInfo, socket);
+                        RPServerConectionManager.updateBestServer(streamInfo, neighbourInfo, socket);
                     }
                     
                     synchronized(streamInfo.clientAdjacent) {
