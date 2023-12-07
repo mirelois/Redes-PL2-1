@@ -186,9 +186,10 @@ public class NodeConnectionManager implements Runnable {
                         for (NeighbourInfo.Node node : removeSet) {
                             neighbourInfo.minNodeQueue.add(node);
                         }
-                        
-                        System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
-                        streamInfo.connectingEmpty.signal();
+                        if (streamInfo.connecting != null) {
+                            System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
+                            streamInfo.connectingEmpty.signal();
+                        }
                     }
                 }
             } finally {
