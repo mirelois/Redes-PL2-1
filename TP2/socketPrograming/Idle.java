@@ -60,32 +60,29 @@ public class Idle implements Runnable {
                         synchronized (this.neighbourInfo.neighBoursLifePoints){
                         Set<InetAddress> aux = new HashSet<>(this.neighbourInfo.neighBoursLifePoints.keySet());
                         for (InetAddress address : aux) {
-                            if (neighbourInfo.streamIdToStreamInfo.values().stream()
-                                .allMatch(s->s==null || s.connected == null || !s.connected.address.equals(address))) {
 
-                                int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
-                                if (lifePoints > 0) {
-                                    this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints - 1);
-                                    try {
-                                        //System.out.println("Enviar IDLE para " + address + " com timestamp " + timeStampToSend);
-                                        socket.send(new ITP(
-                                                address.equals(this.rpIp),
-                                                true,
-                                                false,
-                                                timeStampToSend,
-                                                address,
-                                                Define.idlePort,
-                                                0,
-                                                null).toDatagramPacket());
-                                    } catch (SocketException e) {
-                                        // Vizinho está morto? Será que esta exception faz o que queremos?
-                                        this.neighbourInfo.neighBoursLifePoints.remove(address);
-                                    }
-    
-                                } else {
-                                    System.out.println("Matar por falta de idle: " + address);
+                            int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
+                            if (lifePoints > 0) {
+                                this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints - 1);
+                                try {
+                                    //System.out.println("Enviar IDLE para " + address + " com timestamp " + timeStampToSend);
+                                    socket.send(new ITP(
+                                            address.equals(this.rpIp),
+                                            true,
+                                            false,
+                                            timeStampToSend,
+                                            address,
+                                            Define.idlePort,
+                                            0,
+                                            null).toDatagramPacket());
+                                } catch (SocketException e) {
+                                    // Vizinho está morto? Será que esta exception faz o que queremos?
                                     this.neighbourInfo.neighBoursLifePoints.remove(address);
                                 }
+
+                            } else {
+                                System.out.println("Matar por falta de idle: " + address);
+                                this.neighbourInfo.neighBoursLifePoints.remove(address);
                             }
                         }
                         }
