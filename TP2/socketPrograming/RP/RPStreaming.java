@@ -110,8 +110,8 @@ public class RPStreaming implements Runnable{
                 }
                 
                 synchronized(this.neighbourInfo.minNodeQueue) {
-                    if (this.neighbourInfo.minNodeQueue.peek() != null)
-                        bestMetrics = this.neighbourInfo.minNodeQueue.peek().getMetrics();
+                    if (streamInfo.minServerQueue.peek() != null)
+                        bestMetrics = streamInfo.minServerQueue.peek().getMetrics();
                 }
 
                 if (bestMetrics < 0.95 * currentMetrics) {
@@ -120,6 +120,20 @@ public class RPStreaming implements Runnable{
 
                 Set<InetAddress> streamActiveLinks;
                 
+                System.out.println("\nMelhor: " + bestMetrics +
+                                       " do server " + streamInfo.minServerQueue.peek().address.getHostName() +
+                                       ": " + streamInfo.minServerQueue.peek().jitter +
+                                       " , " + streamInfo.minServerQueue.peek().latency +
+                                       " , " + streamInfo.minServerQueue.peek().lossRate);
+    
+                if (streamInfo.connected != null) {
+                    System.out.println("\nCurrent: " + currentMetrics +
+                                        " do server " + streamInfo.connected.address.getHostName() +
+                                        ": " + streamInfo.connected.jitter +
+                                        " , " + streamInfo.connected.latency +
+                                        " , " + streamInfo.connected.lossRate);
+                }
+
                 synchronized (this.neighbourInfo) {
                     
                     streamActiveLinks = this.neighbourInfo.streamActiveLinks.get(sup.getStreamId());
