@@ -3,10 +3,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Set;
 
-import Node.NodeConnectionManager;
 import Protocols.Packet;
 import Protocols.PacketSizeException;
 import Protocols.Sup;
@@ -109,8 +107,8 @@ public class RPStreaming implements Runnable{
                 }
 
                 for (InetAddress activeLink : streamActiveLinks) {
-                    System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
-                                       " com seq#: " + sup.getSequenceNumber());
+                    //System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
+                    //                   " com seq#: " + sup.getSequenceNumber());
                     socket.send(new Sup(
                             Packet.getCurrTime(),
                             sup.getFrameNumber(),
