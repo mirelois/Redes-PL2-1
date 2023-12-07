@@ -26,6 +26,13 @@ public class NodeConnectionManager implements Runnable {
         NeighbourInfo neighbourInfo,
         NeighbourInfo.StreamInfo streamInfo,
         DatagramSocket socket) throws UnknownHostException {
+        
+        synchronized (neighbourInfo.minNodeQueue) {
+            System.out.println("Current Priority Queue: ");
+            for (NeighbourInfo.Node node : neighbourInfo.minNodeQueue) {
+                System.out.println(node.address.getHostName() + ":" + node.getMetrics());
+            }
+        }
 
         if (neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
             return;
@@ -155,10 +162,6 @@ public class NodeConnectionManager implements Runnable {
                     }
                 }*/
                 synchronized (neighbourInfo.minNodeQueue) {
-                    System.out.println("Current Priority Queue: ");
-                    for (NeighbourInfo.Node node : neighbourInfo.minNodeQueue) {
-                        System.out.println(node.address.getHostName() + ":" + node.getMetrics());
-                    }
                     if (!neighbourInfo.minNodeQueue.peek().equals(streamInfo.connected) &&
                         !neighbourInfo.minNodeQueue.peek().equals(streamInfo.connecting)) {
                         streamInfo.disconnectingDeprecatedLock.lock();
