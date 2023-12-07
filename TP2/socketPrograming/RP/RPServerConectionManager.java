@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.Set;
 
 import Protocols.Link;
 import SharedStructures.Define;
@@ -167,9 +168,36 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
             }*/
             streamInfo.disconnectingDeprecatedLock.lock();
             try {
-                if (streamInfo.connecting != null) {
-                    streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
-                    streamInfo.disconnectingDeprecatedEmpty.signal();
+                synchronized (streamInfo.minServerQueue) {
+                    if (!streamInfo.minServerQueue.peek().equals(streamInfo.connected) &&
+                        !streamInfo.minServerQueue.peek().equals(streamInfo.connecting)) {
+                        streamInfo.disconnectingDeprecatedLock.lock();
+                        try {
+                            if (streamInfo.connecting != null) {
+                                System.out.println("Connecting deprecado: " + streamInfo.connecting.address.getHostName());
+                                streamInfo.deprecated.add(streamInfo.connecting); //add unactivated packet to the remove list
+                                streamInfo.disconnectingDeprecatedEmpty.signal();
+                            }
+                        } finally {
+                            streamInfo.disconnectingDeprecatedLock.unlock();
+                        }
+                        
+                        Set<ServerInfo.StreamInfo.Server> removeSet = new HashSet<>();
+                        streamInfo.connecting = streamInfo.minServerQueue.peek(); // this operation has complexity O(1)
+                        while (streamInfo.connecting != null && 
+                            neighbourInfo.streamActiveLinks.get(streamInfo.streamId).contains(streamInfo.minServerQueue.peek().address)) {
+                                removeSet.add(streamInfo.connecting);
+                                streamInfo.minServerQueue.remove(streamInfo.connecting);
+                                streamInfo.connecting = streamInfo.minServerQueue.peek();
+                        }
+                        for (ServerInfo.StreamInfo.Server server : removeSet) {
+                            streamInfo.minServerQueue.add(server);
+                        }
+                        if (streamInfo.connecting != null) {
+                            System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
+                            streamInfo.connectingEmpty.signal();
+                        }
+                    }
                 }
             } finally {
                 streamInfo.disconnectingDeprecatedLock.unlock();
