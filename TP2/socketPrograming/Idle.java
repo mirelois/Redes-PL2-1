@@ -142,7 +142,8 @@ public class Idle implements Runnable {
                 socket.receive(packet);
 
                 ITP itp = new ITP(packet);
-                System.out.println("Recebido Idle " + itp.getAddress());
+                System.out.println("Recebido Idle " + itp.getAddress() +
+                                   " com timestamp " + itp.getTimeStamp());
                 
                 if (itp.isNode) {
                     InetAddress address = itp.getAddress();
