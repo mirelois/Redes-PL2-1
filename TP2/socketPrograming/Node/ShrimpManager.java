@@ -119,7 +119,7 @@ public class ShrimpManager implements Runnable{
 
                             this.neighbourInfo.streamNameToClientRequests.put(streamName, new HashSet<>());
 
-                        } else if (this.neighbourInfo.rpRequest.isEmpty()) {
+                        } else if (this.neighbourInfo.rpRequest.isEmpty() && this.neighbourInfo.rpAdjacent.isEmpty()) {
                             //Pode não haver stream
                             
                             synchronized(clientRequestStreamSet) {
