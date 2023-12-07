@@ -7,11 +7,11 @@ n2a: n17, n18, n1d, n7b, n9a
 n2b: n17, n18, n1d, n7b, n9a
 n2c: n17, n18, n1d, n7b, n9a
 n2d: n17, n18, n1d, n7b, n9a
-n7a: n21, n22, n3b, n4a
-n7b: n21, n22, n3b, n4a
-n7c: n21, n22, n3b, n4a
-n7d: n21, n22, n3b, n4a
-n7e: n21, n22, n3b, n4a
+n7a: n22, n1b, n2c, n10b
+n7b: n22, n1b, n2c, n10b
+n7c: n22, n1b, n2c, n10b
+n7d: n22, n1b, n2c, n10b
+n7e: n22, n1b, n2c, n10b
 n9a: n23, n2d, n10a
 n9b: n23, n2d, n10a
 n9c: n23, n2d, n10a
