@@ -27,6 +27,26 @@ public class RPStreaming implements Runnable{
     public void run(){
         try(DatagramSocket socket = new DatagramSocket(Define.streamingPort)){
 
+            System.out.println("Started chooser Thread");
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        Thread.sleep(Define.chooserThreadTimeOut);
+                        synchronized (this.neighbourInfo.streamActiveLinks) {
+                            /*while (this.neighbourInfo.streamActiveLinks.values().stream().flatMap(Collection::stream).collect(Collectors.toSet()).isEmpty()) {
+                                this.neighbourInfo.streamActiveLinks.wait();
+                            }*/
+                            for (ServerInfo.StreamInfo streamInfo : this.serverInfo.streamInfoMap.values()) {
+                                System.out.println("Update de timeout à stream " + streamInfo.streamId);
+                                RPServerConectionManager.updateBestServer(streamInfo, socket);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
             byte[] buf = new byte[Define.streamBuffer]; // 1024 is enough? no
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
@@ -95,7 +115,7 @@ public class RPStreaming implements Runnable{
                 }
 
                 if (bestMetrics < 0.95 * currentMetrics) {
-                    RPServerConectionManager.updateBestServer(streamInfo, sup.getStreamId(), socket);
+                    RPServerConectionManager.updateBestServer(streamInfo, socket);
                 }
 
                 Set<InetAddress> streamActiveLinks;
