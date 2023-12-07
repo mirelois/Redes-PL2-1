@@ -51,21 +51,15 @@ public class ShrimpManager implements Runnable{
                     this.neighbourInfo.rpRequest.remove(shrimp.getAddress());
                     clientRequestStreamSet = this.neighbourInfo.streamNameToClientRequests.get(streamName);
                     
+                    Boolean newRpNode = false;
                     //Existe caminho para o RP
                     if (streamId != 255) {
                         System.out.println("    Adicionado novo caminho para o RP: " + shrimp.getAddress());
                         this.neighbourInfo.isConnectedToRP = 1;
                         //Adicionar Novo Caminho para o RP (Porque existe!)
                         rpAdjacent = this.neighbourInfo.rpAdjacent;
+                        newRpNode = !rpAdjacent.contains(shrimp.getAddress());
                         rpAdjacent.add(shrimp.getAddress());
-
-                        synchronized(this.neighbourInfo.minNodeQueue) {
-                            System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
-                                                Packet.getLatency(shrimp.getTimeStamp()));
-        
-                            this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
-                                                                Packet.getLatency(shrimp.getTimeStamp())));
-                        }
 
                     } else {
                         System.out.println("    Não existe conexão!");
@@ -76,6 +70,16 @@ public class ShrimpManager implements Runnable{
                     if (this.neighbourInfo.fileNameToStreamId.get(streamName) == 255) {
                         if (streamId != 255 && streamId != 0) {
                             //Colocar o nome da Stream associado ao seu Id
+
+                            synchronized(this.neighbourInfo.minNodeQueue) {
+                                if (newRpNode) {
+                                    System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
+                                                        Packet.getLatency(shrimp.getTimeStamp()));
+                
+                                    this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
+                                                                        Packet.getLatency(shrimp.getTimeStamp())));
+                                }
+                            }
 
                             synchronized(this.neighbourInfo.streamActiveLinks) {
                                 this.neighbourInfo.streamActiveLinks.put(streamId, new HashSet<>());
@@ -107,7 +111,7 @@ public class ShrimpManager implements Runnable{
                                                             InetAddress.getByName("localhost"),
                                                             Define.nodeConnectionManagerPort,
                                                             0,
-                                                            null).toDatagramPacket());   
+                                                            null).toDatagramPacket());
                                     }
                                 }
                             }
@@ -123,9 +127,22 @@ public class ShrimpManager implements Runnable{
                                 
                                 //Avisar todos os Clientes da falta de conexão
                                 for (InetAddress streamRequest : clientRequestStreamSet) {
-                                    socket.send(new Shrimp(shrimp.getTimeStamp(), streamId, Define.shrimpPort, streamRequest, 
-                                                shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
-
+                                    if (!streamRequest.equals(InetAddress.getByName("localhost"))) {
+                                        System.out.println("  Enviado SHRIMP para " + streamRequest.getHostAddress() +
+                                                        " da stream com id " + streamId);
+                                        socket.send(new Shrimp(shrimp.getTimeStamp(), streamId, Define.shrimpPort, 
+                                                            streamRequest, shrimp.getPayloadSize(), shrimp.getPayload()).toDatagramPacket());
+                                    } else {
+                                        System.out.println("    Shrimp veio para Cliente local - Enviado Link para local");
+                                        socket.send(new Link(false, 
+                                                            false,
+                                                            true,
+                                                            shrimp.getStreamId(),
+                                                            InetAddress.getByName("localhost"),
+                                                            Define.nodeConnectionManagerPort,
+                                                            0,
+                                                            null).toDatagramPacket());
+                                    }
                                 }
                             }
 

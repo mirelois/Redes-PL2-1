@@ -9,7 +9,6 @@ import java.util.Set;
 import Protocols.Link;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
-import SharedStructures.NeighbourInfo.StreamInfo;
 
 import java.net.UnknownHostException;
 
@@ -230,8 +229,8 @@ public class NodeConnectionManager implements Runnable {
                 socket.receive(packet);
 
                 Link link = new Link(packet);
-                System.out.println("Recebido Link de " + link.getAddress() + "\n    do tipo activate: " + link.isActivate() + 
-                                   "\n  do tipo ack: " + link.isAck());
+                //System.out.println("Recebido Link de " + link.getAddress() + "\n    do tipo activate: " + link.isActivate() + 
+                //                   "\n  do tipo ack: " + link.isAck());
                 NeighbourInfo.StreamInfo streamInfo = this.neighbourInfo.streamIdToStreamInfo.get(link.getStreamId());
 
                 NeighbourInfo.Node node = 
@@ -273,7 +272,7 @@ public class NodeConnectionManager implements Runnable {
                                     streamInfo.clientAdjacent.put(link.getAddress(), n + 1);
                                 }
                             }
-                            System.out.println("Enviada resposta de Link de ativação para " + link.getAddress());
+                            //System.out.println("Enviada resposta de Link de ativação para " + link.getAddress());
                             socket.send(new Link(
                                             true,
                                             true,

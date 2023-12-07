@@ -172,6 +172,7 @@ public class Idle implements Runnable {
                     synchronized (this.neighbourInfo.minNodeQueue) {
                         if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
                             timeStampToSend = Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000);
+                            System.out.println("    " + (Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency));
                             System.out.println("    Enviado timestamp: " + timeStampToSend);
                         }
                         socket.send(new ITP(false,
