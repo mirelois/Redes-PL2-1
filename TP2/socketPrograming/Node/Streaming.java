@@ -80,8 +80,8 @@ public class Streaming implements Runnable {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
 
-                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequenceNumber() + 
-                                   " Frame#: " + sup.getFrameNumber());
+                //System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequenceNumber() + 
+                //                   " Frame#: " + sup.getFrameNumber());
 
                 checkLinkActivation(new NeighbourInfo.Node(sup.getAddress(), 0), streamInfo);
 
@@ -182,7 +182,7 @@ public class Streaming implements Runnable {
                 synchronized (streamActiveLinks) {
                     // TODO Como fazer os frame Numbers (o que são?)
                     for (InetAddress activeLink : streamActiveLinks) {
-                        System.out.println("Enviando SUP da stream " + sup.getStreamId() + " para " + activeLink);
+                        //System.out.println("Enviando SUP da stream " + sup.getStreamId() + " para " + activeLink);
 
                         if (!activeLink.equals(sup.getAddress())) {
                             if (activeLink.equals(InetAddress.getByName("localhost"))) {
