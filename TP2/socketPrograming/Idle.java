@@ -135,7 +135,22 @@ public class Idle implements Runnable {
 
                 ITP itp = new ITP(packet);
                 System.out.println("Recebido Idle " + itp.getAddress());
-        
+                
+                if (itp.isNode) {
+                    InetAddress address = itp.getAddress();
+                    synchronized (this.neighbourInfo.neighBoursLifePoints) {
+                        if (this.neighbourInfo.neighBoursLifePoints.get(address) != null) {
+                            //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
+                            int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
+                            if (lifePoints < Define.maxLifePoints) {
+                                this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
+                            }
+                        } else { // vizinho "nasceu"
+                            this.neighbourInfo.neighBoursLifePoints.put(address, Define.maxLifePoints);
+                        }
+                    }
+                }
+                
                 if (!itp.isAck) {
                     synchronized (this.neighbourInfo.minNodeQueue) {
                         if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
@@ -159,29 +174,14 @@ public class Idle implements Runnable {
                             itp.getPayload()).toDatagramPacket());
                         }
                     }
-                }
-                
-                if (itp.isNode) {
-                    InetAddress address = itp.getAddress();
-                    synchronized (this.neighbourInfo.neighBoursLifePoints) {
-                        if (this.neighbourInfo.neighBoursLifePoints.get(address) != null) {
-                            //adicionar "vida" aos nodos adjacentes (ainda estão vivos)
-                            int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
-                            if (lifePoints < Define.maxLifePoints) {
-                                this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints + 1);
-                            }
-                        } else { // vizinho "nasceu"
-                            this.neighbourInfo.neighBoursLifePoints.put(address, Define.maxLifePoints);
+    
+                    if(this.isRP && itp.isServer){
+                        for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
+                            streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                         }
+                    } else if (this.neighbourInfo.rpAdjacent.contains(itp.getAddress())) {
+                        this.neighbourInfo.updateLatency(new NeighbourInfo.Node(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                     }
-                }
-                
-                if(this.isRP && itp.isServer){
-                    for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
-                        streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
-                    }
-                } else if (this.neighbourInfo.rpAdjacent.contains(itp.getAddress())) {
-                    this.neighbourInfo.updateLatency(new NeighbourInfo.Node(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                 }
             }
         }
