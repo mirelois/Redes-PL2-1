@@ -142,7 +142,8 @@ public class RPStreaming implements Runnable{
 
                 synchronized(streamActiveLinks) {
                     for (InetAddress activeLink : streamActiveLinks) {
-                        //System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
+                        synchronized(activeLink) {
+                            //System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
                         //                   " com seq#: " + sup.getSequenceNumber());
                         socket.send(new Sup(
                                 Packet.getCurrTime(),
@@ -153,7 +154,9 @@ public class RPStreaming implements Runnable{
                                 Define.streamingPort,
                                 sup.getPayloadSize(),
                                 sup.getPayload()
-                            ).toDatagramPacket());
+                            ).toDatagramPacket());    
+                        }
+                        
                     }
                 }
             }

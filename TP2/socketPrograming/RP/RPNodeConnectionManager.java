@@ -89,7 +89,9 @@ public class RPNodeConnectionManager implements Runnable { // TODO: ver concorre
                         activeLinks = neighbourInfo.streamActiveLinks.get(link.getStreamId());
 
                         //remove from the active links the one asked to be deactivated
-                        activeLinks.remove(link.getAddress());
+                        synchronized(activeLinks) {
+                            activeLinks.remove(link.getAddress());
+                        }
 
                         //if no more active links remain, then the stream doesn't have any more clients in that direction
                         if (activeLinks.isEmpty()) {
