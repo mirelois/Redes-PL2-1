@@ -58,7 +58,7 @@ public class Idle implements Runnable {
                         Set<InetAddress> aux = new HashSet<>(this.neighbourInfo.neighBoursLifePoints.keySet());
                         for (InetAddress address : aux) {
                             if (neighbourInfo.streamActiveLinks.values().stream().allMatch(s->s == null || !s.contains(address)) &&
-                                neighbourInfo.streamIdToStreamInfo.values().stream().allMatch(s->s == null || !s.connected.address.equals(address))) {
+                                neighbourInfo.streamIdToStreamInfo.values().stream().allMatch(s->s == null || !s.connected.equals(new NeighbourInfo.Node(address, 0)))) {
 
                                 int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
                                 if (lifePoints > 0) {
