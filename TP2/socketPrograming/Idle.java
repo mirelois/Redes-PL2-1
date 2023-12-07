@@ -38,8 +38,7 @@ public class Idle implements Runnable {
         try (DatagramSocket socket = new DatagramSocket(Define.idlePort)) {
             // Acabei de nascer, vou avisar todos ao meu redor
             //Criar a thread que vai dar timeout e enviar os Idles para todos os adjacentes
-            this.timeout = new Thread(
-                () -> {
+            this.timeout = new Thread( () -> {
                 try {
                     // Acabei de saber os meus vizinhos pelo bootstrapper, vou testa-los para ver se tão
                     while (true) {
@@ -125,8 +124,7 @@ public class Idle implements Runnable {
                 catch (Exception E) {
                     E.printStackTrace();
                 }
-            }
-                );
+            });
             //Correr o timeout
             timeout.start();
 
@@ -137,6 +135,31 @@ public class Idle implements Runnable {
 
                 ITP itp = new ITP(packet);
                 System.out.println("Recebido Idle " + itp.getAddress());
+        
+                if (!itp.isAck) {
+                    synchronized (this.neighbourInfo.minNodeQueue) {
+                        if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
+                            System.out.println("    Enviado timestamp: " + Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000));
+                            socket.send(new ITP(false,
+                                true,
+                                true,
+                                Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000),
+                                itp.getAddress(),
+                                itp.getPort(),
+                                itp.getPayloadSize(),
+                                itp.getPayload()).toDatagramPacket());
+                        } else {
+                            socket.send(new ITP(false,
+                            true,
+                            true,
+                            itp.getTimeStamp(),
+                            itp.getAddress(),
+                            itp.getPort(),
+                            itp.getPayloadSize(),
+                            itp.getPayload()).toDatagramPacket());
+                        }
+                    }
+                }
                 
                 if (itp.isNode) {
                     InetAddress address = itp.getAddress();
@@ -152,38 +175,13 @@ public class Idle implements Runnable {
                         }
                     }
                 }
-
+                
                 if(this.isRP && itp.isServer){
                     for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
                         streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                     }
-                } else if (this.neighbourInfo.rpAdjacent.contains((itp.getAddress()))) {
+                } else if (this.neighbourInfo.rpAdjacent.contains(itp.getAddress())) {
                     this.neighbourInfo.updateLatency(new NeighbourInfo.Node(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
-                }
-
-                if (!itp.isAck) {
-                    synchronized (this.neighbourInfo.minNodeQueue) {
-                        if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
-                            System.out.println("    Enviado timestamp: " + Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000));
-                            socket.send(new ITP(false,
-                                    true,
-                                    true,
-                                    Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000),
-                                    itp.getAddress(),
-                                    itp.getPort(),
-                                    itp.getPayloadSize(),
-                                    itp.getPayload()).toDatagramPacket());
-                        } else {
-                            socket.send(new ITP(false,
-                                    true,
-                                    true,
-                                    itp.getTimeStamp(),
-                                    itp.getAddress(),
-                                    itp.getPort(),
-                                    itp.getPayloadSize(),
-                                    itp.getPayload()).toDatagramPacket());
-                        }
-                    }
                 }
             }
         }
@@ -191,5 +189,4 @@ public class Idle implements Runnable {
             e.printStackTrace();
         }
     }
-
 }
