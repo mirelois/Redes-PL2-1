@@ -141,7 +141,7 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
                                         null).toDatagramPacket());
                             }
 
-                            Thread.sleep(Define.RPTimeout);
+                            Thread.sleep(Define.streamingTimeout);
 
                         }
                     } catch (InterruptedException | IOException e) {
@@ -218,12 +218,16 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
                             try {
                                 streamInfo.disconnectingDeprecatedLock.lock();
                                 try {
-                                    if (streamInfo.connected != null) {
-                                        streamInfo.disconnecting.add(streamInfo.connected);
-                                        streamInfo.disconnectingDeprecatedEmpty.signal();
+                                    if (streamInfo.connecting != null && streamInfo.connecting.address.equals(server.address)) {
+                                        if (streamInfo.connected != null) {
+                                            streamInfo.disconnecting.add(streamInfo.connected);
+                                            streamInfo.disconnectingDeprecatedEmpty.signal();
+                                        }
+                                        streamInfo.connected = streamInfo.connecting;
+                                        streamInfo.connecting = null;
+                                        System.out.println("Established Connection!\n   connected: " + 
+                                        streamInfo.connected.address.getHostName());
                                     }
-                                    streamInfo.connected = streamInfo.connecting;
-                                    streamInfo.connecting = null;
                                 } finally {
                                     streamInfo.disconnectingDeprecatedLock.unlock();
                                 }

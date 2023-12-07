@@ -74,7 +74,7 @@ public class NodeConnectionManager implements Runnable {
                                     0,
                                     null).toDatagramPacket());
 
-                            Thread.sleep(Define.RPTimeout);
+                            Thread.sleep(Define.RetransTimeout);
 
                         }
                     } catch (InterruptedException | IOException e) {
