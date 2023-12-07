@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.HashSet;
 
 import Protocols.Packet;
 import Protocols.PacketSizeException;
@@ -55,6 +56,9 @@ public class RPServerAdder implements Runnable{
                             curr_streamID++;
                             streamInfo = new ServerInfo.StreamInfo(streamId);
                             this.serverInfo.streamInfoMap.put(streamId, streamInfo);
+                            if (this.neighbourInfo.streamActiveLinks.get(streamId) == null) {
+                                this.neighbourInfo.streamActiveLinks.put(streamId, new HashSet<>());
+                            }
 
                         } else { //Stream já existe no RP
                             streamInfo = this.serverInfo.streamInfoMap.get(streamId);
