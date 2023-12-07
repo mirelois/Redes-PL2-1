@@ -2,8 +2,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import Protocols.ITP;
 import Protocols.Packet;
@@ -57,8 +60,8 @@ public class Idle implements Runnable {
                         synchronized (this.neighbourInfo.neighBoursLifePoints){
                         Set<InetAddress> aux = new HashSet<>(this.neighbourInfo.neighBoursLifePoints.keySet());
                         for (InetAddress address : aux) {
-                            if (neighbourInfo.streamActiveLinks.values().stream().allMatch(s->s == null || !s.contains(address)) &&
-                                neighbourInfo.streamIdToStreamInfo.values().stream().allMatch(s->s == null || !s.connected.equals(new NeighbourInfo.Node(address, 0)))) {
+                            if (neighbourInfo.streamIdToStreamInfo.values().stream()
+                                .allMatch(s->s==null || s.connected == null || !s.connected.address.equals(address))) {
 
                                 int lifePoints = this.neighbourInfo.neighBoursLifePoints.get(address);
                                 if (lifePoints > 0) {
