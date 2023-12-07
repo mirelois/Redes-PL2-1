@@ -181,6 +181,7 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
                         } finally {
                             streamInfo.disconnectingDeprecatedLock.unlock();
                         }
+                        streamInfo.connecting = streamInfo.minServerQueue.peek();
                         if (streamInfo.connecting != null) {
                             System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
                             streamInfo.connectingEmpty.signal();
