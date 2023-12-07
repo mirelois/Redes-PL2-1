@@ -97,6 +97,7 @@ public class Idle implements Runnable {
                                         for (StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
                                             if (streamInfo.connected != null && streamInfo.connected.address == address) {
                                                 streamInfo.connected = null;
+                                                
                                             }
                                             if (streamInfo.connecting != null && streamInfo.connecting.address == address) {
                                                 streamInfo.connecting = null;

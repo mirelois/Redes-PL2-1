@@ -175,17 +175,8 @@ public class NodeConnectionManager implements Runnable {
                             streamInfo.disconnectingDeprecatedLock.unlock();
                         }
                         
-                        Set<NeighbourInfo.Node> removeSet = new HashSet<>();
                         streamInfo.connecting = neighbourInfo.minNodeQueue.peek(); // this operation has complexity O(1)
-                        while (streamInfo.connecting != null && 
-                            neighbourInfo.streamActiveLinks.get(streamInfo.streamId).contains(neighbourInfo.minNodeQueue.peek().address)) {
-                                removeSet.add(streamInfo.connecting);
-                                neighbourInfo.minNodeQueue.remove(streamInfo.connecting);
-                                streamInfo.connecting = neighbourInfo.minNodeQueue.peek();
-                        }
-                        for (NeighbourInfo.Node node : removeSet) {
-                            neighbourInfo.minNodeQueue.add(node);
-                        }
+                        
                         if (streamInfo.connecting != null) {
                             System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
                             streamInfo.connectingEmpty.signal();
