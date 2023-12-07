@@ -71,7 +71,7 @@ public class RPStreaming implements Runnable{
                                 
                 lossInfo.latestReceivedPacket = sup.getSequenceNumber();
                 
-                System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
+                //System.out.println("Recebida Stream " + sup.getStreamId() + " de " + sup.getAddress());
                 //calculatet and update server latencies
 
                 Integer currLatency = Packet.getLatency(sup.getTime_stamp());
