@@ -36,13 +36,13 @@ public final class Define {
 
     //-------timeouts---------
 
-    public static int streamingTimeout              = 1000;
+    public static int streamingTimeout              = 2000;
     
     public static int bootClientTimeout             = 1000;
 
     public static int RPTimeout                     = 1000; 
 
-    public static int RetransTimeout                = 1000; 
+    public static int RetransTimeout                = 2000; 
 
     public static int idleTimeout                   = 5000;
 

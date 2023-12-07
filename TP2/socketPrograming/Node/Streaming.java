@@ -142,21 +142,22 @@ public class Streaming implements Runnable {
 
                 int timeStampToSend = sup.getTime_stamp();
 
-                /*System.out.println("\nMelhor: " + bestMetrics +
-                                   " do server " + this.neighbourInfo.minNodeQueue.peek().address.getHostName() +
-                                   ": " + this.neighbourInfo.minNodeQueue.peek().jitter +
-                                   " , " + this.neighbourInfo.minNodeQueue.peek().latency +
-                                   " , " + this.neighbourInfo.minNodeQueue.peek().lossRate);
-
-                if (streamInfo.connected != null) {
-                    System.out.println("\nCurrent: " + currentMetrics +
-                                       " do server " + streamInfo.connected.address.getHostName() +
-                                       ": " + streamInfo.connected.jitter +
-                                       " , " + streamInfo.connected.latency +
-                                       " , " + streamInfo.connected.lossRate);
-                }*/
-
-                if (bestMetrics < (0.95 * currentMetrics)) { // Mandar latencia melhor se isto fizer
+                
+                if (bestMetrics < (0.85 * currentMetrics)) { // Mandar latencia melhor se isto fizer
+                    
+                    System.out.println("\nMelhor: " + bestMetrics +
+                                       " do server " + this.neighbourInfo.minNodeQueue.peek().address.getHostName() +
+                                       ": " + this.neighbourInfo.minNodeQueue.peek().jitter +
+                                       " , " + this.neighbourInfo.minNodeQueue.peek().latency +
+                                       " , " + this.neighbourInfo.minNodeQueue.peek().lossRate);
+    
+                    if (streamInfo.connected != null) {
+                        System.out.println("\nCurrent: " + currentMetrics +
+                                           " do server " + streamInfo.connected.address.getHostName() +
+                                           ": " + streamInfo.connected.jitter +
+                                           " , " + streamInfo.connected.latency +
+                                           " , " + streamInfo.connected.lossRate);
+                    }
 
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, socket);
                     streamInfo.connectingLock.lock();
