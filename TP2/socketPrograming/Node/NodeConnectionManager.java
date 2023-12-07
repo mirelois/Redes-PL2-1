@@ -335,7 +335,7 @@ public class NodeConnectionManager implements Runnable {
                         synchronized(streamInfo.clientAdjacent) {
                             streamInfo.clientAdjacent.put(link.getAddress(), streamInfo.clientAdjacent.get(link.getAddress()) - 1);
                         }
-
+                        System.out.println("Enviada resposta de Link de desativação para " + link.getAddress());
                         socket.send(new Link(
                                         true,
                                         false,
