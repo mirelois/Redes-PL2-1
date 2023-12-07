@@ -37,11 +37,12 @@ public class ITP extends Packet { // Idle Tick Protocol
     public ITP(DatagramPacket packet) throws PacketSizeException {
 
         super(packet, HEADER_SIZE);
-
-        this.timeStamp = (Byte.toUnsignedInt(this.header[0]) << 8) |
-                         Byte.toUnsignedInt(this.header[1]);
-
+        
         int flags = Byte.toUnsignedInt(this.header[0]);
+
+        this.timeStamp = (Byte.toUnsignedInt(this.header[1]) << 8) |
+                          Byte.toUnsignedInt(this.header[2]);
+
 
         this.isServer = (flags & 0x01) > 0;
         this.isNode   = (flags & 0x02) > 0;

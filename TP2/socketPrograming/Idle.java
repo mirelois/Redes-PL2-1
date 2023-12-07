@@ -62,7 +62,8 @@ public class Idle implements Runnable {
                                 this.neighbourInfo.neighBoursLifePoints.replace(address, lifePoints - 1);
                                 try {
                                     System.out.println("Enviar IDLE para " + address + " com timestamp " + timeStampToSend);
-                                    socket.send(new ITP(address.equals(this.rpIp),
+                                    socket.send(new ITP(
+                                            address.equals(this.rpIp),
                                             true,
                                             false,
                                             timeStampToSend,
