@@ -13,6 +13,7 @@ import Protocols.Packet;
 import SharedStructures.Define;
 import SharedStructures.NeighbourInfo;
 import SharedStructures.ServerInfo;
+import SharedStructures.NeighbourInfo.StreamInfo;
 
 public class Idle implements Runnable {
     private final NeighbourInfo neighbourInfo;
@@ -91,6 +92,16 @@ public class Idle implements Runnable {
                                     }
                                     synchronized(this.neighbourInfo.minNodeQueue) {
                                         this.neighbourInfo.minNodeQueue.remove(new NeighbourInfo.Node(address, 0));
+                                    }
+                                    synchronized (this.neighbourInfo.streamIdToStreamInfo){
+                                        for (StreamInfo streamInfo : this.neighbourInfo.streamIdToStreamInfo.values()) {
+                                            if (streamInfo.connected != null && streamInfo.connected.address == address) {
+                                                streamInfo.connected = null;
+                                            }
+                                            if (streamInfo.connecting != null && streamInfo.connecting.address == address) {
+                                                streamInfo.connecting = null;
+                                            }
+                                        }
                                     }
                                 }
                             }
