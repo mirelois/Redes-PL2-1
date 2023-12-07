@@ -155,6 +155,7 @@ public class NodeConnectionManager implements Runnable {
                     }
                 }*/
                 synchronized (neighbourInfo.minNodeQueue) {
+                    System.out.println("Current Priority Queue: ");
                     for (NeighbourInfo.Node node : neighbourInfo.minNodeQueue) {
                         System.out.println(node.address.getHostName() + ":" + node.getMetrics());
                     }
@@ -293,16 +294,6 @@ public class NodeConnectionManager implements Runnable {
 
                             //remove from the active links the one asked to be deactivated
                             activeLinks.remove(link.getAddress());
-                            //return it to the minNodeQueue if it is RpAdjacent
-                            synchronized(neighbourInfo.rpAdjacent) {
-                                if (neighbourInfo.rpAdjacent.contains(link.getAddress())) {
-                                    synchronized(neighbourInfo.minNodeQueue) {
-                                        //TODO a latência aqui não pode ser 0
-                                        node = new NeighbourInfo.Node(link.getAddress(), Integer.MAX_VALUE);
-                                        neighbourInfo.updateLatency(node);
-                                    }
-                                }
-                            }
 
                             //if no more active links remain, then the stream doesn't have any more clients in that direction
                             if (activeLinks.isEmpty()) {

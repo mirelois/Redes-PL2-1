@@ -48,7 +48,7 @@ public class Idle implements Runnable {
                         // diminuir vida aos ajdacentes que foram enviados mensagens
                         int timeStampToSend = Packet.getCurrTime();
                         synchronized (this.neighbourInfo.minNodeQueue) {
-                            if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
+                            if (!isRP && this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
                                 timeStampToSend = Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000);
                                 System.out.println("    Enviado timestamp: " + timeStampToSend);
                             }
