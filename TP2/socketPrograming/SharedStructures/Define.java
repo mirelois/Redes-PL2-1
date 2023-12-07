@@ -44,7 +44,7 @@ public final class Define {
 
     public static int RetransTimeout                = 1000; 
 
-    public static int idleTimeout                   = 1000;
+    public static int idleTimeout                   = 5000;
 
     public static int chooserThreadTimeOut          = 2000;
 
