@@ -62,6 +62,16 @@ public class ShrimpManager implements Runnable{
                         newRpNode = !rpAdjacent.contains(shrimp.getAddress());
                         rpAdjacent.add(shrimp.getAddress());
 
+                        synchronized(this.neighbourInfo.minNodeQueue) {
+                            if (newRpNode && streamId != 0) {
+                                System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
+                                                    Packet.getLatency(shrimp.getTimeStamp()));
+            
+                                this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
+                                                                    Packet.getLatency(shrimp.getTimeStamp())));
+                            }
+                        }
+
                     } else {
                         System.out.println("    Não existe conexão!");
                         this.neighbourInfo.notRpAdjacent.add(shrimp.getAddress());
@@ -72,15 +82,6 @@ public class ShrimpManager implements Runnable{
                         if (streamId != 255 && streamId != 0) {
                             //Colocar o nome da Stream associado ao seu Id
 
-                            synchronized(this.neighbourInfo.minNodeQueue) {
-                                if (newRpNode) {
-                                    System.out.println("    Adicionado nodo " + shrimp.getAddress() + " à Queue com latência " +
-                                                        Packet.getLatency(shrimp.getTimeStamp()));
-                
-                                    this.neighbourInfo.minNodeQueue.add(new NeighbourInfo.Node(shrimp.getAddress(), 
-                                                                        Packet.getLatency(shrimp.getTimeStamp())));
-                                }
-                            }
 
                             synchronized(this.neighbourInfo.streamActiveLinks) {
                                 this.neighbourInfo.streamActiveLinks.put(streamId, new HashSet<>());
