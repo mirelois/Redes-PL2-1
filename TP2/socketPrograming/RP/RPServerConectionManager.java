@@ -202,11 +202,6 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
             } finally {
                 streamInfo.disconnectingDeprecatedLock.unlock();
             }
-            synchronized (streamInfo.minServerQueue) {
-                streamInfo.connecting = streamInfo.minServerQueue.peek(); // this operation has complexity O(1)
-                System.out.println("Alterado connecting para " + streamInfo.connecting.address);
-            }
-            streamInfo.connectingEmpty.signal();
         } finally {
             streamInfo.connectingLock.unlock();
         }

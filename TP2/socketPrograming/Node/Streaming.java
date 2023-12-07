@@ -30,7 +30,7 @@ public class Streaming implements Runnable {
                 streamInfo.disconnectingDeprecatedLock.lock();
                 try {
                     if (streamInfo.connecting != null && streamInfo.connecting.address.equals(node.address)) {
-                        if (streamInfo.connected != null) {
+                        if (streamInfo.connected != null && !streamInfo.connected.equals(streamInfo.connecting)) {
                             streamInfo.disconnecting.add(streamInfo.connected);
                             streamInfo.disconnectingDeprecatedEmpty.signal();
                         }
