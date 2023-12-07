@@ -41,7 +41,8 @@ public class ShrimpManager implements Runnable{
                 Set<InetAddress> rpAdjacent, clientRequestStreamSet;
                 
                 System.out.println( "Recebido SHRIMP de " + shrimp.getAddress().getHostAddress() +
-                                    " com streamId " + shrimp.getStreamId());
+                                    " com streamId " + shrimp.getStreamId() + 
+                                    " do ficheiro " + streamName);
 
                 socket.send(new Rip(0, packet.getAddress(), Define.ripPort).toDatagramPacket());
 
