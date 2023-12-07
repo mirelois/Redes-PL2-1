@@ -44,7 +44,7 @@ public final class Define {
 
     public static int RetransTimeout                = 2000; 
 
-    public static int idleTimeout                   = 5000;
+    public static int idleTimeout                   = 1000;
 
     public static int chooserThreadTimeOut          = 5000;
 
@@ -58,6 +58,6 @@ public final class Define {
     public static double extraMetricsDelta           = 0.5;
     public static double mainDelta                   = 0.6;
 
-    public static int maxLifePoints                  = 10;
+    public static int maxLifePoints                  = 5;
 
 }
