@@ -106,19 +106,21 @@ public class RPStreaming implements Runnable{
                     
                 }
 
-                for (InetAddress activeLink : streamActiveLinks) {
-                    //System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
-                    //                   " com seq#: " + sup.getSequenceNumber());
-                    socket.send(new Sup(
-                            Packet.getCurrTime(),
-                            sup.getFrameNumber(),
-                            sup.getSequenceNumber(),
-                            sup.getStreamId(),
-                            activeLink,
-                            Define.streamingPort,
-                            sup.getPayloadSize(),
-                            sup.getPayload()
-                        ).toDatagramPacket());
+                synchronized(streamActiveLinks) {
+                    for (InetAddress activeLink : streamActiveLinks) {
+                        //System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
+                        //                   " com seq#: " + sup.getSequenceNumber());
+                        socket.send(new Sup(
+                                Packet.getCurrTime(),
+                                sup.getFrameNumber(),
+                                sup.getSequenceNumber(),
+                                sup.getStreamId(),
+                                activeLink,
+                                Define.streamingPort,
+                                sup.getPayloadSize(),
+                                sup.getPayload()
+                            ).toDatagramPacket());
+                    }
                 }
             }
         } catch (IOException | PacketSizeException e) {
