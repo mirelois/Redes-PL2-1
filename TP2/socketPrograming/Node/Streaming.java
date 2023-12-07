@@ -80,8 +80,8 @@ public class Streaming implements Runnable {
                     streamInfo = neighbourInfo.streamIdToStreamInfo.get(sup.getStreamId());
                 }
 
-                //System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequenceNumber() + 
-                //                   " Frame#: " + sup.getFrameNumber());
+                System.out.println("Recebido SUP de " + sup.getAddress() + "\n  Seq#: " + sup.getSequenceNumber() + 
+                                   " Frame#: " + sup.getFrameNumber());
 
                 checkLinkActivation(new NeighbourInfo.Node(sup.getAddress(), 0), streamInfo);
 
@@ -144,7 +144,7 @@ public class Streaming implements Runnable {
 
                 
                 if (bestMetrics < (0.85 * currentMetrics)) { // Mandar latencia melhor se isto fizer
-                    System.out.println("\nMelhor: " + bestMetrics +
+                    /*System.out.println("\nMelhor: " + bestMetrics +
                                        " do server " + this.neighbourInfo.minNodeQueue.peek().address.getHostName() +
                                        ": " + this.neighbourInfo.minNodeQueue.peek().jitter +
                                        " , " + this.neighbourInfo.minNodeQueue.peek().latency +
@@ -156,7 +156,7 @@ public class Streaming implements Runnable {
                                            ": " + streamInfo.connected.jitter +
                                            " , " + streamInfo.connected.latency +
                                            " , " + streamInfo.connected.lossRate);
-                    }
+                    }*/
 
                     NodeConnectionManager.updateBestNode(neighbourInfo, streamInfo, socket);
                     streamInfo.connectingLock.lock();

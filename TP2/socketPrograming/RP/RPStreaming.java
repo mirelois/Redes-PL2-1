@@ -120,7 +120,7 @@ public class RPStreaming implements Runnable{
 
                 Set<InetAddress> streamActiveLinks;
                 
-                System.out.println("\nMelhor: " + bestMetrics +
+                /*System.out.println("\nMelhor: " + bestMetrics +
                                        " do server " + streamInfo.minServerQueue.peek().address.getHostName() +
                                        ": " + streamInfo.minServerQueue.peek().jitter +
                                        " , " + streamInfo.minServerQueue.peek().latency +
@@ -132,7 +132,7 @@ public class RPStreaming implements Runnable{
                                         ": " + streamInfo.connected.jitter +
                                         " , " + streamInfo.connected.latency +
                                         " , " + streamInfo.connected.lossRate);
-                }
+                }*/
 
                 synchronized (this.neighbourInfo) {
                     
@@ -143,7 +143,7 @@ public class RPStreaming implements Runnable{
                 synchronized(streamActiveLinks) {
                     for (InetAddress activeLink : streamActiveLinks) {
                         synchronized(activeLink) {
-                            //System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
+                        //System.out.println("Enviada stream " + sup.getStreamId() + " para: " + activeLink +
                         //                   " com seq#: " + sup.getSequenceNumber());
                         socket.send(new Sup(
                                 Packet.getCurrTime(),
