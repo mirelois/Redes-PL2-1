@@ -181,18 +181,6 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
                         } finally {
                             streamInfo.disconnectingDeprecatedLock.unlock();
                         }
-                        
-                        Set<ServerInfo.StreamInfo.Server> removeSet = new HashSet<>();
-                        streamInfo.connecting = streamInfo.minServerQueue.peek(); // this operation has complexity O(1)
-                        while (streamInfo.connecting != null && 
-                            neighbourInfo.streamActiveLinks.get(streamInfo.streamId).contains(streamInfo.minServerQueue.peek().address)) {
-                                removeSet.add(streamInfo.connecting);
-                                streamInfo.minServerQueue.remove(streamInfo.connecting);
-                                streamInfo.connecting = streamInfo.minServerQueue.peek();
-                        }
-                        for (ServerInfo.StreamInfo.Server server : removeSet) {
-                            streamInfo.minServerQueue.add(server);
-                        }
                         if (streamInfo.connecting != null) {
                             System.out.println("Alterado connecting para " + streamInfo.connecting.address.getHostName());
                             streamInfo.connectingEmpty.signal();
@@ -242,7 +230,7 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
                                 streamInfo.disconnectingDeprecatedLock.lock();
                                 try {
                                     if (streamInfo.connecting != null && streamInfo.connecting.address.equals(server.address)) {
-                                        if (streamInfo.connected != null) {
+                                        if (streamInfo.connected != null && !streamInfo.connected.equals(streamInfo.connecting)) {
                                             streamInfo.disconnecting.add(streamInfo.connected);
                                             streamInfo.disconnectingDeprecatedEmpty.signal();
                                         }
