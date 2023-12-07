@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import Protocols.Link;
 import SharedStructures.Define;
+import SharedStructures.NeighbourInfo;
 import SharedStructures.ServerInfo;
 
 public class RPServerConectionManager implements Runnable { // TODO: ver concorrencia e meter synchronized para ai
@@ -29,10 +30,21 @@ public class RPServerConectionManager implements Runnable { // TODO: ver concorr
 
     }
 
-    public static void updateBestServer(ServerInfo.StreamInfo streamInfo, DatagramSocket socket)
+    public static void updateBestServer(ServerInfo.StreamInfo streamInfo, NeighbourInfo neighbourInfo, DatagramSocket socket)
             throws UnknownHostException { // TODO: currently this is never called stfu
 
         Integer streamId = streamInfo.streamId;
+
+        synchronized (streamInfo.minServerQueue) {
+            System.out.println("Current Priority Queue: ");
+            for (ServerInfo.StreamInfo.Server server : streamInfo.minServerQueue) {
+                System.out.println(server.address.getHostName() + ":" + server.getMetrics());
+            }
+        }
+
+        if (neighbourInfo.streamActiveLinks.get(streamInfo.streamId).isEmpty()) {
+            return;
+        }
 
         if (streamInfo.connected != null) {
             streamInfo.updateLatency(streamInfo.connected);// bestServerLatency is the latency of the current best
