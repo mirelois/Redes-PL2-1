@@ -82,9 +82,17 @@ public class Idle implements Runnable {
 
                             } else {
                                 System.out.println("Matar por falta de idle: " + address);
-                                this.neighbourInfo.neighBoursLifePoints.remove(address);
-                                this.neighbourInfo.rpAdjacent.remove(address);
-                                this.neighbourInfo.minNodeQueue.remove(new NeighbourInfo.Node(address, 0));
+                                synchronized(this.neighbourInfo) {
+                                    synchronized(this.neighbourInfo.neighBoursLifePoints) {
+                                        this.neighbourInfo.neighBoursLifePoints.remove(address);
+                                    }
+                                    synchronized(this.neighbourInfo.rpAdjacent) {
+                                        this.neighbourInfo.rpAdjacent.remove(address);  
+                                    }
+                                    synchronized(this.neighbourInfo.minNodeQueue) {
+                                        this.neighbourInfo.minNodeQueue.remove(new NeighbourInfo.Node(address, 0));
+                                    }
+                                }
                             }
                         }
                         }
