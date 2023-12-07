@@ -144,7 +144,6 @@ public class Streaming implements Runnable {
 
                 
                 if (bestMetrics < (0.85 * currentMetrics)) { // Mandar latencia melhor se isto fizer
-                    
                     System.out.println("\nMelhor: " + bestMetrics +
                                        " do server " + this.neighbourInfo.minNodeQueue.peek().address.getHostName() +
                                        ": " + this.neighbourInfo.minNodeQueue.peek().jitter +

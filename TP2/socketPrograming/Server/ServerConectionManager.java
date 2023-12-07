@@ -152,7 +152,7 @@ public class ServerConectionManager implements Runnable {
                     if (serverSenderMap.get(link.getStreamId()).isAlive()){
     
                         serverSenderMap.get(link.getStreamId()).interrupt();
-                        
+                        serverSenderMap.remove(link.getStreamId());
                     }
                     System.out.println("Enviado Link de " + link.getAddress() + " da stream " + link.getStreamId() + 
                                    " do tipo activate: " + false);
