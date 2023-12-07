@@ -46,6 +46,14 @@ public class Idle implements Runnable {
                         //Colecionar num conjunto todos os adjacentes em uso
                         //Enviar para os adjacentes que não estão em uso
                         // diminuir vida aos ajdacentes que foram enviados mensagens
+                        int timeStampToSend = Packet.getCurrTime();
+                        synchronized (this.neighbourInfo.minNodeQueue) {
+                            if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
+                                timeStampToSend = Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000);
+                                System.out.println("    Enviado timestamp: " + timeStampToSend);
+                            }
+                        }
+
                         synchronized (this.neighbourInfo.neighBoursLifePoints){
                         Set<InetAddress> aux = new HashSet<>(this.neighbourInfo.neighBoursLifePoints.keySet());
                         for (InetAddress address : aux) {
@@ -56,7 +64,7 @@ public class Idle implements Runnable {
                                     socket.send(new ITP(address.equals(this.rpIp),
                                             true,
                                             false,
-                                            Packet.getCurrTime(),
+                                            timeStampToSend,
                                             address,
                                             Define.idlePort,
                                             0,
@@ -80,7 +88,7 @@ public class Idle implements Runnable {
                                         socket.send(new ITP(false,
                                                             true,
                                                             false,
-                                                            Packet.getCurrTime(),
+                                                            timeStampToSend,
                                                             streamInfo.connected.address,
                                                             Define.idlePort,
                                                             0,
@@ -96,7 +104,7 @@ public class Idle implements Runnable {
                                             socket.send(new ITP(false,
                                                                 true,
                                                                 false,
-                                                                Packet.getCurrTime(),
+                                                                timeStampToSend,
                                                                 disco.address,
                                                                 Define.idlePort,
                                                                 0,
@@ -106,7 +114,7 @@ public class Idle implements Runnable {
                                             socket.send(new ITP(false,
                                                                 true,
                                                                 false,
-                                                                Packet.getCurrTime(),
+                                                                timeStampToSend,
                                                                 depre.address,
                                                                 Define.idlePort,
                                                                 0,
@@ -150,37 +158,30 @@ public class Idle implements Runnable {
                         }
                     }
                 }
-                
+
+                if(this.isRP && itp.isServer){
+                    for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
+                        streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
+                    }
+                } else if (this.neighbourInfo.rpAdjacent.contains(itp.getAddress())) {
+                    this.neighbourInfo.updateLatency(new NeighbourInfo.Node(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
+                }
+
                 if (!itp.isAck) {
+                    int timeStampToSend = itp.getTimeStamp();
                     synchronized (this.neighbourInfo.minNodeQueue) {
                         if (this.neighbourInfo.isConnectedToRP == 1 && this.neighbourInfo.minNodeQueue.peek() != null) {
-                            System.out.println("    Enviado timestamp: " + Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000));
-                            socket.send(new ITP(false,
-                                true,
-                                true,
-                                Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000),
-                                itp.getAddress(),
-                                itp.getPort(),
-                                itp.getPayloadSize(),
-                                itp.getPayload()).toDatagramPacket());
-                        } else {
-                            socket.send(new ITP(false,
+                            timeStampToSend = Math.floorMod(Packet.getCurrTime() - this.neighbourInfo.minNodeQueue.peek().latency, 60000);
+                            System.out.println("    Enviado timestamp: " + timeStampToSend);
+                        }
+                        socket.send(new ITP(false,
                             true,
                             true,
-                            itp.getTimeStamp(),
+                            timeStampToSend,
                             itp.getAddress(),
                             itp.getPort(),
                             itp.getPayloadSize(),
                             itp.getPayload()).toDatagramPacket());
-                        }
-                    }
-    
-                    if(this.isRP && itp.isServer){
-                        for (ServerInfo.StreamInfo streamInfo : serverInfo.streamInfoMap.values()) {
-                            streamInfo.updateLatency(new ServerInfo.StreamInfo.Server(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
-                        }
-                    } else if (this.neighbourInfo.rpAdjacent.contains(itp.getAddress())) {
-                        this.neighbourInfo.updateLatency(new NeighbourInfo.Node(itp.getAddress(), Packet.getLatency(itp.timeStamp)));
                     }
                 }
             }
